@@ -14,7 +14,7 @@ A minecraft plugin for Sponge platforms.
 This plugin is licensed under [GNU License](https://github.com/EverCraft/EverPermissions/blob/master/LICENSE).
 
 ## Prerequisites ##
-* [Java](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 8
+* [Java](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 ## Clone ##
 The following steps will ensure your project is cloned properly
