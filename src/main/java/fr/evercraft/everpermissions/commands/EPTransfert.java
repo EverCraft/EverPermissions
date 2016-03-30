@@ -41,7 +41,7 @@ import com.google.common.reflect.TypeToken;
 
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.data.EPConfUsers;
@@ -135,14 +135,14 @@ public class EPTransfert extends ECommand<EverPermissions> {
 
 	public Text getButtonConfirmationSQL(){
 		return this.plugin.getMessages().getText("TRANSFERT_SQL_CONFIRMATION_VALID").toBuilder()
-					.onHover(TextActions.showText(UtilsChat.of(this.plugin.getMessages().getMessage("TRANSFERT_SQL_CONFIRMATION_VALID_HOVER"))))
+					.onHover(TextActions.showText(EChat.of(this.plugin.getMessages().getMessage("TRANSFERT_SQL_CONFIRMATION_VALID_HOVER"))))
 					.onClick(TextActions.runCommand("/permtransfer sql confirmation"))
 					.build();
 	}
 	
 	public Text getButtonConfirmationConf(){
 		return this.plugin.getMessages().getText("TRANSFERT_CONF_CONFIRMATION_VALID").toBuilder()
-					.onHover(TextActions.showText(UtilsChat.of(this.plugin.getMessages().getMessage("TRANSFERT_CONF_CONFIRMATION_VALID_HOVER"))))
+					.onHover(TextActions.showText(EChat.of(this.plugin.getMessages().getMessage("TRANSFERT_CONF_CONFIRMATION_VALID_HOVER"))))
 					.onClick(TextActions.runCommand("/permtransfer conf confirmation"))
 					.build();
 	}

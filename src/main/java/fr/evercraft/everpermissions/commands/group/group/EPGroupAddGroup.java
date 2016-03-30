@@ -28,7 +28,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 
@@ -94,23 +94,23 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 			if(group == null || !group.hasWorld(type_group.get())) {
 				// Le groupe a bien été ajouté
 				if(this.plugin.getService().getGroupSubjects().register(group_name, type_group.get())) {
-					player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_GROUP_STAFF")
+					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_GROUP_STAFF")
 							.replaceAll("<group>", group_name)
 							.replaceAll("<type>", type_group.get())));
 					return true;
 				// Le groupe n'a pas été ajouté
 				} else {
-					player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
+					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
 				}
 			// Groupe existant
 			} else {
-				player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_GROUP_ERROR")
+				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_GROUP_ERROR")
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

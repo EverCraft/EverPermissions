@@ -33,7 +33,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
@@ -93,7 +93,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// On connait le monde
 		} else if(args.size() == 3) {
@@ -103,7 +103,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 				resultat = command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -123,7 +123,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 				EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
 				// Joueur existant
 				if(subject != null) {
-					Set<Context> contexts = EContextCalculator.getContextWorld(type_user.get());
+					Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
 					Optional<Subject> parent = subject.getSubjectData().getParent(contexts);
 					// Le groupe du joueur est différent du nouveau groupe
 					if(!(parent.isPresent() && parent.get().equals(group))) {
@@ -132,19 +132,19 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 							// Le groupe a bien changé
 							if(user.getSubjectData().addParent(contexts, group)) {
 								if(staff.equals(user)) {
-									staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_EQUALS")
+									staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_EQUALS")
 											.replaceAll("<player>", user.getName())
 											.replaceAll("<group>", group.getIdentifier())
 											.replaceAll("<type>", type_user.get())));
 								} else {
-									staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_STAFF")
+									staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_STAFF")
 											.replaceAll("<player>", user.getName())
 											.replaceAll("<group>", group.getIdentifier())
 											.replaceAll("<type>", type_user.get())));
 									// Le joueur est connecté
 									Optional<Player> player = user.getPlayer();
 									if(player.isPresent()) {
-										player.get().sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_PLAYER")
+										player.get().sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_PLAYER")
 												.replaceAll("<staff>", staff.getName())
 												.replaceAll("<group>", group.getIdentifier())
 												.replaceAll("<type>", type_user.get())));
@@ -153,17 +153,17 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 								return true;
 							// Le groupe n'a pas été changé
 							} else {
-								staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
+								staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
 							}
 						// Le groupe est inférieur au groupe actuelle du joueur
 						} else {
 							if(staff.equals(user)) {
-								staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_ERROR_PROMOTE_EQUALS")
+								staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_ERROR_PROMOTE_EQUALS")
 										.replaceAll("<player>", user.getName())
 										.replaceAll("<group>", group.getIdentifier())
 										.replaceAll("<type>", type_user.get())));
 							} else {
-								staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_ERROR_PROMOTE_STAFF")
+								staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_ERROR_PROMOTE_STAFF")
 										.replaceAll("<player>", user.getName())
 										.replaceAll("<group>", group.getIdentifier())
 										.replaceAll("<type>", type_user.get())));
@@ -172,12 +172,12 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 					// Le groupe du joueur est égale au nouveau groupe
 					} else {
 						if(staff.equals(user)) {
-							staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_ERROR_EQUALS")
+							staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_ERROR_EQUALS")
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<type>", type_user.get())));
 						} else {
-							staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_ERROR_STAFF")
+							staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEMOTE_ERROR_STAFF")
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<type>", type_user.get())));
@@ -185,17 +185,17 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 					}
 				// Le joueur n'existe pas dans le service de permissions
 				} else {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 				}
 			// Le groupe est introuvable
 			} else {
-				staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_user.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

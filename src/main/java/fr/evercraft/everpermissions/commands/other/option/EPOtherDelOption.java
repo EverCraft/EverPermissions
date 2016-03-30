@@ -30,7 +30,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
@@ -82,7 +82,7 @@ public class EPOtherDelOption extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -94,13 +94,13 @@ public class EPOtherDelOption extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final EOtherSubject subject, final String option) {
 		// L'option a bien été supprimé
 		if(subject.getSubjectData().setOption(new HashSet<Context>(), option, null)) {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_OPTION_PLAYER")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_OPTION_PLAYER")
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<option>", option)));
 			return true;
 		// L'option n'a pas été supprimé
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_OPTION_ERROR")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_OPTION_ERROR")
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<option>", option)));
 		}

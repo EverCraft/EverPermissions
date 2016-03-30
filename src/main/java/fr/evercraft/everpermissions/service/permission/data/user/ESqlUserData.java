@@ -71,6 +71,7 @@ public class ESqlUserData implements IUserData {
 			}
 		} catch (SQLException e) {
 			this.plugin.getLogger().warn("Permissions error when loading : " + e.getMessage());
+			e.printStackTrace();
 		} finally {
 			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
@@ -90,7 +91,7 @@ public class ESqlUserData implements IUserData {
 				this.plugin.getLogger().debug("Loading : ("
 						+ "identifier=" + subject.getIdentifier() + ";"
 						+ "option=" + list.getString("option") + ";"
-						+ "value=" + list.getBoolean("value") + ";"
+						+ "value=" + list.getString("value") + ";"
 						+ "type=" + list.getString("world") + ")");
 			}
 		} catch (SQLException e) {
@@ -271,42 +272,42 @@ public class ESqlUserData implements IUserData {
     	return true;
     }
     
-    public void setOptionAsync(final String subject, final String world, final String type, final String name, final boolean insert) {
+    public void setOptionAsync(final String subject, final String world, final String option, final String value, final boolean insert) {
     	Connection connection = null;
     	PreparedStatement preparedStatement = null;
     	try {
     		connection = this.plugin.getManagerData().getDataBases().getConnection();
-        	if(name == null) {
+        	if(value == null) {
         		String query = 	  "DELETE " 
 			    				+ "FROM `" + this.plugin.getManagerData().getDataBases().getTableUsersOptions() + "` "
-			    				+ "WHERE `uuid` = ? AND `world` = ? AND `type` = ? ;";
+			    				+ "WHERE `uuid` = ? AND `world` = ? AND `option` = ? ;";
 				preparedStatement = connection.prepareStatement(query);
 				preparedStatement.setString(1, subject);
 				preparedStatement.setString(2, world);
-				preparedStatement.setString(3, type);
+				preparedStatement.setString(3, option);
 				
-				this.plugin.getLogger().debug("Remove from database : (identifier='" + subject + "';option='" + type + "';type='" + world + "')");
+				this.plugin.getLogger().debug("Remove from database : (identifier='" + subject + "';option='" + option + "';world='" + world + "')");
         	} else if(insert) {
         		String query = 	  "INSERT INTO `" + this.plugin.getManagerData().getDataBases().getTableUsersOptions() + "` "
 			    				+ "VALUES (?, ?, ?, ?);";
 				preparedStatement = connection.prepareStatement(query);
 				preparedStatement.setString(1, subject);
 				preparedStatement.setString(2, world);
-				preparedStatement.setString(3, type);
-				preparedStatement.setString(4, name);
+				preparedStatement.setString(3, option);
+				preparedStatement.setString(4, value);
 				
-				this.plugin.getLogger().debug("Adding to the database : (identifier='" + subject + "';option='" + type + "';value='" + name + "';type='" + world + "')");
+				this.plugin.getLogger().debug("Adding to the database : (identifier='" + subject + "';option='" + option + "';value='" + value + "';world='" + world + "')");
         	} else {
         		String query = 	  "UPDATE `" + this.plugin.getManagerData().getDataBases().getTableUsersOptions() + "` "
-        						+ "SET `name` = ? "
-        						+ "WHERE `uuid` = ? AND `world` = ? AND `type` = ? ;";
+        						+ "SET `value` = ? "
+        						+ "WHERE `uuid` = ? AND `world` = ? AND `option` = ? ;";
 				preparedStatement = connection.prepareStatement(query);
-				preparedStatement.setString(1, name);
+				preparedStatement.setString(1, value);
 				preparedStatement.setString(2, subject);
 				preparedStatement.setString(3, world);
-				preparedStatement.setString(4, type);
+				preparedStatement.setString(4, option);
 				
-				this.plugin.getLogger().debug("Updating the database : (identifier='" + subject + "';option='" + type + "';value='" + name + "';type='" + world + "')");
+				this.plugin.getLogger().debug("Updating the database : (identifier='" + subject + "';option='" + option + "';value='" + value + "';world='" + world + "')");
         	}
         	preparedStatement.execute();
         } catch (SQLException e) {

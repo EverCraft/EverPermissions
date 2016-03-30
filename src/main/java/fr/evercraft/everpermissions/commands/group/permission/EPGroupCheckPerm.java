@@ -30,7 +30,7 @@ import org.spongepowered.api.util.Tristate;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
@@ -103,32 +103,32 @@ public class EPGroupCheckPerm extends ECommand<EverPermissions> {
 				Tristate value = group.getPermissionValue(EContextCalculator.getContextWorld(type_group.get()), permission);
 				// Permission : True
 				if(value.equals(Tristate.TRUE)) {
-					player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_CHECK_PERMISSION_TRUE")
+					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_CHECK_PERMISSION_TRUE")
 							.replaceAll("<group>", group.getIdentifier())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_group.get())));
 				// Permission : False
 				} else if(value.equals(Tristate.FALSE)) {
-					player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_CHECK_PERMISSION_FALSE")
+					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_CHECK_PERMISSION_FALSE")
 							.replaceAll("<group>", group.getIdentifier())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_group.get())));
 				// Permission : Undefined
 				} else {
-					player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_CHECK_PERMISSION_UNDEFINED")
+					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_CHECK_PERMISSION_UNDEFINED")
 							.replaceAll("<group>", group.getIdentifier())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_group.get())));
 				}
 			// Le groupe est introuvable
 			} else {
-				player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

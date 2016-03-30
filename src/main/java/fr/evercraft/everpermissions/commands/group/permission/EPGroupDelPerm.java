@@ -30,7 +30,7 @@ import org.spongepowered.api.util.Tristate;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
@@ -103,27 +103,27 @@ public class EPGroupDelPerm extends ECommand<EverPermissions> {
 			if(group != null && group.hasWorld(type_group.get())) {
 				// La permission a bien été supprimé
 				if(group.getSubjectData().setPermission(EContextCalculator.getContextWorld(type_group.get()), permission, Tristate.UNDEFINED)) {
-					player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEL_PERMISSION_STAFF")
+					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEL_PERMISSION_STAFF")
 							.replaceAll("<group>", group.getIdentifier())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_group.get())));
 					return true;
 				// La permission n'a pas été supprimé
 				} else {
-					player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEL_PERMISSION_ERROR")
+					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEL_PERMISSION_ERROR")
 							.replaceAll("<group>", group.getIdentifier())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_group.get())));
 				}
 			// Le groupe est introuvable
 			} else {
-				player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

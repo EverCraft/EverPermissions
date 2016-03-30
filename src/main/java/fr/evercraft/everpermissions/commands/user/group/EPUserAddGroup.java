@@ -31,7 +31,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
@@ -90,7 +90,7 @@ public class EPUserAddGroup extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// On connais le monde
 		} else if(args.size() == 3) {
@@ -100,7 +100,7 @@ public class EPUserAddGroup extends ECommand<EverPermissions> {
 				resultat = command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -118,20 +118,20 @@ public class EPUserAddGroup extends ECommand<EverPermissions> {
 			// Groupe existant
 			if(group != null && group.hasWorld(type_group.get())) {
 				// Le groupe a bien été ajouté
-				if(user.getSubjectData().addParent(EContextCalculator.getContextWorld(type_user.get()), group)) {
+				if(user.getSubjectData().addParent(EContextCalculator.getContextWorld(world_name), group)) {
 					if(staff.equals(user)) {
-						staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_GROUP_EQUALS")
+						staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_GROUP_EQUALS")
 								.replaceAll("<player>", user.getName())
 								.replaceAll("<group>", group.getIdentifier())
 								.replaceAll("<type>", type_user.get())));
 					} else {
-						staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_GROUP_STAFF")
+						staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_GROUP_STAFF")
 								.replaceAll("<player>", user.getName())
 								.replaceAll("<group>", group.getIdentifier())
 								.replaceAll("<type>", type_user.get())));
 						Optional<Player> player = user.getPlayer();
 						if(player.isPresent()) {
-							player.get().sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_GROUP_PLAYER")
+							player.get().sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_GROUP_PLAYER")
 									.replaceAll("<staff>", staff.getName())
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<type>", type_user.get())));
@@ -141,12 +141,12 @@ public class EPUserAddGroup extends ECommand<EverPermissions> {
 				// Le groupe n'a pas été ajouté
 				} else {
 					if(staff.equals(user)) {
-						staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_GROUP_ERROR_EQUALS")
+						staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_GROUP_ERROR_EQUALS")
 								.replaceAll("<player>", user.getName())
 								.replaceAll("<group>", group.getIdentifier())
 								.replaceAll("<type>", type_user.get())));
 					} else {
-						staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_GROUP_ERROR_STAFF")
+						staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_GROUP_ERROR_STAFF")
 								.replaceAll("<player>", user.getName())
 								.replaceAll("<group>", group.getIdentifier())
 								.replaceAll("<type>", type_user.get())));
@@ -154,13 +154,13 @@ public class EPUserAddGroup extends ECommand<EverPermissions> {
 				}
 			// Le groupe est introuvable
 			} else {
-				staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_user.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

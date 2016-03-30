@@ -33,7 +33,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
@@ -83,7 +83,7 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get());
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -104,10 +104,10 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 			list.add(this.plugin.getMessages().getText("OTHER_LIST_PERMISSION_PERMISSION"));
 			for(Entry<String, Boolean> permission : permissions.entrySet()) {
 				if(permission.getValue()) {
-					list.add(UtilsChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_PERMISSION_LINE_TRUE")
+					list.add(EChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_PERMISSION_LINE_TRUE")
 							.replaceAll("<permission>", permission.getKey())));
 				} else {
-					list.add(UtilsChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_PERMISSION_LINE_FALSE")
+					list.add(EChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_PERMISSION_LINE_FALSE")
 							.replaceAll("<permission>", permission.getKey())));
 				}
 			}
@@ -119,16 +119,16 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 			list.add(this.plugin.getMessages().getText("OTHER_LIST_PERMISSION_TRANSIENT"));
 			for(Entry<String, Boolean> permission : permissions.entrySet()) {
 				if(permission.getValue()) {
-					list.add(UtilsChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_TRANSIENT_LINE_TRUE")
+					list.add(EChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_TRANSIENT_LINE_TRUE")
 							.replaceAll("<permission>", permission.getKey())));
 				} else {
-					list.add(UtilsChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_TRANSIENT_LINE_FALSE")
+					list.add(EChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_TRANSIENT_LINE_FALSE")
 							.replaceAll("<permission>", permission.getKey())));
 				}
 			}
 		}
 		
-		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(UtilsChat.of(
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
 				this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_TITLE")
 				.replaceAll("<subject>", subject.getIdentifier())), 
 				list, staff);

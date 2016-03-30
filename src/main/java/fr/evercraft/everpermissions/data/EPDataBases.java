@@ -57,7 +57,7 @@ public class EPDataBases extends EDataBase<EverPermissions> {
 							"`uuid` varchar(36) NOT NULL," +
 							"`world` varchar(36) NOT NULL," +
 							"`option` varchar(50) NOT NULL," +
-							"`value` varchar(50) NOT NULL," +
+							"`value` varchar(100) NOT NULL," +
 							"PRIMARY KEY (`uuid`, `world`, `option`));";
 		initTable(this.getTableUsersOptions(), spawns);		
 		return true;

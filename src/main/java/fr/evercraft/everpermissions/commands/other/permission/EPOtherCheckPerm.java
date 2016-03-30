@@ -28,7 +28,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
@@ -79,7 +79,7 @@ public class EPOtherCheckPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -91,12 +91,12 @@ public class EPOtherCheckPerm extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final Subject subject, final String permission) {
 		// Permission : True
 		if(subject.hasPermission(permission)) {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHERS_CHECK_PERMISSION_TRUE")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHERS_CHECK_PERMISSION_TRUE")
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<permission>", permission)));
 		// Permission : False
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHERS_CHECK_PERMISSION_FALSE")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHERS_CHECK_PERMISSION_FALSE")
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<permission>", permission)));
 		}

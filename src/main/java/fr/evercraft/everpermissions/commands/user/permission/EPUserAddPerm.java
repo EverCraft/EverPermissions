@@ -31,7 +31,7 @@ import org.spongepowered.api.util.Tristate;
 import fr.evercraft.everapi.java.UtilsBoolean;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 
@@ -91,7 +91,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// On connais le joueur
 		} else if(args.size() == 4) {
@@ -101,7 +101,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optPlayer.get(), args.get(1), args.get(2), args.get(3));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -118,16 +118,16 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 			// La value est un boolean
 			if(value.isPresent()) {
 				// La permission a bien été ajouté
-				if(user.getSubjectData().setPermission(EContextCalculator.getContextWorld(type_user.get()), permission, Tristate.fromBoolean(value.get()))) {
+				if(user.getSubjectData().setPermission(EContextCalculator.getContextWorld(world_name), permission, Tristate.fromBoolean(value.get()))) {
 					// Permission : True
 					if(value.get()) {
 						if(staff.equals(user)) {
-							staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_TRUE_EQUALS")
+							staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_TRUE_EQUALS")
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
 						} else {
-							staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_TRUE_STAFF")
+							staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_TRUE_STAFF")
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
@@ -135,12 +135,12 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 					// Permission : False
 					} else {
 						if(staff.equals(user)) {
-							staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_FALSE_EQUALS")
+							staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_FALSE_EQUALS")
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
 						} else {
-							staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_FALSE_STAFF")
+							staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_FALSE_STAFF")
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
@@ -152,12 +152,12 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 					// Permission : True
 					if(value.get()) {
 						if(staff.equals(user)) {
-							staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_TRUE_ERROR_EQUALS")
+							staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_TRUE_ERROR_EQUALS")
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
 						} else {
-							staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_TRUE_ERROR_STAFF")
+							staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_TRUE_ERROR_STAFF")
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
@@ -165,12 +165,12 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 					// Permission : False
 					} else {
 						if(staff.equals(user)) {
-							staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_FALSE_ERROR_EQUALS")
+							staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_FALSE_ERROR_EQUALS")
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
 						} else {
-							staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_FALSE_ERROR_STAFF")
+							staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_ADD_PERMISSION_FALSE_ERROR_STAFF")
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
@@ -179,11 +179,11 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 				}
 			// La value n'est pas un boolean
 			} else {
-				staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("ERROR_BOOLEAN")));
+				staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("ERROR_BOOLEAN")));
 			}
 		// Le monde est introuvable
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

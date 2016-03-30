@@ -29,7 +29,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 
@@ -97,26 +97,26 @@ public class EPGroupListGroup extends ECommand<EverPermissions> {
 				// Le groupe par défaut
 				Optional<EGroupSubject> subject = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
 				if(subject.isPresent()) {
-					list.add(UtilsChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_GROUP_DEFAULT")
+					list.add(EChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_GROUP_DEFAULT")
 							.replaceAll("<group>", subject.get().getIdentifier())));
 				}
 				
 				// La liste des groupes
 				list.add(this.plugin.getMessages().getText("GROUP_LIST_GROUP_NAME"));
 				for (EGroupSubject group : groups) {
-					list.add(UtilsChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_GROUP_LINE")
+					list.add(EChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_GROUP_LINE")
 							.replaceAll("<group>", group.getIdentifier())));
 				}
 			}
 			
-			this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(UtilsChat.of(
+			this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
 					this.plugin.getMessages().getMessage("GROUP_LIST_GROUP_TITLE")
 					.replaceAll("<type>", type_group.get())), 
 					list, player);
 			return true;
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

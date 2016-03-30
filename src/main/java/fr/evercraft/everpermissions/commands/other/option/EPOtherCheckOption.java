@@ -30,7 +30,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
@@ -83,7 +83,7 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get(), args.get(1));
 			// Le subject est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -101,13 +101,13 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 						.replaceAll("<subject>", subject.getIdentifier())
 						.replaceAll("<option>", type))
 					.replace("<value>", Text.builder(name)
-						.color(UtilsChat.getTextColor(this.plugin.getMessages().getMessage("OTHER_CHECK_OPTION_DEFINED_NAME_COLOR")))
+						.color(EChat.getTextColor(this.plugin.getMessages().getMessage("OTHER_CHECK_OPTION_DEFINED_NAME_COLOR")))
 						.build())
 					.build());
 			return true;
 		// Il n'y a pas de valeur
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_CHECK_OPTION_UNDEFINED")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_CHECK_OPTION_UNDEFINED")
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<option>", type)));
 		}

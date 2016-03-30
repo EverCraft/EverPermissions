@@ -33,7 +33,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
@@ -82,7 +82,7 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get());
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -105,7 +105,7 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 				list.add(ETextBuilder.toBuilder(this.plugin.getMessages().getMessage("OTHER_LIST_OPTION_OPTION_LINE")
 							.replaceAll("<option>", permission.getKey()))
 						.replace("<value>", Text.builder(permission.getValue())
-							.color(UtilsChat.getTextColor(this.plugin.getMessages().getMessage("OTHER_LIST_OPTION_OPTION_NAME_COLOR")))
+							.color(EChat.getTextColor(this.plugin.getMessages().getMessage("OTHER_LIST_OPTION_OPTION_NAME_COLOR")))
 							.build())
 						.build());
 			}
@@ -119,13 +119,13 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 				list.add(ETextBuilder.toBuilder(this.plugin.getMessages().getMessage("OTHER_LIST_OPTION_TRANSIENT_LINE")
 							.replaceAll("<option>", permission.getKey()))
 						.replace("<value>", Text.builder(permission.getValue())
-							.color(UtilsChat.getTextColor(this.plugin.getMessages().getMessage("OTHER_LIST_OPTION_TRANSIENT_NAME_COLOR")))
+							.color(EChat.getTextColor(this.plugin.getMessages().getMessage("OTHER_LIST_OPTION_TRANSIENT_NAME_COLOR")))
 							.build())
 						.build());
 			}
 		}
 		
-		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(UtilsChat.of(
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
 				this.plugin.getMessages().getMessage("OTHER_LIST_OPTION_TITLE")
 				.replaceAll("<subject>", subject.getIdentifier())), 
 				list, staff);

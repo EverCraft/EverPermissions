@@ -29,7 +29,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
@@ -88,7 +88,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// On connais le monde
 		} else if(args.size() == 3) {
@@ -98,7 +98,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 				resultat = command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -125,7 +125,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 								.replaceAll("<option>", type)
 								.replaceAll("<type>", type_user.get()))
 							.replace("<value>", Text.builder(name.get())
-								.color(UtilsChat.getTextColor(this.plugin.getMessages().getMessage("USER_CHECK_OPTION_DEFINED_EQUALS_NAME_COLOR")))
+								.color(EChat.getTextColor(this.plugin.getMessages().getMessage("USER_CHECK_OPTION_DEFINED_EQUALS_NAME_COLOR")))
 								.build())
 							.build());
 					// La source et le joueur ne sont pas identique
@@ -136,7 +136,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 									.replaceAll("<option>", type)
 									.replaceAll("<type>", type_user.get()))
 								.replace("<value>", Text.builder(name.get())
-									.color(UtilsChat.getTextColor(this.plugin.getMessages().getMessage("USER_CHECK_OPTION_DEFINED_STAFF_NAME_COLOR")))
+									.color(EChat.getTextColor(this.plugin.getMessages().getMessage("USER_CHECK_OPTION_DEFINED_STAFF_NAME_COLOR")))
 									.build())
 								.build());
 					}
@@ -145,13 +145,13 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 				} else {
 					// La source et le joueur sont identique
 					if(staff.equals(user)) {
-						staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_OPTION_UNDEFINED_EQUALS")
+						staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_OPTION_UNDEFINED_EQUALS")
 								.replaceAll("<player>", user.getName())
 								.replaceAll("<option>", type)
 								.replaceAll("<type>", type_user.get())));
 					// La source et le joueur ne sont pas identique
 					} else {
-						staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_OPTION_UNDEFINED_STAFF")
+						staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_OPTION_UNDEFINED_STAFF")
 								.replaceAll("<player>", user.getName())
 								.replaceAll("<option>", type)
 								.replaceAll("<type>", type_user.get())));
@@ -159,11 +159,11 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 				}
 			// Le joueur n'existe pas dans le service de permissions
 			} else {
-				staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// Le monde est introuvable
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

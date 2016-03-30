@@ -30,7 +30,7 @@ import org.spongepowered.api.util.Tristate;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 
@@ -86,7 +86,7 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// On connais le joueur
 		} else if(args.size() == 3) {
@@ -96,7 +96,7 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -114,13 +114,13 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			if(value.equals(Tristate.TRUE)) {
 				// La source et le joueur sont identique
 				if(staff.equals(user)) {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_TRUE_EQUALS")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_TRUE_EQUALS")
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
 				// La source et le joueur ne sont pas identique
 				} else {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_TRUE_STAFF")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_TRUE_STAFF")
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
@@ -129,13 +129,13 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			} else if(value.equals(Tristate.FALSE)) {
 				// La source et le joueur sont identique
 				if(staff.equals(user)) {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_FALSE_EQUALS")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_FALSE_EQUALS")
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
 				// La source et le joueur ne sont pas identique
 				} else {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_FALSE_STAFF")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_FALSE_STAFF")
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
@@ -144,13 +144,13 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			} else {
 				// La source et le joueur sont identique
 				if(staff.equals(user)) {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_UNDEFINED_EQUALS")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_UNDEFINED_EQUALS")
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
 				// La source et le joueur ne sont pas identique
 				} else {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_UNDEFINED_STAFF")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_CHECK_PERMISSION_UNDEFINED_STAFF")
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
@@ -158,7 +158,7 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			}
 		// Le monde est introuvable
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

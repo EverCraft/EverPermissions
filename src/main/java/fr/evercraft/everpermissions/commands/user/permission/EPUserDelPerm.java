@@ -30,7 +30,7 @@ import org.spongepowered.api.util.Tristate;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 
@@ -86,7 +86,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// On connais le joueur
 		} else if(args.size() == 3) {
@@ -96,7 +96,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -110,14 +110,14 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 		// Monde existant
 		if(type_user.isPresent()) {
 			// La permission a bien été supprimé
-			if(user.getSubjectData().setPermission(EContextCalculator.getContextWorld(type_user.get()), permission, Tristate.UNDEFINED)) {
+			if(user.getSubjectData().setPermission(EContextCalculator.getContextWorld(world_name), permission, Tristate.UNDEFINED)) {
 				if(staff.equals(user)) {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_EQUALS")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_EQUALS")
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
 				} else {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_STAFF")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_STAFF")
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
@@ -126,12 +126,12 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 			// La permission n'a pas été supprimé
 			} else {
 				if(staff.equals(user)) {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_ERROR_EQUALS")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_ERROR_EQUALS")
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
 				} else {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_ERROR_STAFF")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_ERROR_STAFF")
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
@@ -139,7 +139,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 			}
 		// Le monde est introuvable
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

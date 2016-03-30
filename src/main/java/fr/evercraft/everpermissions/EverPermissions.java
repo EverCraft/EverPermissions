@@ -35,7 +35,8 @@ import fr.evercraft.everpermissions.service.EPermissionService;
 		url = "http://evercraft.fr/",
 		authors = {"rexbut"},
 		dependencies = {
-		    @Dependency(id = "fr.evercraft.everapi", version = "1.0")
+		    @Dependency(id = "fr.evercraft.everapi", version = "1.0"),
+		    @Dependency(id = "fr.evercraft.everchat", optional = true)
 		})
 public class EverPermissions extends EPlugin {
 	private EPConfig config;

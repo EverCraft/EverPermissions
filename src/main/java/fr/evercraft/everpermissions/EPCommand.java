@@ -28,7 +28,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 
 public class EPCommand extends ECommand<EverPermissions> {
 	public EPCommand(final EverPermissions plugin) {
@@ -37,7 +37,7 @@ public class EPCommand extends ECommand<EverPermissions> {
 	
 	@Override
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getName());
+		return source.hasPermission(this.plugin.getPermissions().get("EVERPERMISSIONS"));
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class EPCommand extends ECommand<EverPermissions> {
 			} else if(args.get(0).equalsIgnoreCase("reload")) {
 				if(source.hasPermission(this.plugin.getPermissions().get("RELOAD"))) {
 					this.plugin.reload();
-					source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("RELOAD_COMMAND")));
+					source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("RELOAD_COMMAND")));
 				} else {
 					source.sendMessage(this.plugin.getPermissions().noPermission());
 				}

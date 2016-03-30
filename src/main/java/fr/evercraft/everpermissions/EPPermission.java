@@ -27,6 +27,7 @@ public class EPPermission extends EPermission {
 
 	@Override
 	protected void load() {
+		add("EVERPERMISSIONS", "command");
 		add("HELP", "help");
 		add("RELOAD", "reload");
 		

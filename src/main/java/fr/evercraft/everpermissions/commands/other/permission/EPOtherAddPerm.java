@@ -32,7 +32,7 @@ import org.spongepowered.api.util.Tristate;
 
 import fr.evercraft.everapi.java.UtilsBoolean;
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
@@ -87,7 +87,7 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -104,12 +104,12 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 			if(subject.getSubjectData().setPermission(new HashSet<Context>(), permission, Tristate.fromBoolean(value.get()))) {
 				// Permission : True
 				if(value.get()) {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_TRUE")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_TRUE")
 							.replaceAll("<subject>", subject.getIdentifier())
 							.replaceAll("<permission>", permission)));
 				// Permission : False
 				} else {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_FALSE")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_FALSE")
 							.replaceAll("<subject>", subject.getIdentifier())
 							.replaceAll("<permission>", permission)));
 				}
@@ -118,19 +118,19 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 			} else {
 				// Permission : True
 				if(value.get()) {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_ERROR_TRUE")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_ERROR_TRUE")
 							.replaceAll("<subject>", subject.getIdentifier())
 							.replaceAll("<permission>", permission)));
 				// Permission : False
 				} else {
-					staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_ERROR_FALSE")
+					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_ERROR_FALSE")
 							.replaceAll("<subject>", subject.getIdentifier())
 							.replaceAll("<permission>", permission)));
 				}
 			}
 		// La value n'est pas un boolean
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("ERROR_BOOLEAN")));
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("ERROR_BOOLEAN")));
 		}
 		return false;
 	}

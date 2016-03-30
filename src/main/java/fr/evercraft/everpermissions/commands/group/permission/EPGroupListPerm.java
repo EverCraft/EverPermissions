@@ -33,7 +33,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
@@ -112,10 +112,10 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 					list.add(this.plugin.getMessages().getText("GROUP_LIST_PERMISSION_PERMISSION"));
 					for(Entry<String, Boolean> permission : permissions.entrySet()) {
 						if(permission.getValue()) {
-							list.add(UtilsChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_PERMISSION_PERMISSION_LINE_TRUE")
+							list.add(EChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_PERMISSION_PERMISSION_LINE_TRUE")
 									.replaceAll("<permission>", permission.getKey())));
 						} else {
-							list.add(UtilsChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_PERMISSION_PERMISSION_LINE_FALSE")
+							list.add(EChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_PERMISSION_PERMISSION_LINE_FALSE")
 									.replaceAll("<permission>", permission.getKey())));
 						}
 					}
@@ -127,16 +127,16 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 					list.add(this.plugin.getMessages().getText("GROUP_LIST_PERMISSION_TRANSIENT"));
 					for(Entry<String, Boolean> permission : permissions.entrySet()) {
 						if(permission.getValue()) {
-							list.add(UtilsChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_PERMISSION_TRANSIENT_LINE_TRUE")
+							list.add(EChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_PERMISSION_TRANSIENT_LINE_TRUE")
 									.replaceAll("<permission>", permission.getKey())));
 						} else {
-							list.add(UtilsChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_PERMISSION_TRANSIENT_LINE_FALSE")
+							list.add(EChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_PERMISSION_TRANSIENT_LINE_FALSE")
 									.replaceAll("<permission>", permission.getKey())));
 						}
 					}
 				}
 				
-				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(UtilsChat.of(
+				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
 						this.plugin.getMessages().getMessage("GROUP_LIST_PERMISSION_TITLE")
 						.replaceAll("<group>", group.getIdentifier())
 						.replaceAll("<type>", type_group.get())), 
@@ -144,13 +144,13 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 				return true;
 			// Le groupe est introuvable
 			} else {
-				player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

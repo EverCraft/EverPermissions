@@ -30,7 +30,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
@@ -85,7 +85,7 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get(), args.get(1), args.get(2));
 			// Le subject est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -103,13 +103,13 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 						.replaceAll("<subject>", subject.getIdentifier())
 						.replaceAll("<option>", option))
 					.replace("<value>", Text.builder(value)
-						.color(UtilsChat.getTextColor(this.plugin.getMessages().getMessage("OTHER_ADD_OPTION_NAME_COLOR")))
+						.color(EChat.getTextColor(this.plugin.getMessages().getMessage("OTHER_ADD_OPTION_NAME_COLOR")))
 						.build())
 					.build());
 			return true;
 		// L'option n'a pas été ajouté
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
 		}
 		return false;
 	}

@@ -33,7 +33,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
@@ -114,7 +114,7 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 						list.add(ETextBuilder.toBuilder(this.plugin.getMessages().getMessage("GROUP_LIST_OPTION_OPTION_LINE")
 									.replaceAll("<option>", permission.getKey()))
 								.replace("<value>", Text.builder(permission.getValue())
-									.color(UtilsChat.getTextColor(this.plugin.getMessages().getMessage("GROUP_LIST_OPTION_OPTION_NAME_COLOR")))
+									.color(EChat.getTextColor(this.plugin.getMessages().getMessage("GROUP_LIST_OPTION_OPTION_NAME_COLOR")))
 									.build())
 								.build());
 					}
@@ -128,13 +128,13 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 						list.add(ETextBuilder.toBuilder(this.plugin.getMessages().getMessage("GROUP_LIST_OPTION_TRANSIENT_LINE")
 									.replaceAll("<option>", permission.getKey()))
 								.replace("<value>", Text.builder(permission.getValue())
-									.color(UtilsChat.getTextColor(this.plugin.getMessages().getMessage("GROUP_LIST_OPTION_TRANSIENT_NAME_COLOR")))
+									.color(EChat.getTextColor(this.plugin.getMessages().getMessage("GROUP_LIST_OPTION_TRANSIENT_NAME_COLOR")))
 									.build())
 								.build());
 					}
 				}
 				
-				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(UtilsChat.of(
+				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
 						this.plugin.getMessages().getMessage("GROUP_LIST_OPTION_TITLE")
 						.replaceAll("<player>", player.getName())
 						.replaceAll("<type>", type_group.get())), 
@@ -142,13 +142,13 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 				return true;
 			// Le groupe est introuvable
 			} else {
-				player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

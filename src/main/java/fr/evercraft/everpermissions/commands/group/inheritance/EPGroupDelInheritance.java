@@ -31,7 +31,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
@@ -111,33 +111,33 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 					Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
 					// L'inheritance a bien été supprimé
 					if(group.getSubjectData().removeParent(contexts, inheritance)) {
-						player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEL_INHERITANCE_STAFF")
+						player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEL_INHERITANCE_STAFF")
 								.replaceAll("<inheritance>", inheritance.getIdentifier())
 								.replaceAll("<group>", group.getIdentifier())
 								.replaceAll("<type>", type_group.get())));
 						return true;
 					// L'inheritance n'a pas été supprimé
 					} else {
-						player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEL_INHERITANCE_ERROR")
+						player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEL_INHERITANCE_ERROR")
 								.replaceAll("<inheritance>", inheritance.getIdentifier())
 								.replaceAll("<group>", group.getIdentifier())
 								.replaceAll("<type>", type_group.get())));
 					}
 				// L'inheritance est introuvable
 				} else {
-					player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND_WORLD")
+					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND_WORLD")
 							.replaceAll("<inheritance>", inheritance_name)
 							.replaceAll("<type>", type_group.get())));
 				}
 			// Le groupe est introuvable
 			} else {
-				player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

@@ -31,7 +31,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
@@ -82,7 +82,7 @@ public class EPOtherDelPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -94,13 +94,13 @@ public class EPOtherDelPerm extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final Subject subject, final String permission) {
 		// La permission a bien été supprimé
 		if(subject.getSubjectData().setPermission(new HashSet<Context>(), permission, Tristate.UNDEFINED)) {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_PERMISSION_PLAYER")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_PERMISSION_PLAYER")
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<permission>", permission)));
 			return true;
 		// La permission n'a pas été supprimé
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_PERMISSION_ERROR")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_PERMISSION_ERROR")
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<permission>", permission)));
 		}

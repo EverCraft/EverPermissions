@@ -32,7 +32,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
@@ -86,7 +86,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// On connait le monde
 		} else if(args.size() == 2) {
@@ -96,7 +96,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 				resultat = command(source, optPlayer.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -110,7 +110,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		this.plugin.getLogger().warn("Debug : typeuser" + type_user.get());
 		// Monde existant
 		if(type_user.isPresent()) {
-			Set<Context> contexts = EContextCalculator.getContextWorld(type_user.get());
+			Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
 			EUserSubject user = this.plugin.getService().getUserSubjects().get(player.getIdentifier());
 			// Joueur existant
 			if(user != null) {
@@ -119,7 +119,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 				// Le groupe
 				Optional<Subject> group = user.getSubjectData().getParent(contexts);
 				if(group.isPresent()) {
-					list.add(UtilsChat.of(this.plugin.getMessages().getMessage("USER_LIST_GROUP_GROUP").replaceAll("<group>", group.get().getIdentifier())));
+					list.add(EChat.of(this.plugin.getMessages().getMessage("USER_LIST_GROUP_GROUP").replaceAll("<group>", group.get().getIdentifier())));
 				} else {
 					list.add(this.plugin.getMessages().getText("USER_LIST_GROUP_GROUP_EMPTY"));
 				}
@@ -131,7 +131,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 				} else {
 					list.add(this.plugin.getMessages().getText("USER_LIST_GROUP_SUBGROUP"));
 					for(Subject subject : groups) {
-						list.add(UtilsChat.of(this.plugin.getMessages().getMessage("USER_LIST_GROUP_SUBGROUP_LINE").replaceAll("<group>", subject.getIdentifier())));
+						list.add(EChat.of(this.plugin.getMessages().getMessage("USER_LIST_GROUP_SUBGROUP_LINE").replaceAll("<group>", subject.getIdentifier())));
 					}
 				}
 				
@@ -140,11 +140,11 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 				if(!groups.isEmpty()) {
 					list.add(this.plugin.getMessages().getText("USER_LIST_GROUP_TRANSIENT"));
 					for(Subject subject : groups) {
-						list.add(UtilsChat.of(this.plugin.getMessages().getMessage("USER_LIST_GROUP_TRANSIENT_LINE").replaceAll("<group>", subject.getIdentifier())));
+						list.add(EChat.of(this.plugin.getMessages().getMessage("USER_LIST_GROUP_TRANSIENT_LINE").replaceAll("<group>", subject.getIdentifier())));
 					}
 				}
 				
-				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(UtilsChat.of(
+				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
 						this.plugin.getMessages().getMessage("USER_LIST_GROUP_TITLE")
 						.replaceAll("<player>", player.getName())
 						.replaceAll("<type>", type_user.get())), 
@@ -152,11 +152,11 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 				return true;
 			// Le joueur n'existe pas dans le service de permissions
 			} else {
-				staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
+				staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
 			}
 		// Le monde est introuvable
 		} else {
-			staff.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

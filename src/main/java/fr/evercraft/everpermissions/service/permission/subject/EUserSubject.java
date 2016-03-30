@@ -90,10 +90,10 @@ public class EUserSubject extends ESubject {
 	
     public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {
 		Set<Context> contexts_user = this.plugin.getService().getContextCalculator().getContextUser(contexts);
-		this.plugin.getLogger().debug("TEST : (identifier=" + this.identifier + "permission=" + permission + ")");
 		// TempoData : Permissions
 		Tristate value = this.getTransientSubjectData().getNodeTree(contexts_user).get(permission);
 		if(!value.equals(Tristate.UNDEFINED)) {
+			this.plugin.getLogger().debug("TransientSubjectData 'Permissions' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
 			return value;
 		}
     	
@@ -103,6 +103,7 @@ public class EUserSubject extends ESubject {
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts_group, permission);
     		if(!value.equals(Tristate.UNDEFINED)) {
+    			this.plugin.getLogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
@@ -110,26 +111,30 @@ public class EUserSubject extends ESubject {
     	// SubjectData : Permissions
     	value = this.getSubjectData().getNodeTree(contexts_user).getTristate(permission);
 		if(!value.equals(Tristate.UNDEFINED)) {
+			this.plugin.getLogger().debug("SubjectData 'Permissions' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
 			return value;
 		}
     	
     	// SubjectData : SubGroup
-    	subjects = this.getSubjectData().getSubParents(contexts_user).iterator();
+    	subjects = this.getSubjectData().getSubParentsContexts(contexts_user).iterator();
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts_group, permission);
     		if(!value.equals(Tristate.UNDEFINED)) {
+    			this.plugin.getLogger().debug("SubjectData 'SubGroup' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
     	
     	// SubjectData : Groups
-    	subjects = this.getSubjectData().getParents(contexts_user).iterator();
+    	subjects = this.getSubjectData().getParentsContexts(contexts_user).iterator();
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts_group, permission);
     		if(!value.equals(Tristate.UNDEFINED)) {
+    			this.plugin.getLogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
+    	this.plugin.getLogger().debug("SubjectData '' : (identifier='" + this.identifier + "';permission='" + permission + "';value='UNDEFINED')");
         return Tristate.UNDEFINED;
     }
     
@@ -158,13 +163,13 @@ public class EUserSubject extends ESubject {
     	}
     	
     	// SubjectData : Permissions
-    	value = this.getSubjectData().getOptions(contexts_user).get(option);
+    	value = this.getSubjectData().getOptionsContexts(contexts_user).get(option);
     	if(value != null) {
 			return Optional.of(value);
 		}
     	
     	// SubjectData : Groups
-    	subjects = this.getSubjectData().getParents(contexts_user).iterator();
+    	subjects = this.getSubjectData().getParentsContexts(contexts_user).iterator();
     	while(subjects.hasNext()) {
     		optValue = ((ESubject) subjects.next()).getOption(contexts_group, option);
     		if(optValue.isPresent()) {

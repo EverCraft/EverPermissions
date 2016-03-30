@@ -30,7 +30,7 @@ import org.spongepowered.api.text.format.TextColors;
 import fr.evercraft.everapi.java.UtilsBoolean;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 
@@ -105,7 +105,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 					if(value.get()) {
 						// Le groupe a bien été mit par défaut
 						if(this.plugin.getService().getGroupSubjects().registerDefault(group, type_group.get())) {
-							player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_TRUE")
+							player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_TRUE")
 									.replaceAll("<group>", group_name)
 									.replaceAll("<type>", type_group.get())));
 							this.plugin.getService().getUserSubjects().reload();
@@ -115,12 +115,12 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 							Optional<EGroupSubject> group_default = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
 							// C'est déjà le groupe par défaut
 							if(group_default.isPresent() && group_default.get().equals(group)) {
-								player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_ERROR_EQUALS")
+								player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_ERROR_EQUALS")
 										.replaceAll("<group>", group_name)
 										.replaceAll("<type>", type_group.get())));
 							// Il y a déja un autre groupe par défaut
 							} else {
-								player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_ERROR_TRUE")
+								player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_ERROR_TRUE")
 										.replaceAll("<group>", group_name)
 										.replaceAll("<type>", type_group.get())));
 							}
@@ -128,31 +128,31 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 					} else {
 						// Le groupe n'est plus un groupe par défaut
 						if(this.plugin.getService().getGroupSubjects().removeDefault(group, type_group.get())) {
-							player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_FALSE")
+							player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_FALSE")
 									.replaceAll("<group>", group_name)
 									.replaceAll("<type>", type_group.get())));
 							this.plugin.getService().getUserSubjects().reload();
 							return true;
 						// Le groupe n'a pas un groupe par défaut
 						} else {
-							player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_ERROR_FALSE")
+							player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_ERROR_FALSE")
 									.replaceAll("<group>", group_name)
 									.replaceAll("<type>", type_group.get())));
 						}
 					}
 				// La value n'est pas un boolean
 				} else {
-					player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_ERROR_BOOLEAN")));
+					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_DEFAULT_GROUP_ERROR_BOOLEAN")));
 				}
 			// Le groupe est introuvable
 			} else {
-				player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

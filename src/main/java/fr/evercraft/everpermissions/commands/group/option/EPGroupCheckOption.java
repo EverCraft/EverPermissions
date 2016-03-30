@@ -31,7 +31,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.sponge.UtilsChat;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
@@ -114,26 +114,26 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 								.replaceAll("<option>", option)
 								.replaceAll("<type>", type_group.get()))
 							.replace("<value>", Text.builder(name)
-								.color(UtilsChat.getTextColor(this.plugin.getMessages().getMessage("GROUP_CHECK_OPTION_DEFINED_NAME_COLOR")))
+								.color(EChat.getTextColor(this.plugin.getMessages().getMessage("GROUP_CHECK_OPTION_DEFINED_NAME_COLOR")))
 								.build())
 							.build());
 					return true;
 				// Il n'y a pas de valeur
 				} else {
-					player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_CHECK_OPTION_UNDEFINED")
+					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_CHECK_OPTION_UNDEFINED")
 							.replaceAll("<group>", group.getIdentifier())
 							.replaceAll("<option>", option)
 							.replaceAll("<type>", type_group.get())));
 				}
 			// Le groupe est introuvable
 			} else {
-				player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(UtilsChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

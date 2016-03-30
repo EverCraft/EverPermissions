@@ -42,8 +42,8 @@ public class EPMessage extends EMessage {
 																"&cYou must specify the name of the world.");
 		
 		// Commands :		
-		addDefault("commands.transfert.description",			"Transfère les données des joueurs.",
-																"Transfers the data of the players.");
+		addDefault("commands.transfert.description",			"Transfère les données des joueurs",
+																"Transfers the data of the players");
 		addDefault("commands.transfert.sqlConfirmation", 		"&7Souhaitez-vous vraiment transférer les données des joueurs dans une base de données &6SQL&7 ? <confirmation>");
 		addDefault("commands.transfert.sqlConfirmationValid", 	"&2&nConfirmer");
 		addDefault("commands.transfert.sqlConfirmationValidHover", "&cCliquez ici pour réaliser le transfert");
@@ -270,20 +270,20 @@ public class EPMessage extends EMessage {
 		addDefault("group.permission.list.transientLine.false", "        &7&l●  &7<permission> : False");
 		
 		// Group : Option
-		addDefault("group.option.add.description", 				"Ajoute une option à un joueur");
+		addDefault("group.option.add.description", 				"Ajoute une option à un groupe");
 		addDefault("group.option.add.staff", 					"&7Le groupe &6<group> &7possède désormais l'option '&6<option>&7' avec la valeur '&6<value>&7' dans les mondes de type &6<type>&7.");
 		addDefault("group.option.add.staffNameColor", 			"&6");
 		
-		addDefault("group.option.del.description", 				"Supprime une option à un joueur");
+		addDefault("group.option.del.description", 				"Supprime une option à un groupe");
 		addDefault("group.option.del.staff", 					"&7Le groupe &6<group> &7ne possède plus l'option '&6<option>&7' dans les mondes de type &6<type>&7.");
 		addDefault("group.option.del.error", 					"&cErreur : &cLe groupe &6<group> &cne possède pas l'option '&6<option>&c' dans les mondes de type &6<type>&c.");
 		
-		addDefault("group.option.check.description", 			"Vérifie si un groupe a une permission");
+		addDefault("group.option.check.description", 			"Vérifie si un groupe a une option");
 		addDefault("group.option.check.define", 				"&7Le groupe &6<group> &7possède l'option '&6<option>&7' avec la valeur '&6<value>&7' dans les mondes de type &6<type>&7.");
 		addDefault("group.option.check.defineNameColor", 		"&6");
 		addDefault("group.option.check.undefined", 				"&7Le groupe &6<group> &7ne possède pas l'option '&6<option>&7' dans les mondes de type &6<type>&7.");
 		
-		addDefault("group.option.list.description", 			"Affiche la liste des permissions d'un groupe");
+		addDefault("group.option.list.description", 			"Affiche la liste des options d'un groupe");
 		addDefault("group.option.list.title", 					"&aLes options de &6<group> &a: &6<type>");
 		addDefault("group.option.list.option", 					"    &6&l➤  Options : ");
 		addDefault("group.option.list.optionLine",				"        &7&l●  &7<option> : &7'<value>&7'");
@@ -330,12 +330,12 @@ public class EPMessage extends EMessage {
 		addDefault("other.option.del.player", 					"&6<subject> &7ne possède plus l'option '&6<option>&7'.");
 		addDefault("other.option.del.error", 					"&cErreur : &6<subject> &cne possède pas l'option '&6<option>&c'.");
 		
-		addDefault("other.option.check.description", 			"Vérifie si un Subject a une permission");
+		addDefault("other.option.check.description", 			"Vérifie si un Subject a une option");
 		addDefault("other.option.check.define", 				"&6<subject> &7possède l'option '&6<option>&7' avec la valeur '&6<value>&7'.");
 		addDefault("other.option.check.defineNameColor", 		"&7");
 		addDefault("other.option.check.undefined", 				"&6<subject> &7ne possède pas l'option '&6<option>&7'.");
 		
-		addDefault("other.option.list.description", 			"Affiche la liste des permissions d'un Subject");
+		addDefault("other.option.list.description", 			"Affiche la liste des options d'un Subject");
 		addDefault("other.option.list.title", 					"&aLes options de &6<subject>");
 		addDefault("other.option.list.option", 					"    &6&l➤  Options : ");
 		addDefault("other.option.list.optionLine", 				"        &7&l●  &7<option> : &7'<value>&7'");
