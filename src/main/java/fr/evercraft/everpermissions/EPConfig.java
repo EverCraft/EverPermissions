@@ -29,7 +29,6 @@ public class EPConfig extends EConfig {
 	
 	public void reload() {
 		super.reload();
-		
 		this.plugin.getLogger().setDebug(this.isDebug());
 	}
 	
