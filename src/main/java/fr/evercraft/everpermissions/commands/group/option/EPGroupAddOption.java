@@ -99,7 +99,6 @@ public class EPGroupAddOption extends ECommand<EverPermissions> {
 	}
 	
 	private boolean command(final CommandSource player, final String group_name, final String option, String value, final String world_name) {
-		value = value.replaceAll("_", " ");
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde existant
 		if(type_group.isPresent()) {

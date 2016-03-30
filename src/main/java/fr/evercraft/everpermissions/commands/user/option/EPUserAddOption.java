@@ -111,7 +111,6 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 	}
 	
 	private boolean command(final CommandSource staff, final User user, final String type, String name, final String world_name) {
-		name = name.replaceAll("_", " ");
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
 		if(type_user.isPresent()) {

@@ -95,7 +95,6 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 	}
 	
 	private boolean command(final CommandSource staff, final EOtherSubject subject, final String option, String value) {
-		value = value.replaceAll("_", " ");
 		// L'option a bien été ajouté
 		if(subject.getSubjectData().setOption(new HashSet<Context>(), option, value)) {
 			staff.sendMessage(ETextBuilder.toBuilder(this.plugin.getMessages().getText("PREFIX"))
