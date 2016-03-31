@@ -42,6 +42,8 @@ public class EPConfUsers extends EConfig {
 			
 			options.put("prefix", "&c");
 			options.put("suffix", "");
+			options.put("hover", "&7Ping : &a<PING>&7 ms[RT]&7Connecté depuis : &a<LAST_DATE_PLAYED>");
+			options.put("suggest", "/msg <NAME> ");
 			
 			// Rexbut
 			addDefault("86f8f95b-e5e6-45c4-bf85-4d64dbd0903f.permissions", permissions);

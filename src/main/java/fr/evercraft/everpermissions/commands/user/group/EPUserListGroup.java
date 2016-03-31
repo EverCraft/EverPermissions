@@ -107,7 +107,6 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 	
 	private boolean command(final CommandSource staff, final User player, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
-		this.plugin.getLogger().warn("Debug : typeuser" + type_user.get());
 		// Monde existant
 		if(type_user.isPresent()) {
 			Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
