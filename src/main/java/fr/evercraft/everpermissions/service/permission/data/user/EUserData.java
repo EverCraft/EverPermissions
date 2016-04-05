@@ -226,7 +226,6 @@ public class EUserData extends EOptionSubjectData {
     
     @Override
     public boolean addParent(Set<Context> contexts, final Subject parent) {
-    	this.plugin.getLogger().warn("addParent");
     	contexts = this.plugin.getService().getContextCalculator().getContextUser(contexts);
     	return addParentContexts(contexts, parent);
     }
