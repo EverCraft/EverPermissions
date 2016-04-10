@@ -4,7 +4,7 @@ EverPermissions
 A minecraft plugin for Sponge platforms.
 
 ## Links ##
-* [Source](https://github.com/EverCraft/EverPermissions)
+* [Download](https://github.com/EverCraft/EverPermissions/releases)
 * [Wiki](http://wiki.evercraft.fr)
 * [Issues](https://github.com/EverCraft/EverPermissions/issues)
 * [Website](http://evercraft.fr)
