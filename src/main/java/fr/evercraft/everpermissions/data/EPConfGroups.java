@@ -37,6 +37,8 @@ public class EPConfGroups extends EConfig {
 			Map<String, String> options = new HashMap<String, String>();
 			
 			// Default
+			permissions.put("everchat.icon", true);
+			
 			permissions.put("evereconomy.help", true);
 			permissions.put("evereconomy.pay", true);
 			permissions.put("evereconomy.balance", true);
@@ -75,6 +77,10 @@ public class EPConfGroups extends EConfig {
 			permissions.clear();
 			options.clear();
 			
+			permissions.put("everchat.chat", true);
+			permissions.put("everchat.format", true);
+			permissions.put("everchat.magic", true);
+			
 			permissions.put("everessentials.jump", true);
 			permissions.put("everessentials.kick", true);
 			permissions.put("everessentials.weather", true);
@@ -97,6 +103,7 @@ public class EPConfGroups extends EConfig {
 			permissions.put("everessentials.back", true);
 			permissions.put("everessentials.broadcast", true);
 			
+			permissions.put("evermails.use", true);
 			
 			options.put("prefix", "&2");
 			options.put("suffix", "");
@@ -111,8 +118,10 @@ public class EPConfGroups extends EConfig {
 			options.clear();
 			
 			permissions.put("everapi", true);
+			permissions.put("everchat", true);
 			permissions.put("everessentials", true);
 			permissions.put("evereconomy", true);
+			permissions.put("evermails", true);
 			permissions.put("everpermissions", true);
 			permissions.put("minecraft", true);
 			permissions.put("sponge", true);
