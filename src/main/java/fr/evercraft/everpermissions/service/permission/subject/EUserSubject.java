@@ -16,9 +16,11 @@
  */
 package fr.evercraft.everpermissions.service.permission.subject;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -29,6 +31,8 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
+
+import com.google.common.base.Preconditions;
 
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
@@ -185,5 +189,19 @@ public class EUserSubject extends ESubject {
 		this.transientData.clearPermissions();
 		this.transientData.clearOptions();
 		this.transientData.clearParents();
+    }
+	
+	 /*
+     * Groupes
+     */
+    
+    @Override
+    public List<Subject> getParents(final Set<Context> contexts) {
+    	Preconditions.checkNotNull(contexts, "contexts");
+    	List<Subject> list = new ArrayList<Subject>();
+    	list.addAll(this.getTransientSubjectData().getParents(contexts));
+    	list.addAll(this.getSubjectData().getParents(contexts));
+    	list.addAll(this.getSubjectData().getSubParents(contexts));
+        return list;
     }
 }
