@@ -35,8 +35,13 @@ public class EPConfOthers extends EConfig {
 			Map<String, String> options = new HashMap<String, String>();
 
 			permissions.put("everapi", true);
-			permissions.put("evereconomy", true);
+			permissions.put("everchat", true);
 			permissions.put("everessentials", true);
+			permissions.put("evereconomy", true);
+			permissions.put("evermails", true);
+			permissions.put("everpermissions", true);
+			permissions.put("minecraft", true);
+			permissions.put("sponge", true);
 			
 			options.put("prefix", "&e");
 			options.put("suffix", "");
@@ -46,6 +51,8 @@ public class EPConfOthers extends EConfig {
 			addDefault("Server.options", options);
 			
 			// CommandBlock
+			permissions.put("everessentials.kick", false);
+			permissions.put("everessentials.stop", false);
 			addDefault("CommandBlock.permissions", permissions);
 			addDefault("CommandBlock.options", options);
 		}

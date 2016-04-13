@@ -199,9 +199,9 @@ public class EUserSubject extends ESubject {
     public List<Subject> getParents(final Set<Context> contexts) {
     	Preconditions.checkNotNull(contexts, "contexts");
     	List<Subject> list = new ArrayList<Subject>();
-    	list.addAll(this.getTransientSubjectData().getParents(contexts));
     	list.addAll(this.getSubjectData().getParents(contexts));
     	list.addAll(this.getSubjectData().getSubParents(contexts));
+    	list.addAll(this.getTransientSubjectData().getParents(contexts));
         return list;
     }
 }
