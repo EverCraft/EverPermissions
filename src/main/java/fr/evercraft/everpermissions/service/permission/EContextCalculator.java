@@ -23,10 +23,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.world.Locatable;
 
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -45,8 +45,8 @@ public class EContextCalculator implements ContextCalculator<Subject> {
     	Optional<CommandSource> subjSource = subject.getCommandSource();
         if (subjSource.isPresent()) {
             CommandSource source = subjSource.get();
-            if (source instanceof LocatedSource) {
-                accumulator.add(new Context(Context.WORLD_KEY, ((LocatedSource) source).getWorld().getName()));
+            if (source instanceof Locatable) {
+                accumulator.add(new Context(Context.WORLD_KEY, ((Locatable) source).getWorld().getName()));
             }
         }
     }
@@ -60,8 +60,8 @@ public class EContextCalculator implements ContextCalculator<Subject> {
 	    	Optional<CommandSource> subjSource = subject.getCommandSource();
 	        if (subjSource.isPresent()) {
 	            CommandSource source = subjSource.get();
-	            if (source instanceof LocatedSource) {
-	            	return context.getName().equals(((LocatedSource) source).getWorld().getName());
+	            if (source instanceof Locatable) {
+	            	return context.getName().equals(((Locatable) source).getWorld().getName());
 	            }
 	        }
     	}
