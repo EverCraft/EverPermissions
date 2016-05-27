@@ -28,9 +28,12 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 
@@ -41,17 +44,17 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("USER_DEL_PERMISSION"));
+		return source.hasPermission(EPPermissions.USER_DEL_PERMISSION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("USER_DEL_PERMISSION_DESCRIPTION");
+		return EPMessages.USER_DEL_PERMISSION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permudelp <" + this.plugin.getEverAPI().getMessages().getArg("player") + "> "
-									 + "<" + this.plugin.getEverAPI().getMessages().getArg("permission") + "> "
-									 + "[" + this.plugin.getEverAPI().getMessages().getArg("world") + "]")
+		return Text.builder("/permudelp <" + EAMessages.ARGS_PLAYER.get() + "> "
+									 + "<" + EAMessages.ARGS_PERMISSION.get() + "> "
+									 + "[" + EAMessages.ARGS_WORLD.get() + "]")
 					.onClick(TextActions.suggestCommand("/permudelp "))
 					.color(TextColors.RED)
 					.build();
@@ -86,7 +89,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// On connais le joueur
 		} else if(args.size() == 3) {
@@ -96,7 +99,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -112,12 +115,12 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 			// La permission a bien été supprimé
 			if(user.getSubjectData().setPermission(EContextCalculator.getContextWorld(world_name), permission, Tristate.UNDEFINED)) {
 				if(staff.equals(user)) {
-					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_EQUALS")
+					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_PERMISSION_EQUALS.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
 				} else {
-					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_STAFF")
+					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_PERMISSION_STAFF.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
@@ -126,12 +129,12 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 			// La permission n'a pas été supprimé
 			} else {
 				if(staff.equals(user)) {
-					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_ERROR_EQUALS")
+					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_PERMISSION_ERROR_EQUALS.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
 				} else {
-					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("USER_DEL_PERMISSION_ERROR_STAFF")
+					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_PERMISSION_ERROR_STAFF.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
 							.replaceAll("<type>", type_user.get())));
@@ -139,7 +142,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 			}
 		// Le monde est introuvable
 		} else {
-			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

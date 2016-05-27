@@ -30,9 +30,12 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
@@ -44,16 +47,16 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("USER_LIST_GROUP"));
+		return source.hasPermission(EPPermissions.USER_LIST_GROUP.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("USER_LIST_GROUP_DESCRIPTION");
+		return EPMessages.USER_LIST_GROUP_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permulist <" + this.plugin.getEverAPI().getMessages().getArg("player") + "> "
-									 + "[" + this.plugin.getEverAPI().getMessages().getArg("world") + "]")
+		return Text.builder("/permulist <" + EAMessages.ARGS_PLAYER.get() + "> "
+									 + "[" + EAMessages.ARGS_WORLD.get() + "]")
 					.onClick(TextActions.suggestCommand("/permulist "))
 					.color(TextColors.RED)
 					.build();
@@ -86,7 +89,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// On connait le monde
 		} else if(args.size() == 2) {
@@ -96,7 +99,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 				resultat = command(source, optPlayer.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -118,44 +121,44 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 				// Le groupe
 				Optional<Subject> group = user.getSubjectData().getParent(contexts);
 				if(group.isPresent()) {
-					list.add(EChat.of(this.plugin.getMessages().getMessage("USER_LIST_GROUP_GROUP").replaceAll("<group>", group.get().getIdentifier())));
+					list.add(EChat.of(EPMessages.USER_LIST_GROUP_GROUP.get().replaceAll("<group>", group.get().getIdentifier())));
 				} else {
-					list.add(this.plugin.getMessages().getText("USER_LIST_GROUP_GROUP_EMPTY"));
+					list.add(EPMessages.USER_LIST_GROUP_GROUP_EMPTY.getText());
 				}
 				
 				// Les sous-groupes
 				List<Subject> groups = user.getSubjectData().getSubParents(contexts);
 				if(groups.isEmpty()) {
-					list.add(this.plugin.getMessages().getText("USER_LIST_GROUP_SUBGROUP_EMPTY"));
+					list.add(EPMessages.USER_LIST_GROUP_SUBGROUP_EMPTY.getText());
 				} else {
-					list.add(this.plugin.getMessages().getText("USER_LIST_GROUP_SUBGROUP"));
+					list.add(EPMessages.USER_LIST_GROUP_SUBGROUP.getText());
 					for(Subject subject : groups) {
-						list.add(EChat.of(this.plugin.getMessages().getMessage("USER_LIST_GROUP_SUBGROUP_LINE").replaceAll("<group>", subject.getIdentifier())));
+						list.add(EChat.of(EPMessages.USER_LIST_GROUP_SUBGROUP_LINE.get().replaceAll("<group>", subject.getIdentifier())));
 					}
 				}
 				
 				// Les groupes temporaires
 				groups = user.getTransientSubjectData().getParents(contexts);
 				if(!groups.isEmpty()) {
-					list.add(this.plugin.getMessages().getText("USER_LIST_GROUP_TRANSIENT"));
+					list.add(EPMessages.USER_LIST_GROUP_TRANSIENT.getText());
 					for(Subject subject : groups) {
-						list.add(EChat.of(this.plugin.getMessages().getMessage("USER_LIST_GROUP_TRANSIENT_LINE").replaceAll("<group>", subject.getIdentifier())));
+						list.add(EChat.of(EPMessages.USER_LIST_GROUP_TRANSIENT_LINE.get().replaceAll("<group>", subject.getIdentifier())));
 					}
 				}
 				
 				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-						this.plugin.getMessages().getMessage("USER_LIST_GROUP_TITLE")
+						EPMessages.USER_LIST_GROUP_TITLE.get()
 						.replaceAll("<player>", player.getName())
 						.replaceAll("<type>", type_user.get())), 
 						list, staff);
 				return true;
 			// Le joueur n'existe pas dans le service de permissions
 			} else {
-				staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
+				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.COMMAND_ERROR.get()));
 			}
 		// Le monde est introuvable
 		} else {
-			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

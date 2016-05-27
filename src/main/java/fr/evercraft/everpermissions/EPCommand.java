@@ -30,6 +30,7 @@ import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
 
 public class EPCommand extends ECommand<EverPermissions> {
 	public EPCommand(final EverPermissions plugin) {
@@ -38,29 +39,29 @@ public class EPCommand extends ECommand<EverPermissions> {
 	
 	@Override
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("EVERPERMISSIONS"));
+		return source.hasPermission(EPPermissions.EVERPERMISSIONS.get());
 	}
 
 	@Override
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("DESCRIPTION");
+		return EPMessages.DESCRIPTION.getText();
 	}
 	
 	@Override
 	public Text help(final CommandSource source) {
 		Text help;
-		if(	source.hasPermission(this.plugin.getPermissions().get("HELP")) ||
-			source.hasPermission(this.plugin.getPermissions().get("RELOAD"))){
+		if(	source.hasPermission(EPPermissions.HELP.get()) ||
+			source.hasPermission(EPPermissions.RELOAD.get())){
 			Builder build = Text.builder("/everpermissions <");
 			
-			if(source.hasPermission(this.plugin.getPermissions().get("HELP"))){
+			if(source.hasPermission(EPPermissions.HELP.get())){
 				build = build.append(Text.builder("help").onClick(TextActions.suggestCommand("/everpermissions help")).build());
-				if(source.hasPermission(this.plugin.getPermissions().get("RELOAD"))){
+				if(source.hasPermission(EPPermissions.RELOAD.get())){
 					build = build.append(Text.builder("|").build());
 				}
 			}
 			
-			if(source.hasPermission(this.plugin.getPermissions().get("RELOAD"))){
+			if(source.hasPermission(EPPermissions.RELOAD.get())){
 				build = build.append(Text.builder("reload").onClick(TextActions.suggestCommand("/everpermissions reload")).build());
 			}
 			
@@ -77,10 +78,10 @@ public class EPCommand extends ECommand<EverPermissions> {
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
 		if(args.size() == 1){
-			if(source.hasPermission(this.plugin.getPermissions().get("HELP"))){
+			if(source.hasPermission(EPPermissions.HELP.get())){
 				suggests.add("help");
 			}
-			if(source.hasPermission(this.plugin.getPermissions().get("RELOAD"))){
+			if(source.hasPermission(EPPermissions.RELOAD.get())){
 				suggests.add("reload");
 			}
 		}
@@ -92,16 +93,16 @@ public class EPCommand extends ECommand<EverPermissions> {
 		if(args.size() == 1){
 			// Help
 			if(args.get(0).equalsIgnoreCase("help")) {
-				if(source.hasPermission(this.plugin.getPermissions().get("HELP"))) {					
+				if(source.hasPermission(EPPermissions.HELP.get())) {					
 					this.plugin.getEverAPI().getManagerService().getEPagination().helpCommand(this.plugin.getManagerCommands(), source, this.plugin);
 				} else {
 					source.sendMessage(EAMessages.NO_PERMISSION.getText());
 				}
 			// Reload
 			} else if(args.get(0).equalsIgnoreCase("reload")) {
-				if(source.hasPermission(this.plugin.getPermissions().get("RELOAD"))) {
+				if(source.hasPermission(EPPermissions.RELOAD.get())) {
 					this.plugin.reload();
-					source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("RELOAD_COMMAND")));
+					source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.RELOAD_COMMAND.get()));
 				} else {
 					source.sendMessage(EAMessages.NO_PERMISSION.getText());
 				}

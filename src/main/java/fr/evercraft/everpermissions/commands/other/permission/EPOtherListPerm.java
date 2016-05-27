@@ -32,8 +32,11 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
@@ -44,15 +47,15 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("OTHER_LIST_PERMISSION"));
+		return source.hasPermission(EPPermissions.OTHER_LIST_PERMISSION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("OTHER_LIST_PERMISSION_DESCRIPTION");
+		return EPMessages.OTHER_LIST_PERMISSION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permolistp <" + this.plugin.getEverAPI().getMessages().getArg("subject") + ">")
+		return Text.builder("/permolistp <" + EAMessages.ARGS_SUBJECT.get() + ">")
 					.onClick(TextActions.suggestCommand("/permolistp "))
 					.color(TextColors.RED)
 					.build();
@@ -83,7 +86,7 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get());
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -99,15 +102,15 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 		// La liste des permissions
 		Map<String, Boolean> permissions = subject.getSubjectData().getPermissions(contexts);
 		if(permissions.isEmpty()) {
-			list.add(this.plugin.getMessages().getText("OTHER_LIST_PERMISSION_PERMISSION_EMPTY"));
+			list.add(EPMessages.OTHER_LIST_PERMISSION_PERMISSION_EMPTY.getText());
 		} else {
-			list.add(this.plugin.getMessages().getText("OTHER_LIST_PERMISSION_PERMISSION"));
+			list.add(EPMessages.OTHER_LIST_PERMISSION_PERMISSION.getText());
 			for(Entry<String, Boolean> permission : permissions.entrySet()) {
 				if(permission.getValue()) {
-					list.add(EChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_PERMISSION_LINE_TRUE")
+					list.add(EChat.of(EPMessages.OTHER_LIST_PERMISSION_PERMISSION_LINE_TRUE.get()
 							.replaceAll("<permission>", permission.getKey())));
 				} else {
-					list.add(EChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_PERMISSION_LINE_FALSE")
+					list.add(EChat.of(EPMessages.OTHER_LIST_PERMISSION_PERMISSION_LINE_FALSE.get()
 							.replaceAll("<permission>", permission.getKey())));
 				}
 			}
@@ -116,20 +119,20 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 		// La liste des permissions temporaires
 		permissions = subject.getTransientSubjectData().getPermissions(contexts);
 		if(!permissions.isEmpty()) {
-			list.add(this.plugin.getMessages().getText("OTHER_LIST_PERMISSION_TRANSIENT"));
+			list.add(EPMessages.OTHER_LIST_PERMISSION_TRANSIENT.getText());
 			for(Entry<String, Boolean> permission : permissions.entrySet()) {
 				if(permission.getValue()) {
-					list.add(EChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_TRANSIENT_LINE_TRUE")
+					list.add(EChat.of(EPMessages.OTHER_LIST_PERMISSION_TRANSIENT_LINE_TRUE.get()
 							.replaceAll("<permission>", permission.getKey())));
 				} else {
-					list.add(EChat.of(this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_TRANSIENT_LINE_FALSE")
+					list.add(EChat.of(EPMessages.OTHER_LIST_PERMISSION_TRANSIENT_LINE_FALSE.get()
 							.replaceAll("<permission>", permission.getKey())));
 				}
 			}
 		}
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-				this.plugin.getMessages().getMessage("OTHER_LIST_PERMISSION_TITLE")
+				EPMessages.OTHER_LIST_PERMISSION_TITLE.get()
 				.replaceAll("<subject>", subject.getIdentifier())), 
 				list, staff);
 		return true;

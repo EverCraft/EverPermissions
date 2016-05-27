@@ -29,9 +29,12 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.text.ETextBuilder;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
@@ -42,17 +45,17 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("OTHER_ADD_OPTION"));
+		return source.hasPermission(EPPermissions.OTHER_ADD_OPTION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("OTHER_ADD_OPTION_DESCRIPTION");
+		return EPMessages.OTHER_ADD_OPTION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permoaddo <" + this.plugin.getEverAPI().getMessages().getArg("subject") + "> "
-									 + "<" + this.plugin.getEverAPI().getMessages().getArg("option") + "> "
-									 + "<" + this.plugin.getEverAPI().getMessages().getArg("value") + ">")
+		return Text.builder("/permoaddo <" + EAMessages.ARGS_SUBJECT.get() + "> "
+									 + "<" + EAMessages.ARGS_OPTION.get() + "> "
+									 + "<" + EAMessages.ARGS_VALUE.get() + ">")
 					.onClick(TextActions.suggestCommand("/permoaddo "))
 					.color(TextColors.RED).build();
 	}
@@ -85,7 +88,7 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get(), args.get(1), args.get(2));
 			// Le subject est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -97,18 +100,18 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final EOtherSubject subject, final String option, String value) {
 		// L'option a bien été ajouté
 		if(subject.getSubjectData().setOption(new HashSet<Context>(), option, value)) {
-			staff.sendMessage(ETextBuilder.toBuilder(this.plugin.getMessages().getText("PREFIX"))
-					.append(this.plugin.getMessages().getMessage("OTHER_ADD_OPTION_PLAYER")
+			staff.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
+					.append(EPMessages.OTHER_ADD_OPTION_PLAYER.get()
 						.replaceAll("<subject>", subject.getIdentifier())
 						.replaceAll("<option>", option))
 					.replace("<value>", Text.builder(value)
-						.color(EChat.getTextColor(this.plugin.getMessages().getMessage("OTHER_ADD_OPTION_NAME_COLOR")))
+						.color(EChat.getTextColor(EPMessages.OTHER_ADD_OPTION_NAME_COLOR.get()))
 						.build())
 					.build());
 			return true;
 		// L'option n'a pas été ajouté
 		} else {
-			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
+			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.COMMAND_ERROR.get()));
 		}
 		return false;
 	}

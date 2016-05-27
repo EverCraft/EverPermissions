@@ -31,9 +31,12 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
@@ -45,16 +48,16 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("USER_LIST_PERMISSION"));
+		return source.hasPermission(EPPermissions.USER_LIST_PERMISSION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("USER_LIST_PERMISSION_DESCRIPTION");
+		return EPMessages.USER_LIST_PERMISSION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permulistp <" + this.plugin.getEverAPI().getMessages().getArg("player") + "> "
-									  + "[" + this.plugin.getEverAPI().getMessages().getArg("world") + "]")
+		return Text.builder("/permulistp <" + EAMessages.ARGS_PLAYER.get() + "> "
+									  + "[" + EAMessages.ARGS_WORLD.get() + "]")
 					.onClick(TextActions.suggestCommand("/permulistp "))
 					.color(TextColors.RED)
 					.build();
@@ -87,7 +90,7 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// On connait le joueur
 		} else if(args.size() == 2) {
@@ -97,7 +100,7 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optPlayer.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -119,15 +122,15 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 				// La liste des permissions
 				Map<String, Boolean> permissions = subject.getSubjectData().getNodeTree(contexts).asMap();
 				if(permissions.isEmpty()) {
-					list.add(this.plugin.getMessages().getText("USER_LIST_PERMISSION_PERMISSION_EMPTY"));
+					list.add(EPMessages.USER_LIST_PERMISSION_PERMISSION_EMPTY.getText());
 				} else {
-					list.add(this.plugin.getMessages().getText("USER_LIST_PERMISSION_PERMISSION"));
+					list.add(EPMessages.USER_LIST_PERMISSION_PERMISSION.getText());
 					for(Entry<String, Boolean> permission : permissions.entrySet()) {
 						if(permission.getValue()) {
-							list.add(EChat.of(this.plugin.getMessages().getMessage("USER_LIST_PERMISSION_PERMISSION_LINE_TRUE")
+							list.add(EChat.of(EPMessages.USER_LIST_PERMISSION_PERMISSION_LINE_TRUE.get()
 									.replaceAll("<permission>", permission.getKey())));
 						} else {
-							list.add(EChat.of(this.plugin.getMessages().getMessage("USER_LIST_PERMISSION_PERMISSION_LINE_FALSE")
+							list.add(EChat.of(EPMessages.USER_LIST_PERMISSION_PERMISSION_LINE_FALSE.get()
 									.replaceAll("<permission>", permission.getKey())));
 						}
 					}
@@ -136,31 +139,31 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 				// La liste des permissions temporaires
 				permissions = subject.getTransientSubjectData().getNodeTree(contexts).asMap();
 				if(!permissions.isEmpty()) {
-					list.add(this.plugin.getMessages().getText("USER_LIST_PERMISSION_TRANSIENT"));
+					list.add(EPMessages.USER_LIST_PERMISSION_TRANSIENT.getText());
 					for(Entry<String, Boolean> permission : permissions.entrySet()) {
 						if(permission.getValue()) {
-							list.add(EChat.of(this.plugin.getMessages().getMessage("USER_LIST_PERMISSION_TRANSIENT_LINE_TRUE")
+							list.add(EChat.of(EPMessages.USER_LIST_PERMISSION_TRANSIENT_LINE_TRUE.get()
 									.replaceAll("<permission>", permission.getKey())));
 						} else {
-							list.add(EChat.of(this.plugin.getMessages().getMessage("USER_LIST_PERMISSION_TRANSIENT_LINE_FALSE")
+							list.add(EChat.of(EPMessages.USER_LIST_PERMISSION_TRANSIENT_LINE_FALSE.get()
 									.replaceAll("<permission>", permission.getKey())));
 						}
 					}
 				}
 				
 				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-						this.plugin.getMessages().getMessage("USER_LIST_PERMISSION_TITLE")
+						EPMessages.USER_LIST_PERMISSION_TITLE.get()
 						.replaceAll("<player>", user.getName())
 						.replaceAll("<type>", type_user.get())), 
 						list, staff);
 				return true;
 			// Le joueur n'existe pas dans le service de permissions
 			} else {
-				staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("PLAYER_NOT_FOUND")));
+				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// Le monde est introuvable
 		} else {
-			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

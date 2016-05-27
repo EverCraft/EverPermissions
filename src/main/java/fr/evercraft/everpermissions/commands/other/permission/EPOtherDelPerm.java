@@ -30,8 +30,11 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
@@ -42,16 +45,16 @@ public class EPOtherDelPerm extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("OTHER_DEL_PERMISSION"));
+		return source.hasPermission(EPPermissions.OTHER_DEL_PERMISSION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("OTHER_DEL_PERMISSION_DESCRIPTION");
+		return EPMessages.OTHER_DEL_PERMISSION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permodelp <" + this.plugin.getEverAPI().getMessages().getArg("subject") + "> "
-									 + "<" + this.plugin.getEverAPI().getMessages().getArg("permission") + ">")
+		return Text.builder("/permodelp <" + EAMessages.ARGS_SUBJECT.get() + "> "
+									 + "<" + EAMessages.ARGS_PERMISSION.get() + ">")
 					.onClick(TextActions.suggestCommand("/permodelp "))
 					.color(TextColors.RED)
 					.build();
@@ -82,7 +85,7 @@ public class EPOtherDelPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -94,13 +97,13 @@ public class EPOtherDelPerm extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final Subject subject, final String permission) {
 		// La permission a bien été supprimé
 		if(subject.getSubjectData().setPermission(new HashSet<Context>(), permission, Tristate.UNDEFINED)) {
-			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_PERMISSION_PLAYER")
+			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_DEL_PERMISSION_PLAYER.get()
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<permission>", permission)));
 			return true;
 		// La permission n'a pas été supprimé
 		} else {
-			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_PERMISSION_ERROR")
+			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_DEL_PERMISSION_ERROR.get()
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<permission>", permission)));
 		}

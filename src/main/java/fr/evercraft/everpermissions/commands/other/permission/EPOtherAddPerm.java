@@ -30,9 +30,12 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.java.UtilsBoolean;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
@@ -43,16 +46,16 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("OTHER_ADD_PERMISSION"));
+		return source.hasPermission(EPPermissions.OTHER_ADD_PERMISSION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("OTHER_ADD_PERMISSION_DESCRIPTION");
+		return EPMessages.OTHER_ADD_PERMISSION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permoaddp <" + this.plugin.getEverAPI().getMessages().getArg("subject") + "> "
-									 + "<" + this.plugin.getEverAPI().getMessages().getArg("permission") + "> "
+		return Text.builder("/permoaddp <" + EAMessages.ARGS_SUBJECT.get() + "> "
+									 + "<" + EAMessages.ARGS_PERMISSION.get() + "> "
 									 + "<true|false>")
 					.onClick(TextActions.suggestCommand("/permoaddp "))
 					.color(TextColors.RED)
@@ -87,7 +90,7 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -104,12 +107,12 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 			if(subject.getSubjectData().setPermission(new HashSet<Context>(), permission, Tristate.fromBoolean(value.get()))) {
 				// Permission : True
 				if(value.get()) {
-					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_TRUE")
+					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_ADD_PERMISSION_TRUE.get()
 							.replaceAll("<subject>", subject.getIdentifier())
 							.replaceAll("<permission>", permission)));
 				// Permission : False
 				} else {
-					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_FALSE")
+					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_ADD_PERMISSION_FALSE.get()
 							.replaceAll("<subject>", subject.getIdentifier())
 							.replaceAll("<permission>", permission)));
 				}
@@ -118,19 +121,19 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 			} else {
 				// Permission : True
 				if(value.get()) {
-					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_ERROR_TRUE")
+					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_ADD_PERMISSION_ERROR_TRUE.get()
 							.replaceAll("<subject>", subject.getIdentifier())
 							.replaceAll("<permission>", permission)));
 				// Permission : False
 				} else {
-					staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_ADD_PERMISSION_ERROR_FALSE")
+					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_ADD_PERMISSION_ERROR_FALSE.get()
 							.replaceAll("<subject>", subject.getIdentifier())
 							.replaceAll("<permission>", permission)));
 				}
 			}
 		// La value n'est pas un boolean
 		} else {
-			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("ERROR_BOOLEAN")));
+			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.ERROR_BOOLEAN.get()));
 		}
 		return false;
 	}

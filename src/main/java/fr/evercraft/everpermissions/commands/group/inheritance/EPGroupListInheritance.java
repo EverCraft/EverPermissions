@@ -29,9 +29,12 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
@@ -43,15 +46,15 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("GROUP_LIST_INHERITANCE"));
+		return source.hasPermission(EPPermissions.GROUP_LIST_INHERITANCE.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("GROUP_LIST_INHERITANCE_DESCRIPTION");
+		return EPMessages.GROUP_LIST_INHERITANCE_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permglisti " + this.plugin.getEverAPI().getMessages().getArg("group") + "> [" + this.plugin.getEverAPI().getMessages().getArg("world") + "]")
+		return Text.builder("/permglisti " + EAMessages.ARGS_GROUP.get() + "> [" + EAMessages.ARGS_WORLD.get() + "]")
 					.onClick(TextActions.suggestCommand("/permglisti "))
 					.color(TextColors.RED)
 					.build();
@@ -104,38 +107,38 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 				// La liste des inheritances
 				List<Subject> groups = group.getSubjectData().getParents(contexts);
 				if(groups.isEmpty()) {
-					list.add(this.plugin.getMessages().getText("GROUP_LIST_INHERITANCE_INHERITANCE_EMPTY"));
+					list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_EMPTY.getText());
 				} else {
-					list.add(this.plugin.getMessages().getText("GROUP_LIST_INHERITANCE_INHERITANCE"));
+					list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE.getText());
 					for(Subject inheritance : groups) {
-						list.add(EChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_INHERITANCE_INHERITANCE_LINE").replaceAll("<inheritance>", inheritance.getIdentifier())));
+						list.add(EChat.of(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_LINE.get().replaceAll("<inheritance>", inheritance.getIdentifier())));
 					}
 				}
 				
 				// La liste des inheritances temporaires
 				groups = group.getTransientSubjectData().getParents(contexts);
 				if(!groups.isEmpty()) {
-					list.add(this.plugin.getMessages().getText("GROUP_LIST_INHERITANCE_TRANSIENT"));
+					list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT.getText());
 					for(Subject inheritance : groups) {
-						list.add(EChat.of(this.plugin.getMessages().getMessage("GROUP_LIST_INHERITANCE_TRANSIENT_LINE").replaceAll("<inheritance>", inheritance.getIdentifier())));
+						list.add(EChat.of(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.get().replaceAll("<inheritance>", inheritance.getIdentifier())));
 					}
 				}
 				
 				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-						this.plugin.getMessages().getMessage("GROUP_LIST_INHERITANCE_TITLE")
+						EPMessages.GROUP_LIST_INHERITANCE_TITLE.get()
 						.replaceAll("<group>", group.getIdentifier())
 						.replaceAll("<type>", type_group.get())), 
 						list, player);
 				return true;
 			// Le groupe n'existe pas dans le service de permissions
 			} else {
-				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

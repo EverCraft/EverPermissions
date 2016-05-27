@@ -29,8 +29,11 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
@@ -41,16 +44,16 @@ public class EPOtherDelOption extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("OTHER_DEL_OPTION"));
+		return source.hasPermission(EPPermissions.OTHER_DEL_OPTION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("OTHER_DEL_OPTION_DESCRIPTION");
+		return EPMessages.OTHER_DEL_OPTION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permodelo <" + this.plugin.getEverAPI().getMessages().getArg("subject") + "> "
-									 + "<" + this.plugin.getEverAPI().getMessages().getArg("option") + ">")
+		return Text.builder("/permodelo <" + EAMessages.ARGS_SUBJECT.get() + "> "
+									 + "<" + EAMessages.ARGS_OPTION.get() + ">")
 					.onClick(TextActions.suggestCommand("/permodelo "))
 					.color(TextColors.RED)
 					.build();
@@ -82,7 +85,7 @@ public class EPOtherDelOption extends ECommand<EverPermissions> {
 				resultat = command(source, optSubject.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_NOT_FOUND")));
+				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -94,13 +97,13 @@ public class EPOtherDelOption extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final EOtherSubject subject, final String option) {
 		// L'option a bien été supprimé
 		if(subject.getSubjectData().setOption(new HashSet<Context>(), option, null)) {
-			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_OPTION_PLAYER")
+			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_DEL_OPTION_PLAYER.get()
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<option>", option)));
 			return true;
 		// L'option n'a pas été supprimé
 		} else {
-			staff.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("OTHER_DEL_OPTION_ERROR")
+			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_DEL_OPTION_ERROR.get()
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<option>", option)));
 		}

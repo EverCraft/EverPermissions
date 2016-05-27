@@ -26,6 +26,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.plugin.ECommand;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EverPermissions;
 
 public class EPOp extends ECommand<EverPermissions> {
@@ -52,7 +53,7 @@ public class EPOp extends ECommand<EverPermissions> {
 	}
 	
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		source.sendMessage(this.plugin.getMessages().getText("PREFIX").concat(this.plugin.getMessages().getText("COMMAND_DEOP")));
+		source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.COMMAND_DEOP.getText()));
 		return false;
 	}
 }

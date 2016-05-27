@@ -28,10 +28,13 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.java.UtilsBoolean;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
@@ -43,18 +46,18 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("GROUP_ADD_PERMISSION"));
+		return source.hasPermission(EPPermissions.GROUP_ADD_PERMISSION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("GROUP_ADD_PERMISSION_DESCRIPTION");
+		return EPMessages.GROUP_ADD_PERMISSION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permgaddp <" + this.plugin.getEverAPI().getMessages().getArg("group") + "> "
-									 + "<" + this.plugin.getEverAPI().getMessages().getArg("permission") + "> "
+		return Text.builder("/permgaddp <" + EAMessages.ARGS_GROUP.get() + "> "
+									 + "<" + EAMessages.ARGS_PERMISSION.get() + "> "
 									 + "<true|false> "
-									 + "[" + this.plugin.getEverAPI().getMessages().getArg("world") + "]")
+									 + "[" + EAMessages.ARGS_WORLD.get() + "]")
 					.onClick(TextActions.suggestCommand("/permgaddp "))
 					.color(TextColors.RED)
 					.build();
@@ -113,13 +116,13 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 					if(group.getSubjectData().setPermission(EContextCalculator.getContextWorld(type_group.get()), permission, Tristate.fromBoolean(value.get()))) {
 						// Permission : True
 						if(value.get()) {
-							player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_PERMISSION_TRUE")
+							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_PERMISSION_TRUE.get()
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_group.get())));
 						// Permission : False
 						} else {
-							player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_PERMISSION_FALSE")
+							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_PERMISSION_FALSE.get()
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_group.get())));
@@ -129,13 +132,13 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 					} else {
 						// Permission : True
 						if(value.get()) {
-							player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_PERMISSION_ERROR_TRUE")
+							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_PERMISSION_ERROR_TRUE.get()
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_group.get())));
 						// Permission : False
 						} else {
-							player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_PERMISSION_ERROR_FALSE")
+							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_PERMISSION_ERROR_FALSE.get()
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_group.get())));
@@ -143,17 +146,17 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 					}
 				// La value n'est pas un boolean
 				} else {
-					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("ERROR_BOOLEAN")));
+					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.ERROR_BOOLEAN.get()));
 				}
 			// Le groupe est introuvable
 			} else {
-				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

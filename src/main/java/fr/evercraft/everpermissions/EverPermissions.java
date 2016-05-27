@@ -41,7 +41,6 @@ import fr.evercraft.everpermissions.service.EPermissionService;
 public class EverPermissions extends EPlugin {
 	private EPConfig config;
 	private EPMessage messages;
-	private EPPermission permissions;
 	
 	private EPManagerEvent managerEvent;
 	private EPManagerData managerData;
@@ -53,7 +52,6 @@ public class EverPermissions extends EPlugin {
 	protected void onPreEnable() throws PluginDisableException, ServerDisableException {
 		this.config = new EPConfig(this);
 		this.messages = new EPMessage(this);
-		this.permissions = new EPPermission(this);
 		
 		this.managerData = new EPManagerData(this);		
 		this.managerEvent = new EPManagerEvent(this);
@@ -91,10 +89,6 @@ public class EverPermissions extends EPlugin {
 	
 	public EPMessage getMessages() {
 		return this.messages;
-	}
-
-	public EPPermission getPermissions() {
-		return this.permissions;
 	}
 
 	public EPermissionService getService() {

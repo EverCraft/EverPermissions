@@ -41,8 +41,9 @@ import com.google.common.reflect.TypeToken;
 
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.ECommand;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.text.ETextBuilder;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.data.EPConfUsers;
 import fr.evercraft.everpermissions.data.EPManagerData;
@@ -55,11 +56,11 @@ public class EPTransfert extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("TRANSFERT"));
+		return source.hasPermission(EPPermissions.TRANSFERT.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("TRANSFERT_DESCRIPTION");
+		return EPMessages.TRANSFERT_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
@@ -90,14 +91,14 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			if(this.plugin.getManagerData().isSQL()) {
 				// Transféré vers une base de donnée SQL
 				if(args.get(0).equalsIgnoreCase("sql")) {
-					source.sendMessage(ETextBuilder.toBuilder(this.plugin.getMessages().getText("PREFIX"))
-							.append(this.plugin.getMessages().getMessage("TRANSFERT_SQL_CONFIRMATION"))
+					source.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
+							.append(EPMessages.TRANSFERT_SQL_CONFIRMATION.get())
 							.replace("<confirmation>", getButtonConfirmationSQL())
 							.build());
 				// Transféré vers un fichier de config
 				} else if(args.get(0).equalsIgnoreCase("conf")) {
-					source.sendMessage(ETextBuilder.toBuilder(this.plugin.getMessages().getText("PREFIX"))
-							.append(this.plugin.getMessages().getMessage("TRANSFERT_CONF_CONFIRMATION"))
+					source.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
+							.append(EPMessages.TRANSFERT_CONF_CONFIRMATION.get())
 							.replace("<confirmation>", getButtonConfirmationConf())
 							.build());
 				// Erreur : sql ou conf
@@ -106,7 +107,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 				}
 			// Error : SQL disable
 			} else {
-				source.sendMessage(this.plugin.getMessages().getText("PREFIX").concat(this.plugin.getMessages().getText("TRANSFERT_DISABLE")));
+				source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_DISABLE.getText()));
 			}
 		} else if(args.size() == 2 && args.get(1).equalsIgnoreCase("confirmation")) {
 			//Si la base de donnée est activé
@@ -125,7 +126,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 				}
 			// Error : SQL disable
 			} else {
-				source.sendMessage(this.plugin.getMessages().getText("PREFIX").concat(this.plugin.getMessages().getText("TRANSFERT_DISABLE")));
+				source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_DISABLE.getText()));
 			}
 		} else {
 			source.sendMessage(help(source));
@@ -134,15 +135,15 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	}
 
 	public Text getButtonConfirmationSQL(){
-		return this.plugin.getMessages().getText("TRANSFERT_SQL_CONFIRMATION_VALID").toBuilder()
-					.onHover(TextActions.showText(EChat.of(this.plugin.getMessages().getMessage("TRANSFERT_SQL_CONFIRMATION_VALID_HOVER"))))
+		return EPMessages.TRANSFERT_SQL_CONFIRMATION_VALID.getText().toBuilder()
+					.onHover(TextActions.showText(EPMessages.TRANSFERT_SQL_CONFIRMATION_VALID_HOVER.getText()))
 					.onClick(TextActions.runCommand("/permtransfer sql confirmation"))
 					.build();
 	}
 	
 	public Text getButtonConfirmationConf(){
-		return this.plugin.getMessages().getText("TRANSFERT_CONF_CONFIRMATION_VALID").toBuilder()
-					.onHover(TextActions.showText(EChat.of(this.plugin.getMessages().getMessage("TRANSFERT_CONF_CONFIRMATION_VALID_HOVER"))))
+		return EPMessages.TRANSFERT_CONF_CONFIRMATION_VALID.getText().toBuilder()
+					.onHover(TextActions.showText(EPMessages.TRANSFERT_CONF_CONFIRMATION_VALID_HOVER.getText()))
 					.onClick(TextActions.runCommand("/permtransfer conf confirmation"))
 					.build();
 	}
@@ -266,10 +267,10 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	    }
 		
 		if(resultat) {
-			this.plugin.getLogger().info(this.plugin.getMessages().getMessage("TRANSFERT_SQL"));
-			player.sendMessage(this.plugin.getMessages().getText("PREFIX").concat(this.plugin.getMessages().getText("TRANSFERT_SQL")));
+			this.plugin.getLogger().info(EPMessages.TRANSFERT_SQL.get());
+			player.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_SQL.getText()));
 		} else {
-			player.sendMessage(this.plugin.getMessages().getText("PREFIX").concat(this.plugin.getMessages().getText("TRANSFERT_ERROR")));
+			player.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_ERROR.getText()));
 		}
 		
 		return resultat;
@@ -373,10 +374,10 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	    }
 		
 		if(resultat) {
-			this.plugin.getLogger().info(this.plugin.getMessages().getMessage("TRANSFERT_CONF"));
-			source.sendMessage(this.plugin.getMessages().getText("PREFIX").concat(this.plugin.getMessages().getText("TRANSFERT_CONF")));
+			this.plugin.getLogger().info(EPMessages.TRANSFERT_CONF.get());
+			source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_CONF.getText()));
 		} else {
-			source.sendMessage(this.plugin.getMessages().getText("PREFIX").concat(this.plugin.getMessages().getText("TRANSFERT_ERROR")));
+			source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_ERROR.getText()));
 		}
 	}
 	

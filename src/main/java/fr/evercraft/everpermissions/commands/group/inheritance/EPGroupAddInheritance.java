@@ -29,9 +29,12 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
@@ -43,17 +46,17 @@ public class EPGroupAddInheritance extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("GROUP_ADD_INHERITANCE"));
+		return source.hasPermission(EPPermissions.GROUP_ADD_INHERITANCE.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("GROUP_ADD_INHERITANCE_DESCRIPTION");
+		return EPMessages.GROUP_ADD_INHERITANCE_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permgaddi <" + this.plugin.getEverAPI().getMessages().getArg("group") + "> "
-									 + "<" + this.plugin.getEverAPI().getMessages().getArg("inheritance") + "> "
-									 + "[" + this.plugin.getEverAPI().getMessages().getArg("world") + "]")
+		return Text.builder("/permgaddi <" + EAMessages.ARGS_GROUP.get() + "> "
+									 + "<" + EAMessages.ARGS_INHERITANCE.get() + "> "
+									 + "[" + EAMessages.ARGS_WORLD.get() + "]")
 					.onClick(TextActions.suggestCommand("/permgaddi "))
 					.color(TextColors.RED)
 					.build();
@@ -113,37 +116,37 @@ public class EPGroupAddInheritance extends ECommand<EverPermissions> {
 						Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
 						// L'inheritance a bien été ajouté
 						if(group.getSubjectData().addParent(contexts, inheritance)) {
-							player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_INHERITANCE_STAFF")
+							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_INHERITANCE_STAFF.get()
 									.replaceAll("<inheritance>", inheritance.getIdentifier())
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<type>", type_group.get())));
 							return true;
 						// L'inheritance n'a pas été ajouté
 						} else {
-							player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_INHERITANCE_ERROR_HAVE")
+							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_INHERITANCE_ERROR_HAVE.get()
 									.replaceAll("<inheritance>", inheritance.getIdentifier())
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<type>", type_group.get())));
 						}
 					// Le groupe et l'inheritance sont égale
 					} else {
-						player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("GROUP_ADD_INHERITANCE_ERROR_EQUALS")));
+						player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_INHERITANCE_ERROR_EQUALS.get()));
 					}
 				// L'inheritance est introuvable
 				} else {
-					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
 							.replaceAll("<inheritance>", inheritance_name)
 							.replaceAll("<type>", type_group.get())));
 				}
 			// Le groupe est introuvable
 			} else {
-				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

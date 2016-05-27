@@ -29,10 +29,13 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.text.ETextBuilder;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
@@ -44,17 +47,17 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("GROUP_CHECK_OPTION"));
+		return source.hasPermission(EPPermissions.GROUP_CHECK_OPTION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("GROUP_CHECK_OPTION_DESCRIPTION");
+		return EPMessages.GROUP_CHECK_OPTION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permgchecko <" + this.plugin.getEverAPI().getMessages().getArg("group") + "> "
-									   + "<" + this.plugin.getEverAPI().getMessages().getArg("option") + "> "
-									   + "[" + this.plugin.getEverAPI().getMessages().getArg("world") + "]")
+		return Text.builder("/permgchecko <" + EAMessages.ARGS_GROUP.get() + "> "
+									   + "<" + EAMessages.ARGS_OPTION.get() + "> "
+									   + "[" + EAMessages.ARGS_WORLD.get() + "]")
 					.onClick(TextActions.suggestCommand("/permgchecko "))
 					.color(TextColors.RED)
 					.build();
@@ -108,32 +111,32 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 				String name = group.getSubjectData().getOptions(contexts).get(option);
 				// Si il y a une valeur
 				if(name != null) {
-					player.sendMessage(ETextBuilder.toBuilder(this.plugin.getMessages().getText("PREFIX"))
-							.append(this.plugin.getMessages().getMessage("GROUP_CHECK_OPTION_DEFINED")
+					player.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
+							.append(EPMessages.GROUP_CHECK_OPTION_DEFINED.get()
 								.replaceAll("<group>", group.getIdentifier())
 								.replaceAll("<option>", option)
 								.replaceAll("<type>", type_group.get()))
 							.replace("<value>", Text.builder(name)
-								.color(EChat.getTextColor(this.plugin.getMessages().getMessage("GROUP_CHECK_OPTION_DEFINED_NAME_COLOR")))
+								.color(EChat.getTextColor(EPMessages.GROUP_CHECK_OPTION_DEFINED_NAME_COLOR.get()))
 								.build())
 							.build());
 					return true;
 				// Il n'y a pas de valeur
 				} else {
-					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_CHECK_OPTION_UNDEFINED")
+					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_CHECK_OPTION_UNDEFINED.get()
 							.replaceAll("<group>", group.getIdentifier())
 							.replaceAll("<option>", option)
 							.replaceAll("<type>", type_group.get())));
 				}
 			// Le groupe est introuvable
 			} else {
-				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_NOT_FOUND")
+				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
 					.replaceAll("<world>", world_name)));
 		}
 		return false;

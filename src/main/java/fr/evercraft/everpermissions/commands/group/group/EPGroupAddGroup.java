@@ -26,9 +26,12 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
+import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 
@@ -39,15 +42,15 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(this.plugin.getPermissions().get("GROUP_ADD_GROUP"));
+		return source.hasPermission(EPPermissions.GROUP_ADD_GROUP.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return this.plugin.getMessages().getText("GROUP_ADD_GROUP_DESCRIPTION");
+		return EPMessages.GROUP_ADD_GROUP_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permgadd <" + this.plugin.getEverAPI().getMessages().getArg("group") + "> [" + this.plugin.getEverAPI().getMessages().getArg("world") + "]")
+		return Text.builder("/permgadd <" + EAMessages.ARGS_GROUP.get() + "> [" + EAMessages.ARGS_WORLD + "]")
 				.onClick(TextActions.suggestCommand("/permgadd "))
 				.color(TextColors.RED)
 				.build();
@@ -94,23 +97,23 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 			if(group == null || !group.hasWorld(type_group.get())) {
 				// Le groupe a bien été ajouté
 				if(this.plugin.getService().getGroupSubjects().register(group_name, type_group.get())) {
-					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_GROUP_STAFF")
+					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_GROUP_STAFF.get()
 							.replaceAll("<group>", group_name)
 							.replaceAll("<type>", type_group.get())));
 					return true;
 				// Le groupe n'a pas été ajouté
 				} else {
-					player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("COMMAND_ERROR")));
+					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.COMMAND_ERROR.get()));
 				}
 			// Groupe existant
 			} else {
-				player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getMessages().getMessage("GROUP_ADD_GROUP_ERROR")
+				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_GROUP_ERROR.get()
 						.replaceAll("<group>", group_name)
 						.replaceAll("<type>", type_group.get())));
 			}
 		// Le monde est introuvable
 		} else {
-			player.sendMessage(EChat.of(this.plugin.getMessages().getMessage("PREFIX") + this.plugin.getEverAPI().getMessages().getMessage("WORLD_NOT_FOUND")
+			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
 					.replaceAll("<world>", world_name)));
 		}
 		return false;
