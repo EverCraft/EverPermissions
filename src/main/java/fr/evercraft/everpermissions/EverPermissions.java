@@ -30,12 +30,12 @@ import fr.evercraft.everpermissions.service.EPermissionService;
 
 @Plugin(id = "fr.evercraft.everpermissions", 
 		name = "EverPermissions", 
-		version = "1.1", 
+		version = "1.2", 
 		description = "Permissions management",
 		url = "http://evercraft.fr/",
 		authors = {"rexbut"},
 		dependencies = {
-		    @Dependency(id = "fr.evercraft.everapi", version = "1.1"),
+		    @Dependency(id = "fr.evercraft.everapi", version = "1.2"),
 		    @Dependency(id = "fr.evercraft.everchat", optional = true)
 		})
 public class EverPermissions extends EPlugin {
