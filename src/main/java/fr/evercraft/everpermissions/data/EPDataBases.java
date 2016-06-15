@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.EDataBase;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -29,7 +30,7 @@ public class EPDataBases extends EDataBase<EverPermissions> {
 	private String table_users_groups;
 	private String table_users_options;
 
-	public EPDataBases(EverPermissions plugin) {
+	public EPDataBases(EverPermissions plugin) throws PluginDisableException {
 		super(plugin);
 	}
 

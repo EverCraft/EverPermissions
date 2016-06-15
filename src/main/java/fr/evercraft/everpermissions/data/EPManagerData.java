@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.spongepowered.api.world.World;
 
+import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.services.permission.event.PermSystemEvent.Action;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.data.user.EConfUserData;
@@ -46,7 +47,7 @@ public class EPManagerData {
 	
 	private EPConfOthers conf_others;
 	
-	public EPManagerData(EverPermissions plugin) {
+	public EPManagerData(EverPermissions plugin) throws PluginDisableException {
 		this.plugin = plugin;
 		
 		// Fichier de configs
@@ -82,9 +83,9 @@ public class EPManagerData {
 	}
 	
 	/**
-	 * 
+	 * @throws PluginDisableException 
 	 */
-	public void reload() {
+	public void reload() throws PluginDisableException {
 		// Désactivation des groupes et des joueurs
 		for(World world : this.plugin.getGame().getServer().getWorlds()) {
 	    	this.plugin.getService().getGroupSubjects().removeWorld(world.getName());
