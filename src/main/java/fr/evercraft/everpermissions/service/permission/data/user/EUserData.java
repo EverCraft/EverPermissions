@@ -36,7 +36,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
-import fr.evercraft.everapi.services.permission.event.PermUserEvent.Action;
+import fr.evercraft.everapi.event.PermUserEvent.Action;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.data.ENode;
@@ -126,7 +126,7 @@ public class EUserData extends EOptionSubjectData {
     		if(world.isPresent()) {
     			// Si la sauvegarde est réussie
 	    		if(this.plugin.getManagerData().getUserData().setPermission(this.getIdentifier(), world.get(), permission, value, insert)) {
-	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSIONS_CHANGED);
+	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSION_CHANGED);
 	    			return true;
 	    		}
     		}
@@ -149,7 +149,7 @@ public class EUserData extends EOptionSubjectData {
     		if(world.isPresent()) {
     			// Si la sauvegarde est réussie
 	    		if(this.plugin.getManagerData().getUserData().clearPermissions(this.getIdentifier(), world.get())) {
-	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSIONS_CHANGED);
+	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSION_CHANGED);
 	    			return true;
 	    		}
     		}
@@ -163,7 +163,7 @@ public class EUserData extends EOptionSubjectData {
     	if(this.clearPermissionsExecute()) {
     		// Si la sauvegarde est réussie
     		if(this.plugin.getManagerData().getUserData().clearPermissions(this.getIdentifier())) {
-    			this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSIONS_CHANGED);
+    			this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSION_CHANGED);
     			return true;
     		}
     	}

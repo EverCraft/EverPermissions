@@ -28,7 +28,7 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
-import fr.evercraft.everapi.services.permission.event.PermOtherEvent.Action;
+import fr.evercraft.everapi.event.PermOtherEvent.Action;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.data.EOptionSubjectData;
 
@@ -100,7 +100,7 @@ public class EOtherData extends EOptionSubjectData {
 	    					+ "value=" + value.asBoolean() + ")");
     		}
     		
-    		this.plugin.getManagerEvent().post(this.subject, Action.OTHER_PERMISSIONS_CHANGED);
+    		this.plugin.getManagerEvent().post(this.subject, Action.OTHER_PERMISSION_CHANGED);
     		this.plugin.getManagerData().saveOther();
     	}
         return false;
@@ -118,7 +118,7 @@ public class EOtherData extends EOptionSubjectData {
     		this.plugin.getManagerData().getConfOther().get(subject.getIdentifier()).removeChild("permissions");
 			this.plugin.getLogger().debug("Removed the permissions configuration file : (" + "identifier=" + subject.getIdentifier() + ")");
 			
-			this.plugin.getManagerEvent().post(this.subject, Action.OTHER_PERMISSIONS_CHANGED);
+			this.plugin.getManagerEvent().post(this.subject, Action.OTHER_PERMISSION_CHANGED);
 			this.plugin.getManagerData().saveOther();
 			return true;
     	}

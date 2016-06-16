@@ -22,8 +22,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.spongepowered.api.world.World;
 
+import fr.evercraft.everapi.event.PermSystemEvent.Action;
 import fr.evercraft.everapi.exception.PluginDisableException;
-import fr.evercraft.everapi.services.permission.event.PermSystemEvent.Action;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.data.user.EConfUserData;
 import fr.evercraft.everpermissions.service.permission.data.user.ESqlUserData;

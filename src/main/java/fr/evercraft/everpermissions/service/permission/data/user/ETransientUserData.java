@@ -25,7 +25,7 @@ import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
-import fr.evercraft.everapi.services.permission.event.PermUserEvent.Action;
+import fr.evercraft.everapi.event.PermUserEvent.Action;
 import fr.evercraft.everpermissions.EverPermissions;
 
 public class ETransientUserData extends MemorySubjectData {
@@ -43,7 +43,7 @@ public class ETransientUserData extends MemorySubjectData {
     @Override
     public boolean setPermission(final Set<Context> contexts, final String permission, final Tristate value) {
         if(super.setPermission(contexts, permission, value)) {
-        	this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSIONS_CHANGED);
+        	this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSION_CHANGED);
         	return true;
         }
         return false;
@@ -52,7 +52,7 @@ public class ETransientUserData extends MemorySubjectData {
     @Override
     public boolean clearPermissions(final Set<Context> context) {
     	 if(super.clearPermissions(context)) {
-         	this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSIONS_CHANGED);
+         	this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSION_CHANGED);
          	return true;
          }
          return false;
@@ -61,7 +61,7 @@ public class ETransientUserData extends MemorySubjectData {
     @Override
     public boolean clearPermissions() {
     	 if(super.clearPermissions()) {
-         	this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSIONS_CHANGED);
+         	this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSION_CHANGED);
          	return true;
          }
          return false;

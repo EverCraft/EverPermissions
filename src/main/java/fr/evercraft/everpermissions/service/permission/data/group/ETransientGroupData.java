@@ -25,7 +25,7 @@ import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
-import fr.evercraft.everapi.services.permission.event.PermGroupEvent.Action;
+import fr.evercraft.everapi.event.PermGroupEvent.Action;
 import fr.evercraft.everpermissions.EverPermissions;
 
 public class ETransientGroupData extends MemorySubjectData {
@@ -47,7 +47,7 @@ public class ETransientGroupData extends MemorySubjectData {
     @Override
     public boolean setPermission(final Set<Context> contexts, final String permission, final Tristate value) {
         if(super.setPermission(contexts, permission, value)) {
-        	this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSIONS_CHANGED);
+        	this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSION_CHANGED);
         	return true;
         }
         return false;
@@ -56,7 +56,7 @@ public class ETransientGroupData extends MemorySubjectData {
     @Override
     public boolean clearPermissions(final Set<Context> context) {
     	 if(super.clearPermissions(context)) {
-         	this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSIONS_CHANGED);
+         	this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSION_CHANGED);
          	return true;
          }
          return false;
@@ -65,7 +65,7 @@ public class ETransientGroupData extends MemorySubjectData {
     @Override
     public boolean clearPermissions() {
     	 if(super.clearPermissions()) {
-         	this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSIONS_CHANGED);
+         	this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSION_CHANGED);
          	return true;
          }
          return false;

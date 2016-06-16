@@ -16,9 +16,9 @@
  */
 package fr.evercraft.everpermissions.service.permission.collection;
 
+import fr.evercraft.everapi.event.PermSystemEvent;
+import fr.evercraft.everapi.event.PermGroupEvent.Action;
 import fr.evercraft.everapi.java.Chronometer;
-import fr.evercraft.everapi.services.permission.event.PermGroupEvent.Action;
-import fr.evercraft.everapi.services.permission.event.PermSystemEvent;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.data.EPConfGroups;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;

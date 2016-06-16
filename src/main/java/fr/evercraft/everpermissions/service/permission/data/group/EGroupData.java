@@ -32,7 +32,7 @@ import org.spongepowered.api.util.Tristate;
 
 import com.google.common.reflect.TypeToken;
 
-import fr.evercraft.everapi.services.permission.event.PermGroupEvent.Action;
+import fr.evercraft.everapi.event.PermGroupEvent.Action;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.data.EPConfGroups;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
@@ -78,7 +78,7 @@ public class EGroupData extends EOptionSubjectData {
     					permissions.getNode(permission).setValue(value.asBoolean());
     					this.plugin.getLogger().debug("Added to the configs file : (identifier='" + subject.getIdentifier() + "';permission='" + permission + "';type='" + world.get() + "')");
     				}
-    				this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSIONS_CHANGED);
+    				this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSION_CHANGED);
     				this.plugin.getManagerData().saveGroup(world.get());
     				return true;
     			}
@@ -101,7 +101,7 @@ public class EGroupData extends EOptionSubjectData {
     				conf.get().getNode().getNode(subject.getIdentifier()).removeChild("permissions");
     				this.plugin.getLogger().debug("Removed the permissions configuration file : (identifier='" + subject.getIdentifier() + "';type='" + world.get() + "')");
     				
-    				this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSIONS_CHANGED);
+    				this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSION_CHANGED);
     				this.plugin.getManagerData().saveGroup(world.get());
     				return true;
     			}
@@ -120,7 +120,7 @@ public class EGroupData extends EOptionSubjectData {
     		}
     		this.plugin.getLogger().debug("Removed the permissions configuration file : (identifier='" + subject.getIdentifier() + "')");
     		
-			this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSIONS_CHANGED);
+			this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSION_CHANGED);
 			this.plugin.getManagerData().saveGroups();
 			return true;
     	}

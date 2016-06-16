@@ -16,8 +16,8 @@
  */
 package fr.evercraft.everpermissions.service.permission.collection;
 
+import fr.evercraft.everapi.event.PermUserEvent.Action;
 import fr.evercraft.everapi.java.Chronometer;
-import fr.evercraft.everapi.services.permission.event.PermUserEvent.Action;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 
