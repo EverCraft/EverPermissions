@@ -18,7 +18,7 @@ package fr.evercraft.everpermissions.commands;
 
 import java.util.TreeMap;
 
-import fr.evercraft.everapi.plugin.ECommand;
+import fr.evercraft.everapi.command.ECommand;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.commands.disable.EPDeop;

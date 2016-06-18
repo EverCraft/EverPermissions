@@ -31,7 +31,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
-import fr.evercraft.everapi.plugin.ECommand;
+import fr.evercraft.everapi.command.ECommand;
 import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;

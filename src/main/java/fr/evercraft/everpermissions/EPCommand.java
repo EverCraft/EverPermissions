@@ -27,8 +27,8 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
+import fr.evercraft.everapi.command.ECommand;
 import fr.evercraft.everapi.exception.PluginDisableException;
-import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 

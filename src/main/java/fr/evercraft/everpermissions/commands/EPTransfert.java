@@ -39,8 +39,8 @@ import org.spongepowered.api.text.format.TextColors;
 
 import com.google.common.reflect.TypeToken;
 
+import fr.evercraft.everapi.command.ECommand;
 import fr.evercraft.everapi.exception.ServerDisableException;
-import fr.evercraft.everapi.plugin.ECommand;
 import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
