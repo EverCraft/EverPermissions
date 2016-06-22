@@ -1,4 +1,0 @@
-rootProject.name = "EverPermissions"
-
-include ':EverAPI'
-project(':EverAPI').projectDir = new File( '../EverAPI' )
