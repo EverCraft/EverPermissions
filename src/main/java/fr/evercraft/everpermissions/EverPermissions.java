@@ -23,7 +23,7 @@ import org.spongepowered.api.service.permission.PermissionService;
 import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.EPlugin;
-import fr.evercraft.everpermissions.commands.EPManagerCommands;
+import fr.evercraft.everpermissions.command.EPManagerCommands;
 import fr.evercraft.everpermissions.data.EPManagerData;
 import fr.evercraft.everpermissions.event.EPManagerEvent;
 import fr.evercraft.everpermissions.service.EPermissionService;
