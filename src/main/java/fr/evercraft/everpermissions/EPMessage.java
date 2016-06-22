@@ -254,8 +254,8 @@ public class EPMessage extends EMessage {
 		GROUP_ADD_PERMISSION_DESCRIPTION("group.permission.add.description", 	"Ajoute une permission à un groupe"),
 		GROUP_ADD_PERMISSION_TRUE("group.permission.add.true", 					"&7Le groupe &6<group> &7possède désormais la permission '&6<permission>&7' dans les mondes de type &6<type>&7."),
 		GROUP_ADD_PERMISSION_FALSE("group.permission.add.false", 				"&7Le groupe &6<group> &7ne possède plus la permission '&6<permission>&7' dans les mondes de type &6<type>&7."),
-		GROUP_ADD_PERMISSION_ERROR_TRUE("group.permission.add.errorTrue", 		"&7Le groupe &6<group> &7ne possède pas la permission '&6<permission>&c' dans les mondes de type &6<type>&c."),
-		GROUP_ADD_PERMISSION_ERROR_FALSE("group.permission.add.errorFalse", 	"&7Le groupe &6<group> &7ne possède pas la permission '&6<permission>&c' dans les mondes de type &6<type>&c."),
+		GROUP_ADD_PERMISSION_ERROR_TRUE("group.permission.add.errorTrue", 		"&7Le groupe &6<group> &7possède déjà la permission '&6<permission>&7' dans les mondes de type &6<type>&c."),
+		GROUP_ADD_PERMISSION_ERROR_FALSE("group.permission.add.errorFalse", 	"&7Le groupe &6<group> &7ne possède pas la permission '&6<permission>&7' dans les mondes de type &6<type>&c."),
 		
 		GROUP_DEL_PERMISSION_DESCRIPTION("group.permission.del.description", 	"Retire une permission à un groupe"),
 		GROUP_DEL_PERMISSION_STAFF("group.permission.del.staff", 				"&6<group> &7ne possède plus la permission '&6<permission>&7' dans les mondes de type &6<type>&7."),

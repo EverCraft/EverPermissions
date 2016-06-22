@@ -49,8 +49,8 @@ public class EPManagerCommands extends TreeMap<String, ECommand<EverPermissions>
 	}
 	
 	public void load() {
-		EPCommand command = new EPCommand(this.plugin);
-		command.add(new EPReload(this.plugin, command));
+		EPCommand manager_command = new EPCommand(this.plugin);
+		manager_command.add(new EPReload(this.plugin, manager_command));
 		
 		// Commands : Disable
 		register(new EPDeop(this.plugin));
@@ -128,6 +128,10 @@ public class EPManagerCommands extends TreeMap<String, ECommand<EverPermissions>
 		
 		register(new EPOtherCheckOption(this.plugin));
 		register(new EPOtherListOption(this.plugin));
+		
+		for(ECommand<EverPermissions> command : this.values()) {
+			manager_command.add(command);
+		}
 	}
 
 	private void register(ECommand<EverPermissions> command) {
