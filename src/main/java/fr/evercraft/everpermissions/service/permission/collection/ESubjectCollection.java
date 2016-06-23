@@ -42,7 +42,12 @@ public abstract class ESubjectCollection implements SubjectCollection {
     
     @Override
     public String getIdentifier() {
-        return identifier;
+        return this.identifier;
+    }
+    
+    @Override
+    public Subject getDefaults() {
+        return this.plugin.getService().getDefaults();
     }
     
     @Override

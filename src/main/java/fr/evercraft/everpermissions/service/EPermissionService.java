@@ -23,15 +23,16 @@ import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.EPermissionDescription;
+import fr.evercraft.everpermissions.service.permission.collection.EDefaultsCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EOthersCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EGroupCollection;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 import fr.evercraft.everpermissions.service.permission.collection.ETemplateCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EUserCollection;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
+import fr.evercraft.everpermissions.service.permission.subject.ETempateSubject;
 
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -46,15 +47,17 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 public class EPermissionService implements PermissionService {
 	public static final String IDENTIFIER_COMMAND_BLOCK = "CommandBlock";
+	public static final String SUBJECTS_DEFAULTS = "default";
 	
 	private final EverPermissions plugin;
 
-	private final MemorySubjectData defaults;
+	private final Subject defaults;
 
     private final EUserCollection userCollection;
     private final EGroupCollection groupCollection;
     private final EOthersCollection commandBlockCollection;
 	private final EOthersCollection systemCollection;
+	private final EDefaultsCollection defaultsCollection;
     
     private final EContextCalculator contextCalculator;
     
@@ -65,7 +68,10 @@ public class EPermissionService implements PermissionService {
     public EPermissionService(final EverPermissions plugin) throws PluginDisableException {
     	this.plugin = plugin;
     	
-    	this.defaults = new MemorySubjectData(this);
+    	// Default
+    	this.defaultsCollection = new EDefaultsCollection(this.plugin);
+    	this.defaults = new ETempateSubject(this.plugin, SUBJECTS_DEFAULTS, this.defaultsCollection);
+    	
     	this.descriptions = new ConcurrentHashMap<String, EPermissionDescription>();
     	
     	// Context
@@ -119,7 +125,7 @@ public class EPermissionService implements PermissionService {
     }
     
     @Override
-    public MemorySubjectData getDefaultData() {
+    public Subject getDefaults() {
         return this.defaults;
     }
     

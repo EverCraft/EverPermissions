@@ -77,6 +77,8 @@ public class EPMessage extends EMessage {
 		USER_ADD_GROUP_STAFF("user.group.add.staff", 						"&6<player> &7est désormais &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_ADD_GROUP_PLAYER("user.group.add.player", 						"&7Vous êtes désormais &6<group> &7dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
 		USER_ADD_GROUP_EQUALS("user.group.add.equals", 						"&7Vous êtes désormais &6<group> &7dans les mondes de type &6<type>&7."),
+		USER_ADD_GROUP_BROADCAST_PLAYER("user.group.add.broadcastPlayer", 	"&6<player> est désormais &6<group> &7dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
+		USER_ADD_GROUP_BROADCAST_EQUALS("user.group.add.broadcastEquals", 	"&6<player> est désormais &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_ADD_GROUP_ERROR_STAFF("user.group.add.errorStaff", 			"&cErreur : &6<player> &cest déjà &6<group> &cdans les mondes de type &6<type>&c."),
 		USER_ADD_GROUP_ERROR_EQUALS("user.group.add.errorEquals", 			"&cErreur : Vous êtes déjà &6<group> &cdans les mondes de type &6<type>&c."),
 		
@@ -85,6 +87,8 @@ public class EPMessage extends EMessage {
 		USER_DEL_GROUP_STAFF("user.group.del.staff", 						"&6<player> &7n'est plus &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_DEL_GROUP_PLAYER("user.group.del.player", 						"&7Vous n'êtes plus &6<group> &7dans les mondes de type &6<type>&7 à cause de &6<staff>&7."),
 		USER_DEL_GROUP_EQUALS("user.group.del.equals", 						"&7Vous n'êtes plus &6<group> &7dans les mondes de type &6<type>&7."),
+		USER_DEL_GROUP_BROADCAST_PLAYER("user.group.del.broadcastPlayer", 	"&6<player> &7n'est plus &6<group> &7dans les mondes de type &6<type>&7 à cause de &6<staff>&7.."),
+		USER_DEL_GROUP_BROADCAST_EQUALS("user.group.del.broadcastEquals", 	"&6<player> est désormais &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_DEL_GROUP_ERROR_STAFF("user.group.del.errorStaff", 			"&cErreur : &6<player> &cn'a pas de groupe &cdans les mondes de type &6<type>&c."),
 		USER_DEL_GROUP_ERROR_EQUALS("user.group.del.errorEquals", 			"&cErreur : Vous n'avez pas de groupe dans les mondes de type &6<type>&c."),
 		
