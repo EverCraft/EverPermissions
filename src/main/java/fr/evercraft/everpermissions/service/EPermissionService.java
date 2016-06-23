@@ -70,7 +70,7 @@ public class EPermissionService implements PermissionService {
     	
     	// Default
     	this.defaultsCollection = new EDefaultsCollection(this.plugin);
-    	this.defaults = new ETempateSubject(this.plugin, SUBJECTS_DEFAULTS, this.defaultsCollection);
+    	this.defaults = new ETempateSubject(this.plugin, SUBJECTS_DEFAULTS, this.defaultsCollection, this);
     	
     	this.descriptions = new ConcurrentHashMap<String, EPermissionDescription>();
     	

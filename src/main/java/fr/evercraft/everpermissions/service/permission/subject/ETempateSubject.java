@@ -17,6 +17,7 @@
 package fr.evercraft.everpermissions.service.permission.subject;
 
 import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.EPermissionService;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 
 import org.spongepowered.api.service.context.Context;
@@ -31,11 +32,11 @@ public class ETempateSubject extends ESubject {
 	private final MemorySubjectData data;
 	private final MemorySubjectData transientData;
 
-    public ETempateSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection collection) {
+    public ETempateSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection collection, EPermissionService service) {
     	super(plugin, identifier, collection);
     	
-    	this.data = new MemorySubjectData(this.plugin.getService());
-        this.transientData = new MemorySubjectData(this.plugin.getService());
+    	this.data = new MemorySubjectData(service);
+        this.transientData = new MemorySubjectData(service);
     }
 
     /*
