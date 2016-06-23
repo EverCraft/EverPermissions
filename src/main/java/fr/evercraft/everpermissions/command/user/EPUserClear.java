@@ -96,9 +96,21 @@ public class EPUserClear extends ECommand<EverPermissions> {
 			if(staff.equals(user)) {
 				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_EQUALS.get()
 						.replaceAll("<player>", user.getName())));
+				if(EPMessages.USER_CLEAR_BROADCAST_EQUALS.has()) {
+					this.plugin.getService().broadcastMessage(staff,
+						EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_STAFF.get()
+							.replaceAll("<staff>", staff.getName())
+							.replaceAll("<player>", user.getName())));
+				}
 			} else {
 				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_STAFF.get()
 						.replaceAll("<player>", user.getName())));
+				if(EPMessages.USER_CLEAR_BROADCAST_PLAYER.has()) {
+					this.plugin.getService().broadcastMessage(staff, user.getUniqueId(),
+						EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_BROADCAST_PLAYER.get()
+							.replaceAll("<staff>", staff.getName())
+							.replaceAll("<player>", user.getName())));
+				}
 			}
 		} else {
 			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));

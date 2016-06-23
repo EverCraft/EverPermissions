@@ -128,6 +128,14 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 								.replaceAll("<player>", player.getName())
 								.replaceAll("<group>", group.get().getIdentifier())
 								.replaceAll("<type>", world.get())));
+						if(EPMessages.USER_DEL_GROUP_BROADCAST_EQUALS.has()) {
+							this.plugin.getService().broadcastMessage(staff,
+								EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_GROUP_BROADCAST_EQUALS.get()
+									.replaceAll("<staff>", staff.getName())
+									.replaceAll("<player>", player.getName())
+									.replaceAll("<group>", player.getIdentifier())
+									.replaceAll("<type>", world.get())));
+						}
 					} else {
 						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_GROUP_STAFF.get()
 								.replaceAll("<player>", player.getName())
@@ -139,6 +147,14 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 							optPlayer.get().sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_GROUP_PLAYER.get()
 									.replaceAll("<staff>", staff.getName())
 									.replaceAll("<group>", group.get().getIdentifier())
+									.replaceAll("<type>", world.get())));
+						}
+						if(EPMessages.USER_DEL_GROUP_BROADCAST_PLAYER.has()) {
+							this.plugin.getService().broadcastMessage(staff, player.getUniqueId(), 
+								EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_GROUP_BROADCAST_PLAYER.get()
+									.replaceAll("<staff>", staff.getName())
+									.replaceAll("<player>", player.getName())
+									.replaceAll("<group>", player.getIdentifier())
 									.replaceAll("<type>", world.get())));
 						}
 					}

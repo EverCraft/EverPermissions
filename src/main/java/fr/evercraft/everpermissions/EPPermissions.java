@@ -28,6 +28,8 @@ public enum EPPermissions implements EnumPermission {
 	HELP("help"),
 	RELOAD("reload"),
 	
+	BROADCAST("broadcast"),
+	
 	// Commands :
 	TRANSFERT("transfert"),
 	

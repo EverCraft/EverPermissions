@@ -131,6 +131,14 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<type>", type_user.get())));
+							if(EPMessages.USER_ADD_SUBGROUP_BROADCAST_EQUALS.has()) {
+								this.plugin.getService().broadcastMessage(staff,
+									EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_SUBGROUP_BROADCAST_EQUALS.get()
+										.replaceAll("<staff>", staff.getName())
+										.replaceAll("<player>", user.getName())
+										.replaceAll("<group>", group.getIdentifier())
+										.replaceAll("<type>", type_user.get())));
+							}
 						} else {
 							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_SUBGROUP_STAFF.get()
 									.replaceAll("<player>", user.getName())
@@ -141,6 +149,14 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 							if(player.isPresent()) {
 								player.get().sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_SUBGROUP_PLAYER.get()
 										.replaceAll("<staff>", staff.getName())
+										.replaceAll("<group>", group.getIdentifier())
+										.replaceAll("<type>", type_user.get())));
+							}
+							if(EPMessages.USER_ADD_SUBGROUP_BROADCAST_PLAYER.has()) {
+								this.plugin.getService().broadcastMessage(staff, user.getUniqueId(), 
+									EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_SUBGROUP_BROADCAST_PLAYER.get()
+										.replaceAll("<staff>", staff.getName())
+										.replaceAll("<player>", user.getName())
 										.replaceAll("<group>", group.getIdentifier())
 										.replaceAll("<type>", type_user.get())));
 							}

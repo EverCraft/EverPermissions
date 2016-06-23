@@ -68,8 +68,10 @@ public class EPMessage extends EMessage {
 		
 		// User :
 		USER_CLEAR_DESCRIPTION("user.clear.description", 		"Supprime un joueur"),
-		USER_CLEAR_STAFF("user.clear.staff", 					"&7Vous avez supprimé toutes les données de &6<player>&7."),
-		USER_CLEAR_EQUALS("user.clear.equals", 					"&7Vous avez supprimé toutes vos données."),
+		USER_CLEAR_STAFF("user.clear.staff", 					"&7Vous avez réinitialisé toutes les données de &6<player>&7."),
+		USER_CLEAR_EQUALS("user.clear.equals", 					"&7Vous avez réinitialisé toutes vos données."),
+		USER_CLEAR_BROADCAST_PLAYER("user.clear.broadcastPlayer", 	"&7Tous les données de &6<player> &7 ont été réinitialisé par &6<staff>&7."),
+		USER_CLEAR_BROADCAST_EQUALS("user.clear.broadcastEquals", 	"&7Tous les données de &6<player> &7 ont été réinitialisé."),
 
 		// User : Group
 		USER_ADD_GROUP_DESCRIPTION("user.group.add.description", 			"Défini le groupe d'un joueur",
@@ -77,8 +79,8 @@ public class EPMessage extends EMessage {
 		USER_ADD_GROUP_STAFF("user.group.add.staff", 						"&6<player> &7est désormais &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_ADD_GROUP_PLAYER("user.group.add.player", 						"&7Vous êtes désormais &6<group> &7dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
 		USER_ADD_GROUP_EQUALS("user.group.add.equals", 						"&7Vous êtes désormais &6<group> &7dans les mondes de type &6<type>&7."),
-		USER_ADD_GROUP_BROADCAST_PLAYER("user.group.add.broadcastPlayer", 	"&6<player> est désormais &6<group> &7dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
-		USER_ADD_GROUP_BROADCAST_EQUALS("user.group.add.broadcastEquals", 	"&6<player> est désormais &6<group> &7dans les mondes de type &6<type>&7."),
+		USER_ADD_GROUP_BROADCAST_PLAYER("user.group.add.broadcastPlayer", 	"&6<player> &7est désormais &6<group> &7dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
+		USER_ADD_GROUP_BROADCAST_EQUALS("user.group.add.broadcastEquals", 	"&6<player> &7est désormais &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_ADD_GROUP_ERROR_STAFF("user.group.add.errorStaff", 			"&cErreur : &6<player> &cest déjà &6<group> &cdans les mondes de type &6<type>&c."),
 		USER_ADD_GROUP_ERROR_EQUALS("user.group.add.errorEquals", 			"&cErreur : Vous êtes déjà &6<group> &cdans les mondes de type &6<type>&c."),
 		
@@ -87,8 +89,8 @@ public class EPMessage extends EMessage {
 		USER_DEL_GROUP_STAFF("user.group.del.staff", 						"&6<player> &7n'est plus &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_DEL_GROUP_PLAYER("user.group.del.player", 						"&7Vous n'êtes plus &6<group> &7dans les mondes de type &6<type>&7 à cause de &6<staff>&7."),
 		USER_DEL_GROUP_EQUALS("user.group.del.equals", 						"&7Vous n'êtes plus &6<group> &7dans les mondes de type &6<type>&7."),
-		USER_DEL_GROUP_BROADCAST_PLAYER("user.group.del.broadcastPlayer", 	"&6<player> &7n'est plus &6<group> &7dans les mondes de type &6<type>&7 à cause de &6<staff>&7.."),
-		USER_DEL_GROUP_BROADCAST_EQUALS("user.group.del.broadcastEquals", 	"&6<player> est désormais &6<group> &7dans les mondes de type &6<type>&7."),
+		USER_DEL_GROUP_BROADCAST_PLAYER("user.group.del.broadcastPlayer", 	"&6<player> &7n'est plus &6<group> &7dans les mondes de type &6<type>&7 à cause de &6<staff>&7."),
+		USER_DEL_GROUP_BROADCAST_EQUALS("user.group.del.broadcastEquals", 	"&6<player> &7n'est plus &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_DEL_GROUP_ERROR_STAFF("user.group.del.errorStaff", 			"&cErreur : &6<player> &cn'a pas de groupe &cdans les mondes de type &6<type>&c."),
 		USER_DEL_GROUP_ERROR_EQUALS("user.group.del.errorEquals", 			"&cErreur : Vous n'avez pas de groupe dans les mondes de type &6<type>&c."),
 		
@@ -97,6 +99,8 @@ public class EPMessage extends EMessage {
 		USER_ADD_SUBGROUP_STAFF("user.group.addsub.staff", 					"&6<player> &7possède désormais les droits &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_ADD_SUBGROUP_PLAYER("user.group.addsub.player", 				"&7Vous possédez désormais les droits &6<group> &7dans les mondes de type &6<type>&7 à cause de &6<staff>&7."),
 		USER_ADD_SUBGROUP_EQUALS("user.group.addsub.equals", 				"&7Vous possédez désormais les droits &6<group> &7dans les mondes de type &6<type>&7."),
+		USER_ADD_SUBGROUP_BROADCAST_PLAYER("user.group.addsub.broadcastPlayer", "&6<player> &7possède désormais les droits &6<group> &7dans les mondes de type &6<type>&7 à cause de &6<staff>&7."),
+		USER_ADD_SUBGROUP_BROADCAST_EQUALS("user.group.addsub.broadcastEquals", "&6<player> &7possède désormais les droits &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_ADD_SUBGROUP_ERROR_STAFF("user.group.addsub.errorStaff", 		"&cErreur : &6<player> &cpossède déjà les droits &6<group> &cdans les mondes de type &6<type>&c."),
 		USER_ADD_SUBGROUP_ERROR_EQUALS("user.group.addsub.errorEquals", 	"&cErreur : Vous possédez déjà les droits &6<group> &cdans les mondes de type &6<type>&c."),
 		
@@ -105,6 +109,8 @@ public class EPMessage extends EMessage {
 		USER_DEL_SUBGROUP_STAFF("user.group.delsub.staff", 					"&6<player> &7ne possède plus les droits &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_DEL_SUBGROUP_PLAYER("user.group.delsub.player", 				"&7Vous ne possédez plus les droits &6<group> &7dans les mondes de type &6<type>&7 à cause de &6<staff>&7."),
 		USER_DEL_SUBGROUP_EQUALS("user.group.delsub.equals", 				"&7Vous ne possédez plus les droits &6<group> &7dans les mondes de type &6<type>&7."),
+		USER_DEL_SUBGROUP_BROADCAST_PLAYER("user.group.delsub.broadcastPlayer", "&6<player> &7ne possède plus les droits &6<group> &7dans les mondes de type &6<type>&7 à cause de &6<staff>&7."),
+		USER_DEL_SUBGROUP_BROADCAST_EQUALS("user.group.delsub.broadcastEquals", "&6<player> &7ne possède plus les droits &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_DEL_SUBGROUP_ERROR_STAFF("user.group.delsub.errorStaff", 		"&cErreur : &6<player> &cne possède pas les droits &6<group> &cdans les mondes de type &6<type>&c."),
 		USER_DEL_SUBGROUP_ERROR_EQUALS("user.group.delsub.errorEquals", 	"&cErreur : Vous ne possédez pas les droits &6<group> &cdans les mondes de type &6<type>&c."),
 		
@@ -113,6 +119,8 @@ public class EPMessage extends EMessage {
 		USER_PROMOTE_STAFF("user.group.promote.staff", 									"&6<player> &7est désormais &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_PROMOTE_PLAYER("user.group.promote.player", 								"&7Vous êtes désormais &6<group> &7dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
 		USER_PROMOTE_EQUALS("user.group.promote.equals", 								"&7Vous êtes désormais &6<group> &7dans les mondes de type &6<type>&7."),
+		USER_PROMOTE_BROADCAST_PLAYER("user.group.promote.broadcastPlayer", 			"&6<player> &7est désormais &6<group> &7dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
+		USER_PROMOTE_BROADCAST_EQUALS("user.group.promote.broadcastEquals", 			"&6<player> &7est désormais &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_PROMOTE_ERROR_STAFF("user.group.promote.errorStaff",  						"&cErreur : &6<player> &cest déjà &6<group> &cdans les mondes de type &6<type>&c."),
 		USER_PROMOTE_ERROR_EQUALS("user.group.promote.errorEquals", 					"&cErreur : Vous êtes déjà &6<group> &cdans les mondes de type &6<type>&c."),
 		USER_PROMOTE_ERROR_DEMOTE_STAFF("user.group.promote.errorgroupDemoteStaff", 	"&cErreur : &6<player> &cpossède déjà un grade supérieur à &6<group> &cdans les mondes de type &6<type>&c."),
@@ -123,6 +131,8 @@ public class EPMessage extends EMessage {
 		USER_DEMOTE_STAFF("user.group.demote.staff", 							"&6<player> &7est désormais &6<group> &7dans les mondes de type &6<type>&7."),
 		USER_DEMOTE_PLAYER("user.group.demote.player", 							"&7Vous êtes désormais &6<group> &7dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
 		USER_DEMOTE_EQUALS("user.group.demote.equals", 							"&7Vous êtes désormais &6<group> &7dans les mondes de type &6<type>&7."),
+		USER_DEMOTE_BROADCAST_PLAYER("user.group.demote.broadcastPlayer", 		"&6<player> &7est désormais &6<group> &7dans les mondes de type &6<type>&7."),
+		USER_DEMOTE_BROADCAST_EQUALS("user.group.demote.broadcastEquals", 		"&6<player> &7est désormais &6<group> &7dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
 		USER_DEMOTE_ERROR_STAFF("user.group.demote.errorStaff", 				"&cErreur : &6<player> &cest déjà &6<group> &cdans les mondes de type &6<type>&c."),
 		USER_DEMOTE_ERROR_EQUALS("user.group.demote.errorEquals",				"&cErreur : Vous êtes déjà &6<group> &cdans les mondes de type &6<type>&c."),
 		USER_DEMOTE_ERROR_PROMOTE_STAFF("user.group.demote.errorPromoteStaff", 	"&cErreur : &6<player> &cpossède déjà un grade inférieur à &6<group> &cdans les mondes de type &6<type>&c."),
@@ -144,10 +154,14 @@ public class EPMessage extends EMessage {
 																						"Add permission directly to the player"),
 		USER_ADD_PERMISSION_TRUE_STAFF("user.permission.add.true.staff", 				"&6<player> &7possède désormais la permission '&6<permission>&7' dans les mondes de type &6<type>&7."),
 		USER_ADD_PERMISSION_TRUE_EQUALS("user.permission.add.true.equals", 				"&7Vous possédez désormais la permission '&6<permission>&7' &7dans les mondes de type &6<type>&7."),
+		USER_ADD_PERMISSION_TRUE_BROADCAST_PLAYER("user.permission.add.true.broadcastPlayer",	"&6<player> &7possède désormais la permission '&6<permission>&7' dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
+		USER_ADD_PERMISSION_TRUE_BROADCAST_EQUALS("user.permission.add.true.broadcastEquals", 	"&6<player> &7possède désormais la permission '&6<permission>&7' dans les mondes de type &6<type>&7."),
 		USER_ADD_PERMISSION_TRUE_ERROR_STAFF("user.permission.add.true.errorStaff", 	"&cErreur : &6<player> &cpossède déjà la permissions '&6<permission>&c' dans les mondes de type &6<type>&c."),
 		USER_ADD_PERMISSION_TRUE_ERROR_EQUALS("user.permission.add.true.errorEquals", 	"&cErreur : Vous possédez déjà la permissions '&6<permission>&c' dans les mondes de type &6<type>&c."),
 		USER_ADD_PERMISSION_FALSE_STAFF("user.permission.add.false.staff", 				"&6<player> &7ne possède plus la permission '&6<permission>&7' dans les mondes de type &6<type>&7."),
 		USER_ADD_PERMISSION_FALSE_EQUALS("user.permission.add.false.equals", 			"&7Vous ne possédez plus la permission '&6<permission>&7' &7dans les mondes de type &6<type>&7."),
+		USER_ADD_PERMISSION_FALSE_BROADCAST_PLAYER("user.permission.add.false.broadcastPlayer",	"&6<player> &7ne possède plus la permission '&6<permission>&7' dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
+		USER_ADD_PERMISSION_FALSE_BROADCAST_EQUALS("user.permission.add.false.broadcastEquals", "&6<player> &7ne possède plus la permission '&6<permission>&7' dans les mondes de type &6<type>&7."),
 		USER_ADD_PERMISSION_FALSE_ERROR_STAFF("user.permission.add.false.errorStaff", 	"&cErreur : &6<player> &cne possède pas la permission '&6<permission>&c' dans les mondes de type &6<type>&c."),
 		USER_ADD_PERMISSION_FALSE_ERROR_EQUALS("user.permission.add.false.errorEquals",	 "&cErreur : Vous ne possédez pas la permission '&6<permission>&c' dans les mondes de type &6<type>&c."),
 		
@@ -155,6 +169,8 @@ public class EPMessage extends EMessage {
 																						"Removes permission directly from the player"),
 		USER_DEL_PERMISSION_STAFF("user.permission.del.staff", 							"&6<player> &7ne possède plus la permission '&6<permission>&7' dans les mondes de type &6<type>&7."),
 		USER_DEL_PERMISSION_EQUALS("user.permission.del.equals", 						"&7Vous ne possédez plus la permission '&6<permission>&7' &7dans les mondes de type &6<type>&7."),
+		USER_DEL_PERMISSION_BROADCAST_PLAYER("user.permission.del.broadcastPlayer",		"&6<player> &7ne possède plus la permission '&6<permission>&7' dans les mondes de type &6<type>&7 grâce à &6<staff>&7."),
+		USER_DEL_PERMISSION_BROADCAST_EQUALS("user.permission.del.broadcastEquals", 	"&6<player> &7ne possède plus la permission '&6<permission>&7' dans les mondes de type &6<type>&7."),
 		USER_DEL_PERMISSION_ERROR_STAFF("user.permission.del.errorStaff", 				"&cErreur : &6<player> &cne possède pas la permission '&6<permission>&c' dans les mondes de type &6<type>&c."),
 		USER_DEL_PERMISSION_ERROR_EQUALS("user.permission.del.errorEquals", 			"&cErreur : Vous ne possédez pas la permission '&6<permission>&c' dans les mondes de type &6<type>&c."),
 		
@@ -415,6 +431,10 @@ public class EPMessage extends EMessage {
 		
 		public TextColor getColor() {
 			return EChat.getTextColor(this.get());
+		}
+
+		public boolean has() {
+			return !this.get().isEmpty();
 		}
 	}
 }

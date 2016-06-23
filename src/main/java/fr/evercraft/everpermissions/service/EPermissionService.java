@@ -20,6 +20,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
 import fr.evercraft.everapi.exception.PluginDisableException;
+import fr.evercraft.everapi.server.player.EPlayer;
+import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.EPermissionDescription;
@@ -32,15 +34,18 @@ import fr.evercraft.everpermissions.service.permission.collection.EUserCollectio
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 import fr.evercraft.everpermissions.service.permission.subject.ETempateSubject;
 
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.context.ContextCalculator;
+import org.spongepowered.api.text.Text;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -194,5 +199,38 @@ public class EPermissionService implements PermissionService {
 
 	public void registerDescription(final EPermissionDescription description) {
 		this.descriptions.put(description.getId(), description);
+	}
+	
+	/*
+	 * BroadCast
+	 */
+
+	public void broadcastMessage(CommandSource player, Text message) {
+		if(player instanceof EPlayer) {
+			((EPlayer) player).broadcastMessage(message, EPPermissions.BROADCAST.get());
+		} else {
+			for(EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
+				if(other.hasPermission(EPPermissions.BROADCAST.get())) {
+					other.sendMessage(message);
+				}
+			}
+		}
+	}
+	
+	public void broadcastMessage(CommandSource staff, UUID uuid, Text message) {
+		if(staff instanceof EPlayer) {
+			EPlayer player = (EPlayer) staff;
+			for(EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
+				if(!player.equals(other) && !uuid.equals(other) && other.hasPermission(EPPermissions.BROADCAST.get())) {
+					other.sendMessage(message);
+				}
+			}
+		} else {
+			for(EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
+				if(!uuid.equals(other) && other.hasPermission(EPPermissions.BROADCAST.get())) {
+					other.sendMessage(message);
+				}
+			}
+		}
 	}
 }
