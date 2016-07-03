@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import com.google.common.collect.ImmutableList;
@@ -38,7 +38,7 @@ import com.google.common.collect.Maps;
 
 import fr.evercraft.everpermissions.EverPermissions;
 
-public abstract class EOptionSubjectData implements OptionSubjectData {
+public abstract class EOptionSubjectData implements SubjectData {
 	protected final EverPermissions plugin;
 	protected final Subject subject;
 	

@@ -21,7 +21,6 @@ import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollec
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.service.context.Context;
 
 import com.google.common.base.Preconditions;
@@ -33,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class ESubject implements OptionSubject {
+public abstract class ESubject implements Subject {
 	protected final EverPermissions plugin;
 	
     private final ESubjectCollection collection;
