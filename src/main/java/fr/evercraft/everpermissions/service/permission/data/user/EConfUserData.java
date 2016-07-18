@@ -16,6 +16,7 @@
  */
 package fr.evercraft.everpermissions.service.permission.data.user;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -274,7 +275,7 @@ public class EConfUserData implements IUserData {
 		if(conf.isPresent()) {
 			List<String> subgroups;
 			try {
-				subgroups = conf.get().get(subject + ".subgroups").getList(TypeToken.of(String.class));
+				subgroups = new ArrayList<String>(conf.get().get(subject + ".subgroups").getList(TypeToken.of(String.class)));
 				subgroups.add(parent);
 				conf.get().get(subject + ".subgroups").setValue(subgroups);
 				this.plugin.getLogger().debug("Added to the configs file : (identifier='" + subject + "';subgroup='" + parent + "';type='" + world + "')");
@@ -291,7 +292,7 @@ public class EConfUserData implements IUserData {
 		if(conf.isPresent()) {
 			List<String> subgroups;
 			try {
-				subgroups = conf.get().get(subject + ".subgroups").getList(TypeToken.of(String.class));
+				subgroups = new ArrayList<String>(conf.get().get(subject + ".subgroups").getList(TypeToken.of(String.class)));
 				subgroups.remove(parent);
 				if(subgroups.isEmpty()) {
 					conf.get().get(subject).removeChild("subgroups");

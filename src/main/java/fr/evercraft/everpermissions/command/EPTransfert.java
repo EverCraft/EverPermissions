@@ -344,7 +344,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 						if(subject != null) {
 							List<String> subgroups;
 							try {
-								subgroups = config.getNode().getNode(list.getString("uuid")).getNode("subgroups").getList(TypeToken.of(String.class));
+								subgroups = new ArrayList<String>(config.getNode().getNode(list.getString("uuid")).getNode("subgroups").getList(TypeToken.of(String.class)));
 								subgroups.add(list.getString("group"));
 								config.getNode().getNode(list.getString("uuid")).getNode("subgroups").setValue(subgroups);
 							} catch (ObjectMappingException e) {}

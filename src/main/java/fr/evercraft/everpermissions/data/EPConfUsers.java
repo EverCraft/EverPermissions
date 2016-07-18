@@ -49,13 +49,13 @@ public class EPConfUsers extends EConfig {
 			addDefault("86f8f95b-e5e6-45c4-bf85-4d64dbd0903f.permissions", permissions);
 			addDefault("86f8f95b-e5e6-45c4-bf85-4d64dbd0903f.options", options);
 			addDefault("86f8f95b-e5e6-45c4-bf85-4d64dbd0903f.group", "Admin");
-			addDefault("86f8f95b-e5e6-45c4-bf85-4d64dbd0903f.subgroup", Arrays.asList());
+			addDefault("86f8f95b-e5e6-45c4-bf85-4d64dbd0903f.subgroups", Arrays.asList());
 			
 			// Lesbleu
 			addDefault("f3345769-4c70-4a9f-9db9-bdb8f9e8a46c.permissions", permissions);
 			addDefault("f3345769-4c70-4a9f-9db9-bdb8f9e8a46c.options", options);
 			addDefault("f3345769-4c70-4a9f-9db9-bdb8f9e8a46c.group", "Moderator");
-			addDefault("f3345769-4c70-4a9f-9db9-bdb8f9e8a46c.subgroup", Arrays.asList("Admin"));
+			addDefault("f3345769-4c70-4a9f-9db9-bdb8f9e8a46c.subgroups", Arrays.asList("Default"));
 		}
 	}
 }

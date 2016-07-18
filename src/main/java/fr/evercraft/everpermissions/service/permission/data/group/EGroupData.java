@@ -18,6 +18,7 @@ package fr.evercraft.everpermissions.service.permission.data.group;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -145,7 +146,7 @@ public class EGroupData extends EOptionSubjectData {
     			if(conf.isPresent()) {
 					try {
 						ConfigurationNode node = conf.get().getNode().getNode(subject.getIdentifier());
-						List<String> subgroups = node.getNode("inheritances").getList(TypeToken.of(String.class));
+						List<String> subgroups = new ArrayList<String>(node.getNode("inheritances").getList(TypeToken.of(String.class)));
 						subgroups.add(parent.getIdentifier());
 						
 						node.getNode("inheritances").setValue(subgroups);
@@ -175,7 +176,7 @@ public class EGroupData extends EOptionSubjectData {
     			if(conf.isPresent()) {
 					try {
 						ConfigurationNode node = conf.get().getNode().getNode(subject.getIdentifier());
-						List<String> subgroups =  node.getNode("inheritances").getList(TypeToken.of(String.class));
+						List<String> subgroups =  new ArrayList<String>(node.getNode("inheritances").getList(TypeToken.of(String.class)));
 						subgroups.remove(parent.getIdentifier());
 						if(subgroups.isEmpty()) {
 							node.removeChild("inheritances");
