@@ -221,13 +221,13 @@ public class EPermissionService implements PermissionService {
 		if(staff instanceof EPlayer) {
 			EPlayer player = (EPlayer) staff;
 			for(EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
-				if(!player.equals(other) && !uuid.equals(other) && other.hasPermission(EPPermissions.BROADCAST.get())) {
+				if(!player.equals(other) && !uuid.equals(other.getUniqueId()) && other.hasPermission(EPPermissions.BROADCAST.get())) {
 					other.sendMessage(message);
 				}
 			}
 		} else {
 			for(EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
-				if(!uuid.equals(other) && other.hasPermission(EPPermissions.BROADCAST.get())) {
+				if(!uuid.equals(other.getUniqueId()) && other.hasPermission(EPPermissions.BROADCAST.get())) {
 					other.sendMessage(message);
 				}
 			}
