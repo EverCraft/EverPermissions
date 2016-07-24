@@ -140,7 +140,7 @@ public class EConfUserData implements IUserData {
 			// Ajoute une permission
 			} else {
 				permissions.getNode(permission).setValue(value.asBoolean());
-				this.plugin.getLogger().warn("Added to the configs file : (identifier='" + subject + "';permission='" + permission + "';value='" + value.asBoolean() + "';type='" + world + "')");
+				this.plugin.getLogger().debug("Added to the configs file : (identifier='" + subject + "';permission='" + permission + "';value='" + value.asBoolean() + "';type='" + world + "')");
 			}
 			this.plugin.getManagerData().saveUser(world);
 			return true;

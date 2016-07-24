@@ -53,6 +53,7 @@ public class EUserCollection extends ESubjectCollection {
 					    	 */
 							@Override
 							public void onRemoval(RemovalNotification<String, EUserSubject> notification) {
+								EUserCollection.this.plugin.getLogger().debug("Unloading the player cache : " + notification.getValue().getIdentifier());
 								EUserCollection.this.plugin.getManagerEvent().post(notification.getValue(), Action.USER_REMOVED);
 							}
 					    	
