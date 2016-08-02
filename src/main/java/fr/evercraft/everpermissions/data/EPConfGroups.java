@@ -73,6 +73,8 @@ public class EPConfGroups extends EConfig {
 			permissions.put("everessentials.toggle.command", true);
 			permissions.put("everessentials.warp.command", true);
 			permissions.put("everessentials.whois.command", true);
+			
+			permissions.put("minecraft.command.help", true);
 
 			options.put("prefix", "&e");
 			options.put("suffix", "");
