@@ -75,7 +75,7 @@ public class EUserCollection extends ESubjectCollection {
 	}
 
 	@Override
-	public EUserSubject get(String identifier) {
+	public EUserSubject get(String identifier) {		
 		try {
 			if(!this.subjects.containsKey(identifier)) {
 				return this.cache.get(identifier);
