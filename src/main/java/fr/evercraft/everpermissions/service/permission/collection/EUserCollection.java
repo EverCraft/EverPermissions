@@ -46,7 +46,7 @@ public class EUserCollection extends ESubjectCollection {
 		this.subjects = new ConcurrentHashMap<String, EUserSubject>();
 		this.cache = CacheBuilder.newBuilder()
 					    .maximumSize(100)
-					    .expireAfterAccess(5, TimeUnit.MINUTES)
+					    .expireAfterAccess(1, TimeUnit.DAYS)
 					    .removalListener(new RemovalListener<String, EUserSubject>() {
 					    	/**
 					    	 * Supprime un joueur du cache
