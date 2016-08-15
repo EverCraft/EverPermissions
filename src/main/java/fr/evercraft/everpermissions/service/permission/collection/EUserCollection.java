@@ -105,8 +105,11 @@ public class EUserCollection extends ESubjectCollection {
 	 * Rechargement : Vide le cache et recharge tous les joueurs
 	 */
 	public void reload() {
-		this.cache.cleanUp();
 		for(EUserSubject subject : this.subjects.values()) {
+			subject.reload();
+		}
+		
+		for(EUserSubject subject : this.cache.asMap().values()) {
 			subject.reload();
 		}
 	}
