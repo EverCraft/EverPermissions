@@ -76,7 +76,7 @@ public abstract class EOptionSubjectData implements SubjectData {
     	checkNotNull(contexts, "contexts");
     	
     	ENode perms = this.permissions.get(contexts);
-    	if(perms != null) {
+    	if (perms != null) {
     		return perms;
     	}
     	return new ENode();
@@ -96,7 +96,7 @@ public abstract class EOptionSubjectData implements SubjectData {
     	checkNotNull(contexts, "contexts");
     	
     	ENode perms = this.permissions.get(contexts);
-    	if(perms != null) {
+    	if (perms != null) {
     		return perms.asMap();
     	}
     	return Collections.emptyMap();
@@ -114,21 +114,21 @@ public abstract class EOptionSubjectData implements SubjectData {
         // Aucune permissions 
         if (oldTree == null) {
         	// Si on ne supprime pas la permission
-        	if(value != Tristate.UNDEFINED) {
+        	if (value != Tristate.UNDEFINED) {
         		this.permissions.putIfAbsent(contexts, ENode.of(ImmutableMap.of(permission, value.asBoolean())));
         		resultat = true;
         	}
         // Supprime une permission
-        } else if(value == Tristate.UNDEFINED) {
+        } else if (value == Tristate.UNDEFINED) {
         	// Si il a la permission
-        	if(oldTree.getTristate(permission) != Tristate.UNDEFINED) {
+        	if (oldTree.getTristate(permission) != Tristate.UNDEFINED) {
         		this.permissions.replace(contexts, oldTree, oldTree.withValue(permission, value));
         		resultat = true;
         	}
         // Ajoute une permission
         } else {
         	// Si la permission est différente
-        	if(!oldTree.asMap().containsKey(permission) || oldTree.asMap().get(permission) != value.asBoolean()) {
+        	if (!oldTree.asMap().containsKey(permission) || oldTree.asMap().get(permission) != value.asBoolean()) {
         		this.permissions.replace(contexts, oldTree, oldTree.withValue(permission, value));
         		resultat = true;
         	}
@@ -169,7 +169,7 @@ public abstract class EOptionSubjectData implements SubjectData {
     	checkNotNull(contexts, "contexts");
     	
         List<String> ret = this.groups.get(contexts);
-        if(ret != null) {
+        if (ret != null) {
         	return toSubjectList(ret);
         }
         return Collections.emptyList();
@@ -182,10 +182,10 @@ public abstract class EOptionSubjectData implements SubjectData {
         contexts = ImmutableSet.copyOf(contexts);
         
         List<String> parents = this.groups.get(contexts);
-        if(parents == null) {
+        if (parents == null) {
         	this.groups.put(contexts, ImmutableList.<String>builder().add(parent.getIdentifier()).build());
         	return true;
-        } else if(!parents.contains(parent.getIdentifier())) {
+        } else if (!parents.contains(parent.getIdentifier())) {
         	this.groups.replace(contexts, ImmutableList.<String>builder().addAll(parents).add(parent.getIdentifier()).build());
         	return true;
         }
@@ -199,7 +199,7 @@ public abstract class EOptionSubjectData implements SubjectData {
         contexts = ImmutableSet.copyOf(contexts);
         
         List<String> parents = new ArrayList<String>(this.groups.get(contexts));
-        if(parents != null && parents.contains(parent.getIdentifier())) {
+        if (parents != null && parents.contains(parent.getIdentifier())) {
         	parents.remove(parent.getIdentifier());
         	this.groups.replace(contexts, ImmutableList.copyOf(parents));
         	return true;
@@ -242,7 +242,7 @@ public abstract class EOptionSubjectData implements SubjectData {
     @Override
     public Map<String, String> getOptions(final Set<Context> contexts) {
     	Map<String, String> ret = this.options.get(contexts);
-    	if(ret != null) {
+    	if (ret != null) {
     		return ImmutableMap.copyOf(ret);
     	}
         return ImmutableMap.of();
@@ -255,7 +255,7 @@ public abstract class EOptionSubjectData implements SubjectData {
         // Aucune option pour ce context
         if (origMap == null) {
         	// Si on ne supprime pas l'option
-        	if(value != null) {
+        	if (value != null) {
         		this.options.putIfAbsent(ImmutableSet.copyOf(contexts), ImmutableMap.of(key.toLowerCase(), value));
         		resultat = true;
         	}
@@ -263,7 +263,7 @@ public abstract class EOptionSubjectData implements SubjectData {
         } else {
         	// Si on supprime l'option
         	Map<String, String> newMap = new HashMap<String, String>();
-        	if(value == null) {
+        	if (value == null) {
         		newMap.putAll(origMap);
         		newMap.remove(key);
         	} else {

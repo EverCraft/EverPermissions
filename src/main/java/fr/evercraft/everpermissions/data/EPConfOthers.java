@@ -30,7 +30,7 @@ public class EPConfOthers extends EConfig {
 
 	@Override
 	public void loadDefault() {
-		if(this.getNode().getValue() == null) {
+		if (this.getNode().getValue() == null) {
 			Map<String, Boolean> permissions = new HashMap<String, Boolean>();
 			Map<String, String> options = new HashMap<String, String>();
 

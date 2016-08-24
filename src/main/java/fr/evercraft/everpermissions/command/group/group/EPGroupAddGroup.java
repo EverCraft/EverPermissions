@@ -58,9 +58,9 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
+		if (args.size() == 1){
 			suggests.add("");
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -70,16 +70,16 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le monde
-		if(args.size() == 1) {
+		if (args.size() == 1) {
 			// Si la source est un joueur
-			if(source instanceof EPlayer) {
+			if (source instanceof EPlayer) {
 				resultat = command(source, args.get(0), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
 				resultat = command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connais le monde
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			resultat = command(source, args.get(0), args.get(1));
 		// Nombre d'argument incorrect
 		} else {
@@ -91,12 +91,12 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource player, final String group_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde existant
-		if(type_group.isPresent()) {
+		if (type_group.isPresent()) {
 			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
 			// Groupe introuvable
-			if(group == null || !group.hasWorld(type_group.get())) {
+			if (group == null || !group.hasWorld(type_group.get())) {
 				// Le groupe a bien été ajouté
-				if(this.plugin.getService().getGroupSubjects().register(group_name, type_group.get())) {
+				if (this.plugin.getService().getGroupSubjects().register(group_name, type_group.get())) {
 					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_GROUP_STAFF.get()
 							.replaceAll("<group>", group_name)
 							.replaceAll("<type>", type_group.get())));

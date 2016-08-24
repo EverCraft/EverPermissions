@@ -64,14 +64,14 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
+		if (args.size() == 1){
 			suggests = null;
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.add("ever");
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			suggests.add("true");
 			suggests.add("false");
-		} else if(args.size() == 4) {
+		} else if (args.size() == 4) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -81,12 +81,12 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le joueur
-		if(args.size() == 3) {
+		if (args.size() == 3) {
 			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optUser.isPresent()){
+			if (optUser.isPresent()){
 				// Si la source est un joueur
-				if(source instanceof EPlayer) {
+				if (source instanceof EPlayer) {
 					resultat = command(source, optUser.get(), args.get(1), args.get(2), ((EPlayer) source).getWorld().getName());
 				// La source n'est pas un joueur
 				} else {
@@ -97,10 +97,10 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// On connais le joueur
-		} else if(args.size() == 4) {
+		} else if (args.size() == 4) {
 			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optPlayer.isPresent()){
+			if (optPlayer.isPresent()){
 				resultat = command(source, optPlayer.get(), args.get(1), args.get(2), args.get(3));
 			// Le joueur est introuvable
 			} else {
@@ -116,21 +116,21 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final User user, final String permission, final String value_name, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
-		if(type_user.isPresent()) {
+		if (type_user.isPresent()) {
 			Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
 			// La value est un boolean
-			if(value.isPresent()) {
+			if (value.isPresent()) {
 				// La permission a bien été ajouté
-				if(user.getSubjectData().setPermission(EContextCalculator.getContextWorld(world_name), permission, Tristate.fromBoolean(value.get()))) {
+				if (user.getSubjectData().setPermission(EContextCalculator.getContextWorld(world_name), permission, Tristate.fromBoolean(value.get()))) {
 					// Permission : True
-					if(value.get()) {
-						if(staff.equals(user)) {
+					if (value.get()) {
+						if (staff.equals(user)) {
 							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_TRUE_EQUALS.get()
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
 							
-							if(EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_EQUALS.has()) {
+							if (EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_EQUALS.has()) {
 								this.plugin.getService().broadcastMessage(staff,
 									EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_EQUALS.get()
 										.replaceAll("<staff>", staff.getName())
@@ -144,7 +144,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
 							
-							if(EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_PLAYER.has()) {
+							if (EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_PLAYER.has()) {
 								this.plugin.getService().broadcastMessage(staff,
 									EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_PLAYER.get()
 										.replaceAll("<staff>", staff.getName())
@@ -155,13 +155,13 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 						}
 					// Permission : False
 					} else {
-						if(staff.equals(user)) {
+						if (staff.equals(user)) {
 							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_FALSE_EQUALS.get()
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
 							
-							if(EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_EQUALS.has()) {
+							if (EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_EQUALS.has()) {
 								this.plugin.getService().broadcastMessage(staff,
 									EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_EQUALS.get()
 										.replaceAll("<staff>", staff.getName())
@@ -175,7 +175,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 									.replaceAll("<permission>", permission)
 									.replaceAll("<type>", type_user.get())));
 							
-							if(EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_PLAYER.has()) {
+							if (EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_PLAYER.has()) {
 								this.plugin.getService().broadcastMessage(staff,
 									EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_PLAYER.get()
 										.replaceAll("<staff>", staff.getName())
@@ -189,8 +189,8 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 				// La permission n'a pas été ajouté
 				} else {
 					// Permission : True
-					if(value.get()) {
-						if(staff.equals(user)) {
+					if (value.get()) {
+						if (staff.equals(user)) {
 							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_TRUE_ERROR_EQUALS.get()
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)
@@ -203,7 +203,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 						}
 					// Permission : False
 					} else {
-						if(staff.equals(user)) {
+						if (staff.equals(user)) {
 							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_FALSE_ERROR_EQUALS.get()
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<permission>", permission)

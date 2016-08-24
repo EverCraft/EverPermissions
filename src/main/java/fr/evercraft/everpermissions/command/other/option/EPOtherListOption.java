@@ -64,11 +64,11 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
-			for(Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
+		if (args.size() == 1){
+			for (Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-			for(Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
+			for (Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
 		}
@@ -78,10 +78,10 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Résultat de la commande :
 		boolean resultat = false;
-		if(args.size() == 1) {
+		if (args.size() == 1) {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le joueur existe
-			if(optSubject.isPresent()){
+			if (optSubject.isPresent()){
 				resultat = command(source, optSubject.get());
 			// Le joueur est introuvable
 			} else {
@@ -100,11 +100,11 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 		
 		// La liste des options
 		Map<String, String> options = subject.getSubjectData().getOptions(contexts);
-		if(options.isEmpty()) {
+		if (options.isEmpty()) {
 			list.add(EPMessages.OTHER_LIST_OPTION_OPTION_EMPTY.getText());
 		} else {
 			list.add(EPMessages.OTHER_LIST_OPTION_OPTION.getText());
-			for(Entry<String, String> permission : options.entrySet()) {
+			for (Entry<String, String> permission : options.entrySet()) {
 				list.add(ETextBuilder.toBuilder(EPMessages.OTHER_LIST_OPTION_OPTION_LINE.get()
 							.replaceAll("<option>", permission.getKey()))
 						.replace("<value>", Text.builder(permission.getValue())
@@ -116,9 +116,9 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 		
 		// La liste des options temporaires
 		options = subject.getTransientSubjectData().getOptions(contexts);
-		if(!options.isEmpty()) {
+		if (!options.isEmpty()) {
 			list.add(EPMessages.OTHER_LIST_OPTION_TRANSIENT.getText());
-			for(Entry<String, String> permission : options.entrySet()) {
+			for (Entry<String, String> permission : options.entrySet()) {
 				list.add(ETextBuilder.toBuilder(EPMessages.OTHER_LIST_OPTION_TRANSIENT_LINE.get()
 							.replaceAll("<option>", permission.getKey()))
 						.replace("<value>", Text.builder(permission.getValue())

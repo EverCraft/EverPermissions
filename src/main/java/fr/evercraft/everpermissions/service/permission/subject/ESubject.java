@@ -78,7 +78,7 @@ public abstract class ESubject implements Subject {
     public Optional<String> getOption(final Set<Context> contexts, final String option) {
 		// TempoData : Permissions
 		String value = this.getTransientSubjectData().getOptions(contexts).get(option);
-		if(value != null) {
+		if (value != null) {
 			return Optional.of(value);
 		}
     	
@@ -87,14 +87,14 @@ public abstract class ESubject implements Subject {
     	Optional<String> optValue;
     	while(subjects.hasNext()) {
     		optValue = ((ESubject) subjects.next()).getOption(contexts, option);
-    		if(optValue.isPresent()) {
+    		if (optValue.isPresent()) {
     			return optValue;
     		}
     	}
     	
     	// SubjectData : Permissions
     	value = this.getSubjectData().getOptions(contexts).get(option);
-    	if(value != null) {
+    	if (value != null) {
 			return Optional.of(value);
 		}
     	
@@ -102,7 +102,7 @@ public abstract class ESubject implements Subject {
     	subjects = this.getSubjectData().getParents(contexts).iterator();
     	while(subjects.hasNext()) {
     		optValue = ((ESubject) subjects.next()).getOption(contexts, option);
-    		if(optValue.isPresent()) {
+    		if (optValue.isPresent()) {
     			return optValue;
     		}
     	}
@@ -143,7 +143,7 @@ public abstract class ESubject implements Subject {
     
     @Override
     public boolean equals(final Object other) {
-    	if(this == other) {
+    	if (this == other) {
     		return true;
     	}
         if (other == null || !(other instanceof ESubject)) {

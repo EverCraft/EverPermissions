@@ -81,13 +81,13 @@ public class EGroupCollection extends ESubjectCollection {
      */
     public boolean register(final String identifier, final String type) {
 		Optional<EPConfGroups> groups =  this.plugin.getManagerData().getConfGroup(type);
-		if(groups.isPresent()) {
+		if (groups.isPresent()) {
 	    	groups.get().addDefault(identifier + ".default", false);
 	    	groups.get().addDefault(identifier + ".inheritances", Arrays.asList());
 	    	
 	    	// Création du groupe si il n'existe pas
 	    	EGroupSubject group =  this.get(identifier);
-	    	if(group == null) {
+	    	if (group == null) {
 	    		group = new EGroupSubject(this.plugin, identifier, this);
 	    		this.subject.putIfAbsent(identifier.toLowerCase(), group);
 	    	}
@@ -108,10 +108,10 @@ public class EGroupCollection extends ESubjectCollection {
      */
     public boolean remove(final String identifier, final String type) {
     	Optional<EPConfGroups> groups =  this.plugin.getManagerData().getConfGroup(type);
-    	if(groups.isPresent()) {
+    	if (groups.isPresent()) {
 	    	groups.get().getNode().removeChild(identifier);
 	    	EGroupSubject group = this.get(identifier);
-	    	if(group != null) {
+	    	if (group != null) {
 	    		group.clear(type);
 	    		this.groups_default.remove(type, group);
 	    		
@@ -131,17 +131,17 @@ public class EGroupCollection extends ESubjectCollection {
 		Chronometer chronometer = new Chronometer();
 		Optional<EPConfGroups> conf = this.plugin.getManagerData().registerGroup(world_name);
 		// Si c'est un nouveau type de groupe
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			Optional<String> type = this.plugin.getManagerData().getTypeGroup(world_name);
-			if(type.isPresent()) {
+			if (type.isPresent()) {
 				Set<Context> contexts = EContextCalculator.getContextWorld(type.get());
 				// Chargement des permissions et des options
 				for (Entry<Object, ? extends ConfigurationNode> group : conf.get().getNode().getChildrenMap().entrySet()) {
-					if(group.getKey() instanceof String) {
+					if (group.getKey() instanceof String) {
 						String group_name = (String) group.getKey();
 						// Initialisation du groupe
 			    		EGroupSubject subject;
-			    		if(!this.subject.containsKey(group_name.toLowerCase())) {
+			    		if (!this.subject.containsKey(group_name.toLowerCase())) {
 			    			subject = new EGroupSubject(this.plugin, group_name, this);
 			    			this.subject.put(group_name.toLowerCase(), subject);
 			    		} else {
@@ -150,7 +150,7 @@ public class EGroupCollection extends ESubjectCollection {
 			    		subject.registerWorld(type.get());
 			    		// Chargement des permissions
 			    		for (Entry<Object, ? extends ConfigurationNode> permission : group.getValue().getNode("permissions").getChildrenMap().entrySet()) {
-			    			if(group.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
+			    			if (group.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
 			    				subject.getSubjectData().setPermissionExecute(contexts, (String) permission.getKey(), Tristate.fromBoolean(permission.getValue().getBoolean(false)));
 			    			} else {
 			    				this.plugin.getLogger().warn("Error : Loading group ("
@@ -160,7 +160,7 @@ public class EGroupCollection extends ESubjectCollection {
 			    		}
 			    		// Chargement des options
 			    		for (Entry<Object, ? extends ConfigurationNode> options : group.getValue().getNode("options").getChildrenMap().entrySet()) {
-			    			if(group.getKey() instanceof String && options.getValue().getValue() instanceof String) {
+			    			if (group.getKey() instanceof String && options.getValue().getValue() instanceof String) {
 			    				subject.getSubjectData().setOptionExecute(contexts, (String) options.getKey(), options.getValue().getString(""));
 			    			} else {
 			    				this.plugin.getLogger().warn("Error : Loading group ("
@@ -172,13 +172,13 @@ public class EGroupCollection extends ESubjectCollection {
 				}
 				// Chargement des inheritances
 				for (Entry<Object, ? extends ConfigurationNode> group : conf.get().getNode().getChildrenMap().entrySet()) {
-					if(group.getKey() instanceof String) {
+					if (group.getKey() instanceof String) {
 						String group_name = (String) group.getKey();
 						EGroupSubject subject = get(group_name);
 						try {
 							for (String inheritance : group.getValue().getNode("inheritances").getList(TypeToken.of(String.class))) {
 								EGroupSubject parent = get(inheritance);
-								if(parent != null && !parent.equals(subject)) {
+								if (parent != null && !parent.equals(subject)) {
 									subject.getSubjectData().addParentExecute(contexts, parent);
 								} else {
 									this.plugin.getLogger().warn("Error : Loading group ("
@@ -193,13 +193,13 @@ public class EGroupCollection extends ESubjectCollection {
 				// Event GROUP_ADDED
 				// Ajout du groupe par défaut
 				for (Entry<Object, ? extends ConfigurationNode> group : conf.get().getNode().getChildrenMap().entrySet()) {
-					if(group.getKey() instanceof String) {
+					if (group.getKey() instanceof String) {
 						String group_name = (String) group.getKey();
 						EGroupSubject subject = get(group_name);
-						if(subject != null) {
+						if (subject != null) {
 							this.plugin.getManagerEvent().post(subject, Action.GROUP_ADDED);
 							// Si c'est un groupe par défaut
-							if(group.getValue().getNode("default").getBoolean(false)) {
+							if (group.getValue().getNode("default").getBoolean(false)) {
 				    			this.groups_default.put(type.get(), subject);
 				    			
 				    			this.plugin.getManagerEvent().post(PermSystemEvent.Action.DEFAULT_GROUP_CHANGED);
@@ -219,17 +219,17 @@ public class EGroupCollection extends ESubjectCollection {
 	 */
 	public void removeWorld(final String world_name) {
     	Optional<String> world = this.plugin.getManagerData().getTypeGroup(world_name);
-		if(world.isPresent()) {
+		if (world.isPresent()) {
 			Optional<EPConfGroups> conf = this.plugin.getManagerData().removeGroup(world_name);
-			if(conf.isPresent()) {
+			if (conf.isPresent()) {
 				for (Entry<Object, ? extends ConfigurationNode> group : conf.get().getNode().getChildrenMap().entrySet()) {
-					if(group.getKey() instanceof String) {
+					if (group.getKey() instanceof String) {
 						EGroupSubject subject = this.get((String) group.getKey());
-						if(subject != null) {
+						if (subject != null) {
 							subject.clear(world.get());
 							this.groups_default.remove(world.get(), subject);
 							
-							if(subject.getWorlds().isEmpty()) {
+							if (subject.getWorlds().isEmpty()) {
 								this.subject.remove(subject);
 							}
 
@@ -250,7 +250,7 @@ public class EGroupCollection extends ESubjectCollection {
 	public Set<EGroupSubject> getGroups(final String type) {
 		Set<EGroupSubject> groups = new HashSet<EGroupSubject>();
 		for (EGroupSubject group : this.subject.values()) {
-			if(group.hasWorld(type)) {
+			if (group.hasWorld(type)) {
 				groups.add(group);
 			}
 		}
@@ -286,10 +286,10 @@ public class EGroupCollection extends ESubjectCollection {
 	 */
 	public boolean registerDefault(final EGroupSubject group, final String type) {
 		// Il n'y a pas de groupe par défaut
-		if(!this.groups_default.containsKey(type)) {
+		if (!this.groups_default.containsKey(type)) {
 			Optional<EPConfGroups> groups =  this.plugin.getManagerData().getConfGroup(type);
 			// Si le fichier de configuration existe
-			if(groups.isPresent()) {
+			if (groups.isPresent()) {
 				groups.get().get(group.getIdentifier() + ".default").setValue(true);
 				this.groups_default.putIfAbsent(type, group);
 				
@@ -309,10 +309,10 @@ public class EGroupCollection extends ESubjectCollection {
 	 */
 	public boolean removeDefault(final EGroupSubject group, final String type) {
 		// Il n'y a pas de groupe par défaut
-		if(this.groups_default.containsKey(type) && this.groups_default.get(type).equals(group)) {
+		if (this.groups_default.containsKey(type) && this.groups_default.get(type).equals(group)) {
 			Optional<EPConfGroups> groups =  this.plugin.getManagerData().getConfGroup(type);
 			// Si le fichier de configuration existe
-			if(groups.isPresent()) {
+			if (groups.isPresent()) {
 				groups.get().get(group.getIdentifier() + ".default").setValue(false);
 				this.groups_default.remove(type, group);
 				

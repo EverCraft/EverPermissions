@@ -65,9 +65,9 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
+		if (args.size() == 1){
 			suggests = null;
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -77,12 +77,12 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le monde
-		if(args.size() == 1) {
+		if (args.size() == 1) {
 			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optUser.isPresent()){
+			if (optUser.isPresent()){
 				// Si la source est un joueur
-				if(source instanceof EPlayer) {
+				if (source instanceof EPlayer) {
 					resultat = command(source, optUser.get(), ((EPlayer) source).getWorld().getName());
 				// La source n'est pas un joueur
 				} else {
@@ -93,10 +93,10 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// On connait le monde
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optPlayer.isPresent()){
+			if (optPlayer.isPresent()){
 				resultat = command(source, optPlayer.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
@@ -112,20 +112,20 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final User player, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
-		if(type_user.isPresent()) {
+		if (type_user.isPresent()) {
 			Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
 			EUserSubject user = this.plugin.getService().getUserSubjects().get(player.getIdentifier());
 			// Joueur existant
-			if(user != null) {
+			if (user != null) {
 				List<Text> list = new ArrayList<Text>();
 				
 				// La liste des options
 				Map<String, String> options = user.getSubjectData().getOptions(contexts);
-				if(options.isEmpty()) {
+				if (options.isEmpty()) {
 					list.add(EPMessages.USER_LIST_OPTION_OPTION_EMPTY.getText());
 				} else {
 					list.add(EPMessages.USER_LIST_OPTION_OPTION.getText());
-					for(Entry<String, String> permission : options.entrySet()) {
+					for (Entry<String, String> permission : options.entrySet()) {
 						list.add(ETextBuilder.toBuilder(EPMessages.USER_LIST_OPTION_OPTION_LINE.get()
 									.replaceAll("<option>", permission.getKey()))
 								.replace("<value>", Text.builder(permission.getValue())
@@ -137,9 +137,9 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 				
 				// La liste des options temporaires
 				options = user.getTransientSubjectData().getOptions(contexts);
-				if(!options.isEmpty()) {
+				if (!options.isEmpty()) {
 					list.add(EPMessages.USER_LIST_OPTION_TRANSIENT.getText());
-					for(Entry<String, String> permission : options.entrySet()) {
+					for (Entry<String, String> permission : options.entrySet()) {
 						list.add(ETextBuilder.toBuilder(EPMessages.USER_LIST_OPTION_TRANSIENT_LINE.get()
 									.replaceAll("<option>", permission.getKey()))
 								.replace("<value>", Text.builder(permission.getValue())

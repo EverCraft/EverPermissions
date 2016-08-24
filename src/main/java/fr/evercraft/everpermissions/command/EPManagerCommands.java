@@ -129,7 +129,7 @@ public class EPManagerCommands extends TreeMap<String, ECommand<EverPermissions>
 		register(new EPOtherCheckOption(this.plugin));
 		register(new EPOtherListOption(this.plugin));
 		
-		for(ECommand<EverPermissions> command : this.values()) {
+		for (ECommand<EverPermissions> command : this.values()) {
 			manager_command.add(command);
 		}
 	}

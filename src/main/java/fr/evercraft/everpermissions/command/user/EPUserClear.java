@@ -58,7 +58,7 @@ public class EPUserClear extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
+		if (args.size() == 1){
 			suggests = null;
 		}
 		return suggests;
@@ -68,10 +68,10 @@ public class EPUserClear extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le monde
-		if(args.size() == 1) {
+		if (args.size() == 1) {
 			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optUser.isPresent()){
+			if (optUser.isPresent()){
 				resultat = command(source, optUser.get());
 			// Le joueur est introuvable
 			} else {
@@ -87,16 +87,16 @@ public class EPUserClear extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final User user) {
 		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
 		// User existant
-		if(subject != null) {
+		if (subject != null) {
 			subject.getSubjectData().clearParents();
 			subject.getSubjectData().clearSubParents();
 			subject.getSubjectData().clearPermissions();
 			subject.getSubjectData().clearOptions();
 			subject.reload();
-			if(staff.equals(user)) {
+			if (staff.equals(user)) {
 				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_EQUALS.get()
 						.replaceAll("<player>", user.getName())));
-				if(EPMessages.USER_CLEAR_BROADCAST_EQUALS.has()) {
+				if (EPMessages.USER_CLEAR_BROADCAST_EQUALS.has()) {
 					this.plugin.getService().broadcastMessage(staff,
 						EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_STAFF.get()
 							.replaceAll("<staff>", staff.getName())
@@ -105,7 +105,7 @@ public class EPUserClear extends ECommand<EverPermissions> {
 			} else {
 				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_STAFF.get()
 						.replaceAll("<player>", user.getName())));
-				if(EPMessages.USER_CLEAR_BROADCAST_PLAYER.has()) {
+				if (EPMessages.USER_CLEAR_BROADCAST_PLAYER.has()) {
 					this.plugin.getService().broadcastMessage(staff, user.getUniqueId(),
 						EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_BROADCAST_PLAYER.get()
 							.replaceAll("<staff>", staff.getName())

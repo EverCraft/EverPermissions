@@ -154,7 +154,7 @@ public class ESqlUserData implements IUserData {
     	try {
     		connection = this.plugin.getManagerData().getDataBases().getConnection();
     		// Supprime une permission
-        	if(value.equals(Tristate.UNDEFINED)) {
+        	if (value.equals(Tristate.UNDEFINED)) {
         		String query = 	  "DELETE " 
 			    				+ "FROM `" + this.plugin.getManagerData().getDataBases().getTableUsersPermissions() + "` "
 			    				+ "WHERE `uuid` = ? AND `world` = ? AND `permission` = ? ;";
@@ -165,7 +165,7 @@ public class ESqlUserData implements IUserData {
 				
 				this.plugin.getLogger().debug("Remove from database : (identifier='" + subject + "';permission='" + permission + "';type='" + world + "')");
 			// Ajoute une permission
-        	} else if(insert) {
+        	} else if (insert) {
         		String query = 	  "INSERT INTO `" + this.plugin.getManagerData().getDataBases().getTableUsersPermissions() + "` "
 			    				+ "VALUES (?, ?, ?, ?);";
 				preparedStatement = connection.prepareStatement(query);
@@ -277,7 +277,7 @@ public class ESqlUserData implements IUserData {
     	PreparedStatement preparedStatement = null;
     	try {
     		connection = this.plugin.getManagerData().getDataBases().getConnection();
-        	if(value == null) {
+        	if (value == null) {
         		String query = 	  "DELETE " 
 			    				+ "FROM `" + this.plugin.getManagerData().getDataBases().getTableUsersOptions() + "` "
 			    				+ "WHERE `uuid` = ? AND `world` = ? AND `option` = ? ;";
@@ -287,7 +287,7 @@ public class ESqlUserData implements IUserData {
 				preparedStatement.setString(3, option);
 				
 				this.plugin.getLogger().debug("Remove from database : (identifier='" + subject + "';option='" + option + "';world='" + world + "')");
-        	} else if(insert) {
+        	} else if (insert) {
         		String query = 	  "INSERT INTO `" + this.plugin.getManagerData().getDataBases().getTableUsersOptions() + "` "
 			    				+ "VALUES (?, ?, ?, ?);";
 				preparedStatement = connection.prepareStatement(query);

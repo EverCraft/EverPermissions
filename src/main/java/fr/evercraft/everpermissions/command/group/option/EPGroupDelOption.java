@@ -61,14 +61,14 @@ public class EPGroupDelOption extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
-			for(Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
+		if (args.size() == 1){
+			for (Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.add("prefix");
 			suggests.add("suffix");
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -78,16 +78,16 @@ public class EPGroupDelOption extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le monde
-		if(args.size() == 2) {
+		if (args.size() == 2) {
 			// Si la source est un joueur
-			if(source instanceof EPlayer) {
+			if (source instanceof EPlayer) {
 				resultat = command(source, args.get(0), args.get(1), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
 				resultat = command(source, args.get(0), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connais le monde
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			resultat = command(source, args.get(0), args.get(1), args.get(2));
 		// Nombre d'argument incorrect
 		} else {
@@ -99,12 +99,12 @@ public class EPGroupDelOption extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource player, final String group_name, final String option, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde existant
-		if(type_group.isPresent()) {
+		if (type_group.isPresent()) {
 			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
 			// Groupe existant
-			if(group != null && group.hasWorld(type_group.get())) {
+			if (group != null && group.hasWorld(type_group.get())) {
 				// L'option a bien été supprimé
-				if(group.getSubjectData().setOption(EContextCalculator.getContextWorld(type_group.get()), option, null)) {
+				if (group.getSubjectData().setOption(EContextCalculator.getContextWorld(type_group.get()), option, null)) {
 					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_DEL_OPTION_STAFF.get()
 							.replaceAll("<group>", group.getIdentifier())
 							.replaceAll("<option>", option)

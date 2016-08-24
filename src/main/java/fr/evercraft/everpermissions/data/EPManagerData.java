@@ -73,7 +73,7 @@ public class EPManagerData {
 	 */
 	public void start() {
 		// DB : SQL
-		if(this.database.isEnable()) {
+		if (this.database.isEnable()) {
 			this.sql = true;
 			this.user_data = new ESqlUserData(this.plugin);
 		// DB : Config
@@ -87,7 +87,7 @@ public class EPManagerData {
 	 */
 	public void reload() throws PluginDisableException {
 		// Désactivation des groupes et des joueurs
-		for(World world : this.plugin.getGame().getServer().getWorlds()) {
+		for (World world : this.plugin.getGame().getServer().getWorlds()) {
 	    	this.plugin.getService().getGroupSubjects().removeWorld(world.getName());
 	    	this.removeUser(world.getName());
 		}
@@ -98,8 +98,8 @@ public class EPManagerData {
 		start();
 		
 		// Réactivation des mondes
-		for(World world : this.plugin.getGame().getServer().getWorlds()) {
-			if(world.isLoaded()) {
+		for (World world : this.plugin.getGame().getServer().getWorlds()) {
+			if (world.isLoaded()) {
 	    		this.plugin.getService().getGroupSubjects().registerWorld(world.getName());
 	    		this.registerUser(world.getName());
 			}
@@ -143,7 +143,7 @@ public class EPManagerData {
 		String group = this.plugin.getConfigs().getGroups(world);
 		this.world_groups.putIfAbsent(world, group);
 		// Si le type de groupe n'existait pas encore
-		if(!this.conf_groups.containsKey(group)) {
+		if (!this.conf_groups.containsKey(group)) {
 			this.conf_groups.putIfAbsent(group, new EPConfGroups(this.plugin, MKDIR_GROUPS + "/" + group));
 			return Optional.ofNullable(this.conf_groups.get(group));
 		}
@@ -159,7 +159,7 @@ public class EPManagerData {
 		String group = this.world_groups.get(world);
 		this.world_groups.remove(world);
 		// S'il y a plus de monde qui utilise ce type 
-		if(group != null && !this.world_groups.containsValue(group)) {
+		if (group != null && !this.world_groups.containsValue(group)) {
 			return Optional.ofNullable(this.conf_groups.remove(group));
 		}
 		return Optional.empty();
@@ -203,7 +203,7 @@ public class EPManagerData {
 	public Optional<EPConfUsers> registerUser(final String world) {
 		String user = this.plugin.getConfigs().getUsers(world);
 		this.world_users.putIfAbsent(world, user);
-		if(!sql && !this.conf_users.containsKey(user)) {
+		if (!sql && !this.conf_users.containsKey(user)) {
 			this.conf_users.putIfAbsent(user, new EPConfUsers(this.plugin, MKDIR_USERS + "/" + user));
 			return Optional.ofNullable(this.conf_users.get(user));
 		}
@@ -218,7 +218,7 @@ public class EPManagerData {
 	public Optional<EPConfUsers> removeUser(final String world) {
 		String user = this.world_users.get(world);
 		this.world_users.remove(world);
-		if(user != null && !this.world_users.containsValue(user)) {
+		if (user != null && !this.world_users.containsValue(user)) {
 			return Optional.ofNullable(this.conf_users.remove(user));
 		}
 		return Optional.empty();
@@ -260,7 +260,7 @@ public class EPManagerData {
 	 */
 	public void saveGroup(final String type){
 		final Optional<EPConfGroups> conf = this.getConfGroup(type);
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
 				conf.get().save();
 			}).name("Permissions : save group (type='" + type + "')").submit(this.plugin);
@@ -273,7 +273,7 @@ public class EPManagerData {
 	 */
 	public void saveGroups(){
 		this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
-			for(EPConfGroups conf : conf_groups.values()) {
+			for (EPConfGroups conf : conf_groups.values()) {
 				conf.save();
 			}
 		}).name("Permissions : save groups").submit(this.plugin);
@@ -285,7 +285,7 @@ public class EPManagerData {
 	 */
 	public void saveUser(final String type){
 		final Optional<EPConfUsers> conf = this.getConfUser(type);
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
 				conf.get().save();
 			}).name("Permissions : save user (type='" + type + "')").submit(this.plugin);
@@ -298,7 +298,7 @@ public class EPManagerData {
 	 */
 	public void saveUsers(){
 		this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
-			for(EPConfGroups conf : conf_groups.values()) {
+			for (EPConfGroups conf : conf_groups.values()) {
 				conf.save();
 			}
 		}).name("Permissions : save users").submit(this.plugin);

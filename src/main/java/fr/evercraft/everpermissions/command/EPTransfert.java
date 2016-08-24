@@ -75,7 +75,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
+		if (args.size() == 1){
 			suggests.add("sql");
 			suggests.add("conf");
 		}
@@ -86,17 +86,17 @@ public class EPTransfert extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		
-		if(args.size() == 1) {
+		if (args.size() == 1) {
 			//Si la base de donnée est activé
-			if(this.plugin.getManagerData().isSQL()) {
+			if (this.plugin.getManagerData().isSQL()) {
 				// Transféré vers une base de donnée SQL
-				if(args.get(0).equalsIgnoreCase("sql")) {
+				if (args.get(0).equalsIgnoreCase("sql")) {
 					source.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
 							.append(EPMessages.TRANSFERT_SQL_CONFIRMATION.get())
 							.replace("<confirmation>", getButtonConfirmationSQL())
 							.build());
 				// Transféré vers un fichier de config
-				} else if(args.get(0).equalsIgnoreCase("conf")) {
+				} else if (args.get(0).equalsIgnoreCase("conf")) {
 					source.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
 							.append(EPMessages.TRANSFERT_CONF_CONFIRMATION.get())
 							.replace("<confirmation>", getButtonConfirmationConf())
@@ -109,15 +109,15 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			} else {
 				source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_DISABLE.getText()));
 			}
-		} else if(args.size() == 2 && args.get(1).equalsIgnoreCase("confirmation")) {
+		} else if (args.size() == 2 && args.get(1).equalsIgnoreCase("confirmation")) {
 			//Si la base de donnée est activé
-			if(this.plugin.getManagerData().isSQL()) {
+			if (this.plugin.getManagerData().isSQL()) {
 				// Transféré vers une base de donnée SQL
-				if(args.get(0).equalsIgnoreCase("sql")) {
+				if (args.get(0).equalsIgnoreCase("sql")) {
 					this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> commandSQL(source)).submit(this.plugin);
 					resultat = true;
 				// Transféré vers un fichier de config
-				} else if(args.get(0).equalsIgnoreCase("conf")) {
+				} else if (args.get(0).equalsIgnoreCase("conf")) {
 					this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> commandConf(source)).submit(this.plugin);
 					resultat = true;
 				// Erreur : sql ou conf
@@ -174,7 +174,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
     		connection = this.plugin.getManagerData().getDataBases().getConnection();
     		
     		// Suppression des données qu'il y a actuellement dans base de données
-    		if(this.plugin.getManagerData().getDataBases().clear(connection)) {
+    		if (this.plugin.getManagerData().getDataBases().clear(connection)) {
     			preparedPermissions = connection.prepareStatement(queryPermissions);
     			preparedGroups = connection.prepareStatement(queryGroups);
     			preparedOptions = connection.prepareStatement(queryOptions);
@@ -183,21 +183,21 @@ public class EPTransfert extends ECommand<EverPermissions> {
     			ConfigurationNode config = null;
     			
     			// Pour tous les types de joueurs
-    			for(String world : new HashSet<String>(this.plugin.getManagerData().getWorldUsers().values())) {
+    			for (String world : new HashSet<String>(this.plugin.getManagerData().getWorldUsers().values())) {
     				file = this.plugin.getPath().resolve(EPManagerData.MKDIR_USERS + "/" + world + ".conf").toFile();
     				// Si le fichier existe
-    				if(file.exists()) {
+    				if (file.exists()) {
     					try {
 							config = HoconConfigurationLoader.builder().setFile(file).build().load();
 
 							// Pour tous les joueurs
 		    				for (Entry<Object, ? extends ConfigurationNode> conf : config.getChildrenMap().entrySet()) {
-		    					if(conf.getKey() instanceof String) {
+		    					if (conf.getKey() instanceof String) {
 		    						String user = (String) conf.getKey();
 				    	    			
 			    	    			// Chargement des permissions
 			    	    			for (Entry<Object, ? extends ConfigurationNode> permission : conf.getValue().getNode("permissions").getChildrenMap().entrySet()) {
-			    		    			if(permission.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
+			    		    			if (permission.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
 			    		    				preparedPermissions.setString(1, user);
 			    		    				preparedPermissions.setString(2, world);
 			    		    				preparedPermissions.setString(3, (String) permission.getKey());
@@ -209,7 +209,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			    	    			// Chargement des options
 			    	    			for (Entry<Object, ? extends ConfigurationNode> option : conf.getValue().getNode("options").getChildrenMap().entrySet()) {
 			    	    				String value = option.getValue().getString(null);
-			    		    			if(option.getKey() instanceof String && value != null) {
+			    		    			if (option.getKey() instanceof String && value != null) {
 			    		    				preparedOptions.setString(1, user);
 			    		    				preparedOptions.setString(2, world);
 			    		    				preparedOptions.setString(3, (String) option.getKey());
@@ -222,7 +222,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			    	    			try {
 			    						for (String subgroup : conf.getValue().getNode("subgroups").getList(TypeToken.of(String.class))) {
 			    							EGroupSubject subject = this.plugin.getService().getGroupSubjects().get(subgroup);
-			    							if(subject != null) {
+			    							if (subject != null) {
 			    								preparedGroups.setString(1, user);
 			    								preparedGroups.setString(2, world);
 			    								preparedGroups.setString(3, subject.getIdentifier());
@@ -234,9 +234,9 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			    	    			
 			    	    			// Chargement du groupe
 			    	    			String group = conf.getValue().getNode("group").getString(null);
-			    	    			if(group != null) {
+			    	    			if (group != null) {
 			    	    				EGroupSubject subject = this.plugin.getService().getGroupSubjects().get(group);
-		    							if(subject != null) {
+		    							if (subject != null) {
 		    								preparedGroups.setString(1, user);
 		    								preparedGroups.setString(2, world);
 		    								preparedGroups.setString(3, subject.getIdentifier());
@@ -266,7 +266,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			} catch (SQLException e) {}
 	    }
 		
-		if(resultat) {
+		if (resultat) {
 			this.plugin.getLogger().info(EPMessages.TRANSFERT_SQL.get());
 			player.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_SQL.getText()));
 		} else {
@@ -309,10 +309,10 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			File file = null;
 			
 			// Pour tous les types de joueurs
-			for(String world : new HashSet<String>(this.plugin.getManagerData().getWorldUsers().values())) {
+			for (String world : new HashSet<String>(this.plugin.getManagerData().getWorldUsers().values())) {
 				// Supprime le fichier s'il existe on le supprime
 				file = this.plugin.getPath().resolve(EPManagerData.MKDIR_USERS + "/" + world + ".conf").toFile();
-				if(file.exists()) {
+				if (file.exists()) {
 					file.delete();
 				}
 				
@@ -339,9 +339,9 @@ public class EPTransfert extends ECommand<EverPermissions> {
 				list = preparedGroups.executeQuery();
 				while (list.next()) {
 					// Si c'est un sous-groupe
-					if(list.getBoolean("subgroup")) {
+					if (list.getBoolean("subgroup")) {
 						EGroupSubject subject = this.plugin.getService().getGroupSubjects().get(list.getString("group"));
-						if(subject != null) {
+						if (subject != null) {
 							List<String> subgroups;
 							try {
 								subgroups = new ArrayList<String>(config.getNode().getNode(list.getString("uuid")).getNode("subgroups").getList(TypeToken.of(String.class)));
@@ -352,7 +352,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 					// Si c'est un groupe
 					} else {
 						EGroupSubject subject = this.plugin.getService().getGroupSubjects().get(list.getString("group"));
-						if(subject != null) {
+						if (subject != null) {
 							config.getNode().getNode(list.getString("uuid")).getNode("group").setValue(subject.getIdentifier());
 						}
 					}
@@ -373,7 +373,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			} catch (SQLException e) {}
 	    }
 		
-		if(resultat) {
+		if (resultat) {
 			this.plugin.getLogger().info(EPMessages.TRANSFERT_CONF.get());
 			source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_CONF.getText()));
 		} else {

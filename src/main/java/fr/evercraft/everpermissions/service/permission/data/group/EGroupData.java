@@ -62,16 +62,16 @@ public class EGroupData extends EOptionSubjectData {
     	checkNotNull(permission, "permission");
     	checkNotNull(value, "value");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.setPermissionExecute(contexts, permission, value)) {
+    	if (this.setPermissionExecute(contexts, permission, value)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			Optional<EPConfGroups> users = this.plugin.getManagerData().getConfGroup(world.get());
     			// Si le fichier de configuration existe
-    			if(users.isPresent()) {
+    			if (users.isPresent()) {
     				ConfigurationNode permissions = users.get().getNode().getNode(subject.getIdentifier(), "permissions");
     				// Supprime une permission
-    				if(value.equals(Tristate.UNDEFINED)) {
+    				if (value.equals(Tristate.UNDEFINED)) {
     					permissions.removeChild(permission);
     					this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject.getIdentifier() + "';permission='" + permission + "';type='" + world.get() + "')");
     				// Ajoute une permission
@@ -92,13 +92,13 @@ public class EGroupData extends EOptionSubjectData {
     public boolean clearPermissions(final Set<Context> contexts) {
     	checkNotNull(contexts, "contexts");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearPermissionsExecute(contexts)) {
+    	if (this.clearPermissionsExecute(contexts)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			Optional<EPConfGroups> conf = this.plugin.getManagerData().getConfGroup(world.get());
     			// Si le fichier de configuration existe
-    			if(conf.isPresent()) {
+    			if (conf.isPresent()) {
     				conf.get().getNode().getNode(subject.getIdentifier()).removeChild("permissions");
     				this.plugin.getLogger().debug("Removed the permissions configuration file : (identifier='" + subject.getIdentifier() + "';type='" + world.get() + "')");
     				
@@ -114,9 +114,9 @@ public class EGroupData extends EOptionSubjectData {
     @Override
     public boolean clearPermissions() {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearPermissionsExecute()) {
+    	if (this.clearPermissionsExecute()) {
     		// Pour tous les types de groupe
-    		for(Entry<String, EPConfGroups> world : this.plugin.getManagerData().getConfGroups().entrySet()) {
+    		for (Entry<String, EPConfGroups> world : this.plugin.getManagerData().getConfGroups().entrySet()) {
     			world.getValue().getNode().getNode(subject.getIdentifier()).removeChild("permissions");
     		}
     		this.plugin.getLogger().debug("Removed the permissions configuration file : (identifier='" + subject.getIdentifier() + "')");
@@ -137,13 +137,13 @@ public class EGroupData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	checkNotNull(parent, "parent");    	
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.addParentExecute(contexts, parent)) {
+    	if (this.addParentExecute(contexts, parent)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			Optional<EPConfGroups> conf = this.plugin.getManagerData().getConfGroup(world.get());
     			// Si le fichier de configuration existe
-    			if(conf.isPresent()) {
+    			if (conf.isPresent()) {
 					try {
 						ConfigurationNode node = conf.get().getNode().getNode(subject.getIdentifier());
 						List<String> subgroups = new ArrayList<String>(node.getNode("inheritances").getList(TypeToken.of(String.class)));
@@ -167,18 +167,18 @@ public class EGroupData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	checkNotNull(parent, "parent");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.removeParentExecute(contexts, parent)) {
+    	if (this.removeParentExecute(contexts, parent)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			Optional<EPConfGroups> conf = this.plugin.getManagerData().getConfGroup(world.get());
     			// Si le fichier de configuration existe
-    			if(conf.isPresent()) {
+    			if (conf.isPresent()) {
 					try {
 						ConfigurationNode node = conf.get().getNode().getNode(subject.getIdentifier());
 						List<String> subgroups =  new ArrayList<String>(node.getNode("inheritances").getList(TypeToken.of(String.class)));
 						subgroups.remove(parent.getIdentifier());
-						if(subgroups.isEmpty()) {
+						if (subgroups.isEmpty()) {
 							node.removeChild("inheritances");
 						} else {
 							node.getNode("inheritances").setValue(subgroups);
@@ -199,13 +199,13 @@ public class EGroupData extends EOptionSubjectData {
     public boolean clearParents(final Set<Context> contexts) {
     	checkNotNull(contexts, "contexts");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearParentsExecute(contexts)) {
+    	if (this.clearParentsExecute(contexts)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			Optional<EPConfGroups> users = this.plugin.getManagerData().getConfGroup(world.get());
     			// Si le fichier de configuration existe
-    			if(users.isPresent()) {
+    			if (users.isPresent()) {
     				users.get().getNode().getNode(subject.getIdentifier()).removeChild("inheritances");
     				this.plugin.getLogger().debug("Removed the inheritances configuration file : (identifier='" + subject.getIdentifier() + "';type='" + world.get() + "')");
     				
@@ -221,9 +221,9 @@ public class EGroupData extends EOptionSubjectData {
     @Override
     public boolean clearParents() {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearParentsExecute()) {
+    	if (this.clearParentsExecute()) {
     		// Pour tous les types de groupe
-    		for(Entry<String, EPConfGroups> world : this.plugin.getManagerData().getConfGroups().entrySet()) {
+    		for (Entry<String, EPConfGroups> world : this.plugin.getManagerData().getConfGroups().entrySet()) {
     			world.getValue().getNode().getNode(subject.getIdentifier()).removeChild("inheritances");
     		}
         	this.plugin.getLogger().debug("Removed the inheritances configuration file : (identifier='" + subject.getIdentifier() + "')");
@@ -241,15 +241,15 @@ public class EGroupData extends EOptionSubjectData {
     @Override
     public boolean setOption(final Set<Context> contexts, final String option, final String value) {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.setOptionExecute(contexts, option, value)) {
+    	if (this.setOptionExecute(contexts, option, value)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			Optional<EPConfGroups> conf = this.plugin.getManagerData().getConfGroup(world.get());
     			// Si le fichier de configuration existe
-    			if(conf.isPresent()) {
+    			if (conf.isPresent()) {
     				ConfigurationNode options = conf.get().getNode().getNode(subject.getIdentifier(), "options");
-    				if(value == null) {
+    				if (value == null) {
     					options.removeChild(option);
     					this.plugin.getLogger().warn("Removed from configs file : (identifier='" + subject.getIdentifier() + "';option='" + option + "';type='" + world.get() + "')");
     				} else {
@@ -269,13 +269,13 @@ public class EGroupData extends EOptionSubjectData {
     @Override
     public boolean clearOptions(final Set<Context> contexts) {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearOptionsExecute(contexts)) {
+    	if (this.clearOptionsExecute(contexts)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			Optional<EPConfGroups> conf = this.plugin.getManagerData().getConfGroup(world.get());
     			// Si le fichier de configuration existe
-    			if(conf.isPresent()) {
+    			if (conf.isPresent()) {
     				conf.get().getNode().getNode(subject.getIdentifier()).removeChild("options");
     				this.plugin.getLogger().warn("Removed the options configuration file : (identifier='" + subject.getIdentifier() + "';type='" + world.get() + "')");
     			}
@@ -290,9 +290,9 @@ public class EGroupData extends EOptionSubjectData {
     @Override
     public boolean clearOptions() {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearOptionsExecute()) {
+    	if (this.clearOptionsExecute()) {
     		// Pour tous les types de groupe
-    		for(Entry<String, EPConfGroups> group : this.plugin.getManagerData().getConfGroups().entrySet()) {
+    		for (Entry<String, EPConfGroups> group : this.plugin.getManagerData().getConfGroups().entrySet()) {
     			group.getValue().get(subject.getIdentifier()).removeChild("options");
     		}
     		this.plugin.getLogger().warn("Removed the options configuration file : (identifier='" + subject.getIdentifier() + "')");

@@ -102,7 +102,7 @@ public class EPermissionService implements PermissionService {
      * Rechargement de toutes les collections
      */
     public void reload() {    	
-    	for(ESubjectCollection collection : this.subjectCollections.values()) {
+    	for (ESubjectCollection collection : this.subjectCollections.values()) {
     		collection.reload();
     	}
     }
@@ -140,9 +140,9 @@ public class EPermissionService implements PermissionService {
      * @return Un EOtherSubject
      */
     public Optional<EOtherSubject> getOtherSubject(final String identifier) {
-		if(this.plugin.getService().getSytemSubjects().hasRegistered(identifier)) {
+		if (this.plugin.getService().getSytemSubjects().hasRegistered(identifier)) {
 			return Optional.ofNullable(this.plugin.getService().getSytemSubjects().get(identifier));
-		} else if(this.plugin.getService().getCommandBlockSubjects().hasRegistered(identifier)) {
+		} else if (this.plugin.getService().getCommandBlockSubjects().hasRegistered(identifier)) {
 			return Optional.ofNullable(this.plugin.getService().getCommandBlockSubjects().get(identifier));
 		}
 		return Optional.empty();
@@ -206,11 +206,11 @@ public class EPermissionService implements PermissionService {
 	 */
 
 	public void broadcastMessage(CommandSource player, Text message) {
-		if(player instanceof EPlayer) {
+		if (player instanceof EPlayer) {
 			((EPlayer) player).broadcastMessage(message, EPPermissions.BROADCAST.get());
 		} else {
-			for(EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
-				if(other.hasPermission(EPPermissions.BROADCAST.get())) {
+			for (EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
+				if (other.hasPermission(EPPermissions.BROADCAST.get())) {
 					other.sendMessage(message);
 				}
 			}
@@ -218,16 +218,16 @@ public class EPermissionService implements PermissionService {
 	}
 	
 	public void broadcastMessage(CommandSource staff, UUID uuid, Text message) {
-		if(staff instanceof EPlayer) {
+		if (staff instanceof EPlayer) {
 			EPlayer player = (EPlayer) staff;
-			for(EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
-				if(!player.equals(other) && !uuid.equals(other.getUniqueId()) && other.hasPermission(EPPermissions.BROADCAST.get())) {
+			for (EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
+				if (!player.equals(other) && !uuid.equals(other.getUniqueId()) && other.hasPermission(EPPermissions.BROADCAST.get())) {
 					other.sendMessage(message);
 				}
 			}
 		} else {
-			for(EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
-				if(!uuid.equals(other.getUniqueId()) && other.hasPermission(EPPermissions.BROADCAST.get())) {
+			for (EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
+				if (!uuid.equals(other.getUniqueId()) && other.hasPermission(EPPermissions.BROADCAST.get())) {
 					other.sendMessage(message);
 				}
 			}

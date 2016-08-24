@@ -64,16 +64,16 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
-			for(Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
+		if (args.size() == 1){
+			for (Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-			for(Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
+			for (Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.add("ever");
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			suggests.add("true");
 			suggests.add("false");
 		}
@@ -83,10 +83,10 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Résultat de la commande :
 		boolean resultat = false;
-		if(args.size() == 3) {
+		if (args.size() == 3) {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le joueur existe
-			if(optSubject.isPresent()){
+			if (optSubject.isPresent()){
 				resultat = command(source, optSubject.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
@@ -102,11 +102,11 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final Subject subject, final String permission, final String value_name) {
 		Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
 		// La value est un boolean
-		if(value.isPresent()) {
+		if (value.isPresent()) {
 			// La permission a bien été ajouté
-			if(subject.getSubjectData().setPermission(new HashSet<Context>(), permission, Tristate.fromBoolean(value.get()))) {
+			if (subject.getSubjectData().setPermission(new HashSet<Context>(), permission, Tristate.fromBoolean(value.get()))) {
 				// Permission : True
-				if(value.get()) {
+				if (value.get()) {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_ADD_PERMISSION_TRUE.get()
 							.replaceAll("<subject>", subject.getIdentifier())
 							.replaceAll("<permission>", permission)));
@@ -120,7 +120,7 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 			// La permission n'a pas été ajouté
 			} else {
 				// Permission : True
-				if(value.get()) {
+				if (value.get()) {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_ADD_PERMISSION_ERROR_TRUE.get()
 							.replaceAll("<subject>", subject.getIdentifier())
 							.replaceAll("<permission>", permission)));

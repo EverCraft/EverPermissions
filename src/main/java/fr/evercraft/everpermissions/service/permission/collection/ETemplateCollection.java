@@ -37,7 +37,7 @@ public class ETemplateCollection extends ESubjectCollection {
     
     @Override
     public EOtherSubject get(final String identifier) {
-		if(!this.subjects.containsKey(identifier)) {			
+		if (!this.subjects.containsKey(identifier)) {			
 			Chronometer chronometer = new Chronometer();
 			
 			EOtherSubject subject = new EOtherSubject(this.plugin, identifier, ETemplateCollection.this);

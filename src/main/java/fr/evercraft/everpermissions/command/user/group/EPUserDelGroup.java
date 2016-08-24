@@ -64,13 +64,13 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
+		if (args.size() == 1){
 			suggests = null;
-		} else if(args.size() == 2) {
-			for(Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
+		} else if (args.size() == 2) {
+			for (Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -80,12 +80,12 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le monde
-		if(args.size() == 1) {
+		if (args.size() == 1) {
 			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optUser.isPresent()){
+			if (optUser.isPresent()){
 				// Si la source est un joueur
-				if(source instanceof EPlayer) {
+				if (source instanceof EPlayer) {
 					resultat = command(source, optUser.get(), ((EPlayer) source).getWorld().getName());
 				// La source n'est pas un joueur
 				} else {
@@ -96,10 +96,10 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// On connais le monde
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optPlayer.isPresent()){
+			if (optPlayer.isPresent()){
 				resultat = command(source, optPlayer.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
@@ -115,20 +115,20 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final User player, final String world_name) {
 		Optional<String> world = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
-		if(world.isPresent()) {
+		if (world.isPresent()) {
 			Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
 			EUserSubject user = this.plugin.getService().getUserSubjects().get(player.getIdentifier());
 			// Joueur existant
-			if(user != null) {
+			if (user != null) {
 				Optional<Subject> group = user.getSubjectData().getParent(contexts);
 				// Le groupe a bien été supprimé
-				if(group.isPresent() && user.getSubjectData().removeParent(contexts)) {
-					if(staff.equals(user)) {
+				if (group.isPresent() && user.getSubjectData().removeParent(contexts)) {
+					if (staff.equals(user)) {
 						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_GROUP_EQUALS.get()
 								.replaceAll("<player>", player.getName())
 								.replaceAll("<group>", group.get().getIdentifier())
 								.replaceAll("<type>", world.get())));
-						if(EPMessages.USER_DEL_GROUP_BROADCAST_EQUALS.has()) {
+						if (EPMessages.USER_DEL_GROUP_BROADCAST_EQUALS.has()) {
 							this.plugin.getService().broadcastMessage(staff,
 								EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_GROUP_BROADCAST_EQUALS.get()
 									.replaceAll("<staff>", staff.getName())
@@ -143,13 +143,13 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 								.replaceAll("<type>", world.get())));
 						// Le joueur est connecté
 						Optional<Player> optPlayer = player.getPlayer();
-						if(optPlayer.isPresent()) {
+						if (optPlayer.isPresent()) {
 							optPlayer.get().sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_GROUP_PLAYER.get()
 									.replaceAll("<staff>", staff.getName())
 									.replaceAll("<group>", group.get().getIdentifier())
 									.replaceAll("<type>", world.get())));
 						}
-						if(EPMessages.USER_DEL_GROUP_BROADCAST_PLAYER.has()) {
+						if (EPMessages.USER_DEL_GROUP_BROADCAST_PLAYER.has()) {
 							this.plugin.getService().broadcastMessage(staff, player.getUniqueId(), 
 								EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_GROUP_BROADCAST_PLAYER.get()
 									.replaceAll("<staff>", staff.getName())
@@ -161,7 +161,7 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 					return true;
 				// Le groupe n'a pas été supprimé
 				} else {
-					if(staff.equals(user)) {
+					if (staff.equals(user)) {
 						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_GROUP_ERROR_EQUALS.get()
 								.replaceAll("<player>", player.getName())
 								.replaceAll("<type>", world.get())));

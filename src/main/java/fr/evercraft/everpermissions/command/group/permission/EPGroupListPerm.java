@@ -65,11 +65,11 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
-			for(Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
+		if (args.size() == 1){
+			for (Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -79,16 +79,16 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le monde
-		if(args.size() == 1) {
+		if (args.size() == 1) {
 			// Si la source est un joueur
-			if(source instanceof EPlayer) {
+			if (source instanceof EPlayer) {
 				resultat = command(source, args.get(0), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
 				resultat = command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connait le monde
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			resultat = command(source, args.get(0), args.get(1));
 		// Nombre d'argument incorrect
 		} else {
@@ -100,21 +100,21 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource player, final String group_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde existant
-		if(type_group.isPresent()) {
+		if (type_group.isPresent()) {
 			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
 			// Groupe existant
-			if(group != null && group.hasWorld(type_group.get())) {
+			if (group != null && group.hasWorld(type_group.get())) {
 				Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
 				List<Text> list = new ArrayList<Text>();
 				
 				// La liste des permissions
 				Map<String, Boolean> permissions = group.getSubjectData().getPermissions(contexts);
-				if(permissions.isEmpty()) {
+				if (permissions.isEmpty()) {
 					list.add(EPMessages.GROUP_LIST_PERMISSION_PERMISSION_EMPTY.getText());
 				} else {
 					list.add(EPMessages.GROUP_LIST_PERMISSION_PERMISSION.getText());
-					for(Entry<String, Boolean> permission : permissions.entrySet()) {
-						if(permission.getValue()) {
+					for (Entry<String, Boolean> permission : permissions.entrySet()) {
+						if (permission.getValue()) {
 							list.add(EChat.of(EPMessages.GROUP_LIST_PERMISSION_PERMISSION_LINE_TRUE.get()
 									.replaceAll("<permission>", permission.getKey())));
 						} else {
@@ -126,10 +126,10 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 				
 				// La liste des permissions temporaires
 				permissions = group.getTransientSubjectData().getPermissions(contexts);
-				if(!permissions.isEmpty()) {
+				if (!permissions.isEmpty()) {
 					list.add(EPMessages.GROUP_LIST_PERMISSION_TRANSIENT.getText());
-					for(Entry<String, Boolean> permission : permissions.entrySet()) {
-						if(permission.getValue()) {
+					for (Entry<String, Boolean> permission : permissions.entrySet()) {
+						if (permission.getValue()) {
 							list.add(EChat.of(EPMessages.GROUP_LIST_PERMISSION_TRANSIENT_LINE_TRUE.get()
 									.replaceAll("<permission>", permission.getKey())));
 						} else {

@@ -46,12 +46,12 @@ public class EOtherData extends EOptionSubjectData {
     
     public void load() {    	
 		ConfigurationNode user = this.plugin.getManagerData().getConfOther().get(subject.getIdentifier());
-		if(user.getValue() != null) {
+		if (user.getValue() != null) {
 			Set<Context> contexts = new HashSet<Context>();
 			
 			// Chargement des permissions
 			for (Entry<Object, ? extends ConfigurationNode> permission : user.getNode("permissions").getChildrenMap().entrySet()) {
-    			if(permission.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
+    			if (permission.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
     				this.setPermissionExecute(contexts, (String) permission.getKey(), Tristate.fromBoolean(permission.getValue().getBoolean(false)));
     				this.plugin.getLogger().debug("Loading : ("
     						+ "identifier=" + subject.getIdentifier() + ";"
@@ -65,7 +65,7 @@ public class EOtherData extends EOptionSubjectData {
 			// Chargement des options
 			for (Entry<Object, ? extends ConfigurationNode> option : user.getNode("options").getChildrenMap().entrySet()) {
 				String value = option.getValue().getString(null);
-    			if(option.getKey() instanceof String && value != null) {
+    			if (option.getKey() instanceof String && value != null) {
     				this.setOptionExecute(contexts, (String) option.getKey(), value);
     				this.plugin.getLogger().debug("Loading : ("
     						+ "identifier=" + subject.getIdentifier() + ";"
@@ -86,10 +86,10 @@ public class EOtherData extends EOptionSubjectData {
     	checkNotNull(permission, "permission");
     	checkNotNull(value, "value");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.setPermissionExecute(contexts, permission, value)) {
+    	if (this.setPermissionExecute(contexts, permission, value)) {
     		ConfigurationNode permissions = this.plugin.getManagerData().getConfOther().getNode().getNode(subject.getIdentifier(), "permissions");
     		// Si le fichier de configuration existe
-    		if(value.equals(Tristate.UNDEFINED)) {
+    		if (value.equals(Tristate.UNDEFINED)) {
     			permissions.removeChild(permission);
     			this.plugin.getLogger().debug("Inclusion in the database (identifier='" + subject.getIdentifier() + "';permission='" + permission + "')");
     		} else {
@@ -114,7 +114,7 @@ public class EOtherData extends EOptionSubjectData {
     @Override
     public boolean clearPermissions() {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearPermissionsExecute()) {
+    	if (this.clearPermissionsExecute()) {
     		this.plugin.getManagerData().getConfOther().get(subject.getIdentifier()).removeChild("permissions");
 			this.plugin.getLogger().debug("Removed the permissions configuration file : (" + "identifier=" + subject.getIdentifier() + ")");
 			
@@ -133,7 +133,7 @@ public class EOtherData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	checkNotNull(parent, "parent");
     	
-    	if(this.addParentExecute(contexts, parent)) {
+    	if (this.addParentExecute(contexts, parent)) {
     		this.plugin.getManagerEvent().post(this.subject, Action.OTHER_INHERITANCE_CHANGED);
 			return true;
         }
@@ -144,7 +144,7 @@ public class EOtherData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	checkNotNull(parent, "parent");
     	
-    	if(this.removeParentExecute(contexts, parent)) {
+    	if (this.removeParentExecute(contexts, parent)) {
     		this.plugin.getManagerEvent().post(this.subject, Action.OTHER_INHERITANCE_CHANGED);
 			return true;
         }
@@ -154,7 +154,7 @@ public class EOtherData extends EOptionSubjectData {
     public boolean clearParents(final Set<Context> contexts) {
     	checkNotNull(contexts, "contexts");
     	
-    	if(this.clearParentsExecute(contexts)) {
+    	if (this.clearParentsExecute(contexts)) {
     		this.plugin.getManagerEvent().post(this.subject, Action.OTHER_INHERITANCE_CHANGED);
 			return true;
         }
@@ -162,7 +162,7 @@ public class EOtherData extends EOptionSubjectData {
     }
     
     public boolean clearParents() {
-    	if(this.clearParentsExecute()) {
+    	if (this.clearParentsExecute()) {
     		this.plugin.getManagerEvent().post(this.subject, Action.OTHER_INHERITANCE_CHANGED);
     		return true;
         }
@@ -176,9 +176,9 @@ public class EOtherData extends EOptionSubjectData {
     @Override
     public boolean setOption(final Set<Context> contexts, final String option, final String value) {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.setOptionExecute(contexts, option, value)) {
+    	if (this.setOptionExecute(contexts, option, value)) {
     		ConfigurationNode options = this.plugin.getManagerData().getConfOther().getNode().getNode(subject.getIdentifier(), "options");
-			if(value == null) {
+			if (value == null) {
 				options.removeChild(option);
 				this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject.getIdentifier() + "';option='" + option + "')");
 			} else {
@@ -201,7 +201,7 @@ public class EOtherData extends EOptionSubjectData {
     @Override
     public boolean clearOptions() {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearOptionsExecute()) {
+    	if (this.clearOptionsExecute()) {
     		this.plugin.getManagerData().getConfOther().getNode().getNode(subject.getIdentifier()).removeChild("options");
 			this.plugin.getLogger().debug("Removed the options configuration file : (identifier=" + subject.getIdentifier() + ")");
 			

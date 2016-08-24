@@ -68,7 +68,7 @@ public class EPConfig extends EConfig {
 	 */
 	public String getGroups(final String world) {
 		String name = this.get("groups." + world).getString(null);
-		if(name == null) {
+		if (name == null) {
 			name = EPConfig.DEFAULT;
 			this.get("groups." + world).setValue(name);
 			this.save();
@@ -83,7 +83,7 @@ public class EPConfig extends EConfig {
 	 */
 	public String getUsers(final String world) {
 		String name = this.get("users." + world).getString(null);
-		if(name == null) {
+		if (name == null) {
 			name = EPConfig.DEFAULT;
 			this.get("users." + world).setValue(name);
 			this.save();

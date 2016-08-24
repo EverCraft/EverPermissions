@@ -77,7 +77,7 @@ public class EUserCollection extends ESubjectCollection {
 	@Override
 	public EUserSubject get(String identifier) {		
 		try {
-			if(!this.subjects.containsKey(identifier)) {
+			if (!this.subjects.containsKey(identifier)) {
 				return this.cache.get(identifier);
 	    	}
 	    	return this.subjects.get(identifier);
@@ -105,11 +105,11 @@ public class EUserCollection extends ESubjectCollection {
 	 * Rechargement : Vide le cache et recharge tous les joueurs
 	 */
 	public void reload() {
-		for(EUserSubject subject : this.subjects.values()) {
+		for (EUserSubject subject : this.subjects.values()) {
 			subject.reload();
 		}
 		
-		for(EUserSubject subject : this.cache.asMap().values()) {
+		for (EUserSubject subject : this.cache.asMap().values()) {
 			subject.reload();
 		}
 	}
@@ -121,7 +121,7 @@ public class EUserCollection extends ESubjectCollection {
 	public void registerPlayer(String identifier) {
 		EUserSubject player = this.cache.getIfPresent(identifier);
 		// Si le joueur est dans le cache
-		if(player != null) {
+		if (player != null) {
 			this.subjects.putIfAbsent(identifier, player);
 			this.plugin.getLogger().debug("Loading player cache : " + identifier);
 		// Si le joueur n'est pas dans le cache
@@ -141,7 +141,7 @@ public class EUserCollection extends ESubjectCollection {
 	public void removePlayer(String identifier) {
 		EUserSubject player = this.subjects.remove(identifier);
 		// Si le joueur existe
-		if(player != null) {
+		if (player != null) {
 			this.cache.put(identifier, player);
 			this.plugin.getManagerEvent().post(player, Action.USER_REMOVED);
 			this.plugin.getLogger().debug("Unloading the player : " + identifier);

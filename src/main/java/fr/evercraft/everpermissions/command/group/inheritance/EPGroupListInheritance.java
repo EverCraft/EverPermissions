@@ -62,11 +62,11 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
-			for(Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
+		if (args.size() == 1){
+			for (Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -76,16 +76,16 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le monde
-		if(args.size() == 1) {
+		if (args.size() == 1) {
 			// Si la source est un joueur
-			if(source instanceof EPlayer) {
+			if (source instanceof EPlayer) {
 				resultat = command(source, args.get(0), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
 				resultat = command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connait le monde
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			resultat = command(source, args.get(0), args.get(1));
 		// Nombre d'argument incorrect
 		} else {
@@ -97,29 +97,29 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource player, final String group_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde existant
-		if(type_group.isPresent()) {
+		if (type_group.isPresent()) {
 			Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
 			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
 			// Groupe existant
-			if(group != null && group.hasWorld(type_group.get())) {
+			if (group != null && group.hasWorld(type_group.get())) {
 				List<Text> list = new ArrayList<Text>();
 
 				// La liste des inheritances
 				List<Subject> groups = group.getSubjectData().getParents(contexts);
-				if(groups.isEmpty()) {
+				if (groups.isEmpty()) {
 					list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_EMPTY.getText());
 				} else {
 					list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE.getText());
-					for(Subject inheritance : groups) {
+					for (Subject inheritance : groups) {
 						list.add(EChat.of(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_LINE.get().replaceAll("<inheritance>", inheritance.getIdentifier())));
 					}
 				}
 				
 				// La liste des inheritances temporaires
 				groups = group.getTransientSubjectData().getParents(contexts);
-				if(!groups.isEmpty()) {
+				if (!groups.isEmpty()) {
 					list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT.getText());
-					for(Subject inheritance : groups) {
+					for (Subject inheritance : groups) {
 						list.add(EChat.of(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.get().replaceAll("<inheritance>", inheritance.getIdentifier())));
 					}
 				}

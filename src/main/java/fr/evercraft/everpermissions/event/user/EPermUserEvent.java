@@ -40,7 +40,7 @@ public class EPermUserEvent implements PermUserEvent {
         this.action = action;
         this.cause = cause;
         
-        if(this.subject.getContainingCollection().getIdentifier().equals(PermissionService.SUBJECTS_USER)) {
+        if (this.subject.getContainingCollection().getIdentifier().equals(PermissionService.SUBJECTS_USER)) {
     		try {
     			this.player = plugin.getEServer().getEPlayer(UUID.fromString(this.subject.getIdentifier()));
     		} catch(IllegalArgumentException e) {

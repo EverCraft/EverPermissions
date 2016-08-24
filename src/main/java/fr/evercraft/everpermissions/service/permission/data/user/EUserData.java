@@ -67,15 +67,15 @@ public class EUserData extends EOptionSubjectData {
     	this.plugin.getManagerData().getUserData().load(this);
     	
     	// Chargement des groupes par défault
-    	for(World world : this.plugin.getGame().getServer().getWorlds()) {
-    		if(world.isLoaded()) {
+    	for (World world : this.plugin.getGame().getServer().getWorlds()) {
+    		if (world.isLoaded()) {
     			Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world.getName());
     			Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world.getName());
-    			if(type_group.isPresent() && type_user.isPresent()) {
+    			if (type_group.isPresent() && type_user.isPresent()) {
     				Set<Context> contexts = EContextCalculator.getContextWorld(type_user.get());
-    				if(!this.getParentContexts(contexts).isPresent()) {
+    				if (!this.getParentContexts(contexts).isPresent()) {
 	    				Optional<EGroupSubject> subject = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
-	    				if(subject.isPresent()) {
+	    				if (subject.isPresent()) {
 	    					this.addParentExecute(contexts, subject.get());
 	    					this.plugin.getLogger().debug("Loading : ("
 	        						+ "identifier=" + this.getIdentifier() + ";"
@@ -101,7 +101,7 @@ public class EUserData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	
     	ENode perms = this.permissions.get(contexts);
-    	if(perms != null) {
+    	if (perms != null) {
     		return perms.asMap();
     	}
     	return Collections.emptyMap();
@@ -120,12 +120,12 @@ public class EUserData extends EOptionSubjectData {
     	
     	boolean insert = this.getNodeTree(contexts).asMap().get(permission) == null;
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.setPermissionExecute(contexts, permission, value)) {
+    	if (this.setPermissionExecute(contexts, permission, value)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			// Si la sauvegarde est réussie
-	    		if(this.plugin.getManagerData().getUserData().setPermission(this.getIdentifier(), world.get(), permission, value, insert)) {
+	    		if (this.plugin.getManagerData().getUserData().setPermission(this.getIdentifier(), world.get(), permission, value, insert)) {
 	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSION_CHANGED);
 	    			return true;
 	    		}
@@ -143,12 +143,12 @@ public class EUserData extends EOptionSubjectData {
     public boolean clearPermissionsContexts(final Set<Context> contexts) {
     	checkNotNull(contexts, "contexts");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearPermissionsExecute(contexts)) {
+    	if (this.clearPermissionsExecute(contexts)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			// Si la sauvegarde est réussie
-	    		if(this.plugin.getManagerData().getUserData().clearPermissions(this.getIdentifier(), world.get())) {
+	    		if (this.plugin.getManagerData().getUserData().clearPermissions(this.getIdentifier(), world.get())) {
 	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSION_CHANGED);
 	    			return true;
 	    		}
@@ -160,9 +160,9 @@ public class EUserData extends EOptionSubjectData {
     @Override
     public boolean clearPermissions() {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearPermissionsExecute()) {
+    	if (this.clearPermissionsExecute()) {
     		// Si la sauvegarde est réussie
-    		if(this.plugin.getManagerData().getUserData().clearPermissions(this.getIdentifier())) {
+    		if (this.plugin.getManagerData().getUserData().clearPermissions(this.getIdentifier())) {
     			this.plugin.getManagerEvent().post(this.subject, Action.USER_PERMISSION_CHANGED);
     			return true;
     		}
@@ -193,7 +193,7 @@ public class EUserData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	
         String ret = this.groups.get(contexts);
-        if(ret != null) {
+        if (ret != null) {
         	return toSubjectList(ret);
         }
         return Collections.emptyList();
@@ -208,7 +208,7 @@ public class EUserData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	
         String ret = this.groups.get(contexts);
-        if(ret != null) {
+        if (ret != null) {
         	return Optional.ofNullable(this.plugin.getService().getGroupSubjects().get(ret));
         }
         return Optional.empty();
@@ -235,12 +235,12 @@ public class EUserData extends EOptionSubjectData {
     	checkNotNull(parent, "parent");
     	
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.addParentExecute(contexts, parent)) {
+    	if (this.addParentExecute(contexts, parent)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			// Si la sauvegarde est réussie
-	    		if(this.plugin.getManagerData().getUserData().addParent(this.getIdentifier(), world.get(), parent.getIdentifier())) {
+	    		if (this.plugin.getManagerData().getUserData().addParent(this.getIdentifier(), world.get(), parent.getIdentifier())) {
 	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_GROUP_CHANGED);
 	    			return true;
 	    		}
@@ -255,10 +255,10 @@ public class EUserData extends EOptionSubjectData {
     	
         contexts = ImmutableSet.copyOf(contexts);
         String oldParents = this.groups.get(contexts);
-        if(oldParents == null) {
+        if (oldParents == null) {
         	this.groups.put(contexts, parent.getIdentifier());
         	return true;
-        } else if(!oldParents.equals(parent.getIdentifier()) && this.removeParentContexts(contexts, this.plugin.getService().getGroupSubjects().get(oldParents))) {
+        } else if (!oldParents.equals(parent.getIdentifier()) && this.removeParentContexts(contexts, this.plugin.getService().getGroupSubjects().get(oldParents))) {
         	this.groups.put(contexts, parent.getIdentifier());
         	return true;
         }
@@ -275,12 +275,12 @@ public class EUserData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	checkNotNull(parent, "parent");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.removeParentExecute(contexts, parent)) {
+    	if (this.removeParentExecute(contexts, parent)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			// Si la sauvegarde est réussie
-	    		if(this.plugin.getManagerData().getUserData().removeParent(this.getIdentifier(), world.get(), parent.getIdentifier())) {
+	    		if (this.plugin.getManagerData().getUserData().removeParent(this.getIdentifier(), world.get(), parent.getIdentifier())) {
 	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_GROUP_CHANGED);
 	    			return true;
 	    		}
@@ -293,7 +293,7 @@ public class EUserData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	checkNotNull(parent, "parent");
         contexts = ImmutableSet.copyOf(contexts);
-        if(this.groups.containsKey(contexts) && this.groups.get(contexts).equals(parent.getIdentifier())) {
+        if (this.groups.containsKey(contexts) && this.groups.get(contexts).equals(parent.getIdentifier())) {
         	this.groups.remove(contexts);
         	return true;
         }
@@ -309,12 +309,12 @@ public class EUserData extends EOptionSubjectData {
     public boolean clearParentsContexts(final Set<Context> contexts) {
     	checkNotNull(contexts, "contexts");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearParentsExecute(contexts)) {
+    	if (this.clearParentsExecute(contexts)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			// Si la sauvegarde est réussie
-	    		if(this.plugin.getManagerData().getUserData().clearParents(this.getIdentifier(), world.get())) {
+	    		if (this.plugin.getManagerData().getUserData().clearParents(this.getIdentifier(), world.get())) {
 	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_GROUP_CHANGED);
 	    			return true;
 	    		}
@@ -332,8 +332,8 @@ public class EUserData extends EOptionSubjectData {
     @Override
     public boolean clearParents() {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearParentsExecute()) {
-    		if(this.plugin.getManagerData().getUserData().clearParents(this.getIdentifier())) {
+    	if (this.clearParentsExecute()) {
+    		if (this.plugin.getManagerData().getUserData().clearParents(this.getIdentifier())) {
     			this.plugin.getManagerEvent().post(this.subject, Action.USER_GROUP_CHANGED);
     			return true;
     		}
@@ -342,7 +342,7 @@ public class EUserData extends EOptionSubjectData {
     }
     
     public boolean clearParentsExecute() {
-        if(!this.groups.isEmpty()) {
+        if (!this.groups.isEmpty()) {
         	this.groups.clear();
         	return true;
         }
@@ -370,7 +370,7 @@ public class EUserData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	
         List<String> ret = this.subgroups.get(contexts);
-        if(ret != null) {
+        if (ret != null) {
         	return toSubjectList(ret);
         }
         return Collections.emptyList();
@@ -385,12 +385,12 @@ public class EUserData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	checkNotNull(parent, "parent");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.addSubParentExecute(contexts, parent)) {
+    	if (this.addSubParentExecute(contexts, parent)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			// Si la sauvegarde est réussie
-	    		if(this.plugin.getManagerData().getUserData().addSubParent(this.getIdentifier(), world.get(), parent.getIdentifier())) {
+	    		if (this.plugin.getManagerData().getUserData().addSubParent(this.getIdentifier(), world.get(), parent.getIdentifier())) {
 	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_SUBGROUP_CHANGED);
 	    			return true;
 	    		}
@@ -405,10 +405,10 @@ public class EUserData extends EOptionSubjectData {
     	
         contexts = ImmutableSet.copyOf(contexts);
         List<String> parents = this.subgroups.get(contexts);
-        if(parents == null) {
+        if (parents == null) {
         	this.subgroups.put(contexts, ImmutableList.<String>builder().add(parent.getIdentifier()).build());
         	return true;
-        } else if(!parents.contains(parent.getIdentifier())) {
+        } else if (!parents.contains(parent.getIdentifier())) {
         	this.subgroups.replace(contexts, ImmutableList.<String>builder().addAll(parents).add(parent.getIdentifier()).build());
         	return true;
         }
@@ -424,12 +424,12 @@ public class EUserData extends EOptionSubjectData {
     	checkNotNull(contexts, "contexts");
     	checkNotNull(parent, "parent");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.removeSubParentExecute(contexts, parent)) {
+    	if (this.removeSubParentExecute(contexts, parent)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			// Si la sauvegarde est réussie
-	    		if(this.plugin.getManagerData().getUserData().removeSubParent(this.getIdentifier(), world.get(), parent.getIdentifier())) {
+	    		if (this.plugin.getManagerData().getUserData().removeSubParent(this.getIdentifier(), world.get(), parent.getIdentifier())) {
 	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_SUBGROUP_CHANGED);
 	    			return true;
 	    		}
@@ -444,9 +444,9 @@ public class EUserData extends EOptionSubjectData {
     	
         contexts = ImmutableSet.copyOf(contexts);
         List<String> parents = this.subgroups.get(contexts);
-        if(parents != null) {
+        if (parents != null) {
 	        parents = new ArrayList<String>(parents);
-	        if(parents != null && parents.contains(parent.getIdentifier())) {
+	        if (parents != null && parents.contains(parent.getIdentifier())) {
 	        	parents.remove(parent.getIdentifier());
 	        	this.subgroups.replace(contexts, ImmutableList.copyOf(parents));
 	        	return true;
@@ -463,12 +463,12 @@ public class EUserData extends EOptionSubjectData {
     public boolean clearSubParentsContexts(final Set<Context> contexts) {
     	checkNotNull(contexts, "contexts");
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearSubParentsExecute(contexts)) {
+    	if (this.clearSubParentsExecute(contexts)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			// Si la sauvegarde est réussie
-	    		if(this.plugin.getManagerData().getUserData().clearSubParents(this.getIdentifier(), world.get())) {
+	    		if (this.plugin.getManagerData().getUserData().clearSubParents(this.getIdentifier(), world.get())) {
 	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_SUBGROUP_CHANGED);
 	    			return true;
 	    		}
@@ -484,9 +484,9 @@ public class EUserData extends EOptionSubjectData {
     
     public boolean clearSubParents() {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearSubParentsExecute()) {
+    	if (this.clearSubParentsExecute()) {
     		// Si la sauvegarde est réussie
-    		if(this.plugin.getManagerData().getUserData().clearSubParents(this.getIdentifier())) {
+    		if (this.plugin.getManagerData().getUserData().clearSubParents(this.getIdentifier())) {
     			this.plugin.getManagerEvent().post(this.subject, Action.USER_SUBGROUP_CHANGED);
     			return true;
     		}
@@ -522,7 +522,7 @@ public class EUserData extends EOptionSubjectData {
     
     public Map<String, String> getOptionsContexts(final Set<Context> contexts) {
     	Map<String, String> ret = this.options.get(contexts);
-    	if(ret != null) {
+    	if (ret != null) {
     		return ImmutableMap.copyOf(ret);
     	}
         return ImmutableMap.of();
@@ -537,12 +537,12 @@ public class EUserData extends EOptionSubjectData {
     public boolean setOptionContexts(final Set<Context> contexts, final String type, final String name) {
     	boolean insert = (this.getOptionsContexts(contexts).get(type) == null);
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.setOptionExecute(contexts, type, name)) {
+    	if (this.setOptionExecute(contexts, type, name)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			// Si la sauvegarde est réussie
-	    		if(this.plugin.getManagerData().getUserData().setOption(this.getIdentifier(), world.get(), type, name, insert)) {
+	    		if (this.plugin.getManagerData().getUserData().setOption(this.getIdentifier(), world.get(), type, name, insert)) {
 	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_OPTION_CHANGED);
 	    			return true;
 	    		}
@@ -559,12 +559,12 @@ public class EUserData extends EOptionSubjectData {
     
     public boolean clearOptionsContexts(final Set<Context> contexts) {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearOptionsExecute(contexts)) {
+    	if (this.clearOptionsExecute(contexts)) {
     		Optional<String> world = EContextCalculator.getWorld(contexts);
     		// Si il y a un monde
-    		if(world.isPresent()) {
+    		if (world.isPresent()) {
     			// Si la sauvegarde est réussie
-	    		if(this.plugin.getManagerData().getUserData().clearOptions(this.getIdentifier(), world.get())) {
+	    		if (this.plugin.getManagerData().getUserData().clearOptions(this.getIdentifier(), world.get())) {
 	    			this.plugin.getManagerEvent().post(this.subject, Action.USER_OPTION_CHANGED);
 	    			return true;
 	    		}
@@ -576,9 +576,9 @@ public class EUserData extends EOptionSubjectData {
     @Override
     public boolean clearOptions() {
     	// S'il n'y a pas d'erreur : on sauvegarde
-    	if(this.clearOptionsExecute()) {
+    	if (this.clearOptionsExecute()) {
     		// Si la sauvegarde est réussie
-    		if(this.plugin.getManagerData().getUserData().clearOptions(this.getIdentifier())) {
+    		if (this.plugin.getManagerData().getUserData().clearOptions(this.getIdentifier())) {
     			this.plugin.getManagerEvent().post(this.subject, Action.USER_OPTION_CHANGED);
     			return true;
     		}

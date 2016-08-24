@@ -75,7 +75,7 @@ public class EUserSubject extends ESubject {
     @Override
     public Optional<CommandSource> getCommandSource() {
     	Optional<Player> optPlayer = this.plugin.getGame().getServer().getPlayer(UUID.fromString(this.getIdentifier()));
-        if(optPlayer.isPresent()) {
+        if (optPlayer.isPresent()) {
             return Optional.of(optPlayer.get());
         }
         return Optional.empty();
@@ -96,7 +96,7 @@ public class EUserSubject extends ESubject {
 		Set<Context> contexts_user = this.plugin.getService().getContextCalculator().getContextUser(contexts);
 		// TempoData : Permissions
 		Tristate value = this.getTransientSubjectData().getNodeTree(contexts_user).get(permission);
-		if(!value.equals(Tristate.UNDEFINED)) {
+		if (!value.equals(Tristate.UNDEFINED)) {
 			this.plugin.getLogger().debug("TransientSubjectData 'Permissions' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
 			return value;
 		}
@@ -106,7 +106,7 @@ public class EUserSubject extends ESubject {
     	Iterator<Subject> subjects = this.getTransientSubjectData().getParents(contexts_user).iterator();
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts_group, permission);
-    		if(!value.equals(Tristate.UNDEFINED)) {
+    		if (!value.equals(Tristate.UNDEFINED)) {
     			this.plugin.getLogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
@@ -114,7 +114,7 @@ public class EUserSubject extends ESubject {
     	
     	// SubjectData : Permissions
     	value = this.getSubjectData().getNodeTree(contexts_user).getTristate(permission);
-		if(!value.equals(Tristate.UNDEFINED)) {
+		if (!value.equals(Tristate.UNDEFINED)) {
 			this.plugin.getLogger().debug("SubjectData 'Permissions' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
 			return value;
 		}
@@ -123,7 +123,7 @@ public class EUserSubject extends ESubject {
     	subjects = this.getSubjectData().getSubParentsContexts(contexts_user).iterator();
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts_group, permission);
-    		if(!value.equals(Tristate.UNDEFINED)) {
+    		if (!value.equals(Tristate.UNDEFINED)) {
     			this.plugin.getLogger().debug("SubjectData 'SubGroup' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
@@ -133,7 +133,7 @@ public class EUserSubject extends ESubject {
     	subjects = this.getSubjectData().getParentsContexts(contexts_user).iterator();
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts_group, permission);
-    		if(!value.equals(Tristate.UNDEFINED)) {
+    		if (!value.equals(Tristate.UNDEFINED)) {
     			this.plugin.getLogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
@@ -151,7 +151,7 @@ public class EUserSubject extends ESubject {
     	Set<Context> contexts_user = this.plugin.getService().getContextCalculator().getContextUser(contexts);
 		// TempoData : Permissions
 		String value = this.getTransientSubjectData().getOptions(contexts_user).get(option);
-		if(value != null) {
+		if (value != null) {
 			return Optional.of(value);
 		}
     	
@@ -161,14 +161,14 @@ public class EUserSubject extends ESubject {
     	Optional<String> optValue;
     	while(subjects.hasNext()) {
     		optValue = ((ESubject) subjects.next()).getOption(contexts_group, option);
-    		if(optValue.isPresent()) {
+    		if (optValue.isPresent()) {
     			return optValue;
     		}
     	}
     	
     	// SubjectData : Permissions
     	value = this.getSubjectData().getOptionsContexts(contexts_user).get(option);
-    	if(value != null) {
+    	if (value != null) {
 			return Optional.of(value);
 		}
     	
@@ -176,7 +176,7 @@ public class EUserSubject extends ESubject {
     	subjects = this.getSubjectData().getParentsContexts(contexts_user).iterator();
     	while(subjects.hasNext()) {
     		optValue = ((ESubject) subjects.next()).getOption(contexts_group, option);
-    		if(optValue.isPresent()) {
+    		if (optValue.isPresent()) {
     			return optValue;
     		}
     	}

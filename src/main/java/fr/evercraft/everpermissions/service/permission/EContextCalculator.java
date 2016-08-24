@@ -56,7 +56,7 @@ public class EContextCalculator implements ContextCalculator<Subject> {
      */
     @Override
     public boolean matches(final Context context, final Subject subject) {
-    	if(context.getType().equals(Context.WORLD_KEY)) {
+    	if (context.getType().equals(Context.WORLD_KEY)) {
 	    	Optional<CommandSource> subjSource = subject.getCommandSource();
 	        if (subjSource.isPresent()) {
 	            CommandSource source = subjSource.get();
@@ -75,10 +75,10 @@ public class EContextCalculator implements ContextCalculator<Subject> {
      */
     public Set<Context> getContextGroup(final Set<Context> contexts) {
 		Set<Context> accumulator = new HashSet<Context>();
-		for(Context context : contexts) {
-			if(context.getType().equals(Context.WORLD_KEY)) {
+		for (Context context : contexts) {
+			if (context.getType().equals(Context.WORLD_KEY)) {
 				Optional<String> world = this.plugin.getManagerData().getTypeGroup(context.getName());
-				if(world.isPresent()) {
+				if (world.isPresent()) {
 					accumulator.add(new Context(Context.WORLD_KEY, world.get()));
 				}
 			}
@@ -93,10 +93,10 @@ public class EContextCalculator implements ContextCalculator<Subject> {
      */
     public Set<Context> getContextUser(final Set<Context> contexts) {
 		Set<Context> accumulator = new HashSet<Context>();
-		for(Context context : contexts) {
-			if(context.getType().equals(Context.WORLD_KEY)) {
+		for (Context context : contexts) {
+			if (context.getType().equals(Context.WORLD_KEY)) {
 				Optional<String> world = this.plugin.getManagerData().getTypeUser(context.getName());
-				if(world.isPresent()) {
+				if (world.isPresent()) {
 					accumulator.add(new Context(Context.WORLD_KEY, world.get()));
 				}
 			}
@@ -126,7 +126,7 @@ public class EContextCalculator implements ContextCalculator<Subject> {
 		Context context;
 		while(iterator.hasNext() && !world.isPresent()) {
 			context = iterator.next();
-			if(context.getType().equals(Context.WORLD_KEY)) {
+			if (context.getType().equals(Context.WORLD_KEY)) {
 				world = Optional.ofNullable(context.getName());
 			}
 		}

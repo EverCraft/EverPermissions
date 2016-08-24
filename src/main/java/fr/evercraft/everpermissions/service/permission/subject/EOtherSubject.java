@@ -59,13 +59,13 @@ public class EOtherSubject extends ESubject {
 
     @Override
     public Optional<CommandSource> getCommandSource() {
-    	if(this.getContainingCollection().getIdentifier().equals(PermissionService.SUBJECTS_SYSTEM)) {
+    	if (this.getContainingCollection().getIdentifier().equals(PermissionService.SUBJECTS_SYSTEM)) {
     		if (this.getIdentifier().equals("Server")) {
                 return Optional.of(this.plugin.getGame().getServer().getConsole());
             } else if (this.getIdentifier().equals("RCON")) {
                 // TODO: Implement RCON API?
             }
-    	} else if(this.getContainingCollection().getIdentifier().equals(PermissionService.SUBJECTS_COMMAND_BLOCK)) {
+    	} else if (this.getContainingCollection().getIdentifier().equals(PermissionService.SUBJECTS_COMMAND_BLOCK)) {
     		// TODO: Implement CommandBlock API?
     	}
         return Optional.empty();
@@ -75,7 +75,7 @@ public class EOtherSubject extends ESubject {
     public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {
     	// TempoData : Permissions
     	Tristate value = this.getTransientSubjectData().getNodeTree(contexts).get(permission);
-		if(!value.equals(Tristate.UNDEFINED)) {
+		if (!value.equals(Tristate.UNDEFINED)) {
 			return value;
 		}
     	
@@ -83,14 +83,14 @@ public class EOtherSubject extends ESubject {
     	Iterator<Subject> subjects = this.getTransientSubjectData().getParents(contexts).iterator();
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts, permission);
-    		if(!value.equals(Tristate.UNDEFINED)) {
+    		if (!value.equals(Tristate.UNDEFINED)) {
     			return value;
     		}
     	}
     	
     	// MemoryData : Permissions
 		value = this.getSubjectData().getNodeTree(contexts).getTristate(permission);
-		if(!value.equals(Tristate.UNDEFINED)) {
+		if (!value.equals(Tristate.UNDEFINED)) {
 			return value;
 		}
     	
@@ -98,7 +98,7 @@ public class EOtherSubject extends ESubject {
     	subjects = this.getSubjectData().getParents(contexts).iterator();
     	while(subjects.hasNext()) {
     		Tristate tristate = subjects.next().getPermissionValue(contexts, permission);
-    		if(!tristate.equals(Tristate.UNDEFINED)) {
+    		if (!tristate.equals(Tristate.UNDEFINED)) {
     			return tristate;
     		}
     	}

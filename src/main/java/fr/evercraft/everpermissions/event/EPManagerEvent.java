@@ -57,9 +57,9 @@ public class EPManagerEvent {
 	public boolean post(final PermSystemEvent.Action action) {
 		this.plugin.getLogger().debug("Event PermSystemEvent : (Action='" + action.name() +"')");
 		
-		if(action.equals(PermSystemEvent.Action.RELOADED)) {
+		if (action.equals(PermSystemEvent.Action.RELOADED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermSystemReloadEvent(this.getCause()));
-		} else if(action.equals(PermSystemEvent.Action.DEFAULT_GROUP_CHANGED)) {
+		} else if (action.equals(PermSystemEvent.Action.DEFAULT_GROUP_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermSystemDefaultEvent(this.getCause()));
 		}
 		return false;
@@ -68,17 +68,17 @@ public class EPManagerEvent {
 	public boolean post(final Subject subject, final PermUserEvent.Action action) {
 		this.plugin.getLogger().debug("Event PermUserEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
 		
-		if(action.equals(PermUserEvent.Action.USER_ADDED)) {
+		if (action.equals(PermUserEvent.Action.USER_ADDED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermUserAddEvent(subject, this.getCause(), this.plugin));
-		} else if(action.equals(PermUserEvent.Action.USER_REMOVED)) {
+		} else if (action.equals(PermUserEvent.Action.USER_REMOVED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermUserRemoveEvent(subject, this.getCause(), this.plugin));
-		} else if(action.equals(PermUserEvent.Action.USER_PERMISSION_CHANGED)) {
+		} else if (action.equals(PermUserEvent.Action.USER_PERMISSION_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermUserPermissionEvent(subject, this.getCause(), this.plugin));
-		} else if(action.equals(PermUserEvent.Action.USER_OPTION_CHANGED)) {
+		} else if (action.equals(PermUserEvent.Action.USER_OPTION_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermUserOptionEvent(subject, this.getCause(), this.plugin));
-		} else if(action.equals(PermUserEvent.Action.USER_GROUP_CHANGED)) {
+		} else if (action.equals(PermUserEvent.Action.USER_GROUP_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermUserGroupEvent(subject, this.getCause(), this.plugin));
-		} else if(action.equals(PermUserEvent.Action.USER_SUBGROUP_CHANGED)) {
+		} else if (action.equals(PermUserEvent.Action.USER_SUBGROUP_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermUserSubGroupEvent(subject, this.getCause(), this.plugin));
 		}
 		return false;
@@ -87,15 +87,15 @@ public class EPManagerEvent {
 	public boolean post(final Subject subject, final PermGroupEvent.Action action) {
 		this.plugin.getLogger().debug("Event PermGroupEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
 		
-		if(action.equals(PermGroupEvent.Action.GROUP_ADDED)) {
+		if (action.equals(PermGroupEvent.Action.GROUP_ADDED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermGroupAddEvent(subject, this.getCause()));
-		} else if(action.equals(PermGroupEvent.Action.GROUP_REMOVED)) {
+		} else if (action.equals(PermGroupEvent.Action.GROUP_REMOVED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermGroupRemoveEvent(subject, this.getCause()));
-		} else if(action.equals(PermGroupEvent.Action.GROUP_PERMISSION_CHANGED)) {
+		} else if (action.equals(PermGroupEvent.Action.GROUP_PERMISSION_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermGroupPermissionEvent(subject, this.getCause()));
-		} else if(action.equals(PermGroupEvent.Action.GROUP_INHERITANCE_CHANGED)) {
+		} else if (action.equals(PermGroupEvent.Action.GROUP_INHERITANCE_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermGroupInheritanceEvent(subject, this.getCause()));
-		} else if(action.equals(PermGroupEvent.Action.GROUP_OPTION_CHANGED)) {
+		} else if (action.equals(PermGroupEvent.Action.GROUP_OPTION_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermGroupOptionEvent(subject, this.getCause()));
 		}
 		return false;
@@ -104,15 +104,15 @@ public class EPManagerEvent {
 	public boolean post(final Subject subject, final PermOtherEvent.Action action) {
 		this.plugin.getLogger().debug("Event PermOtherEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
 		
-		if(action.equals(PermOtherEvent.Action.OTHER_ADDED)) {
+		if (action.equals(PermOtherEvent.Action.OTHER_ADDED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermOtherAddEvent(subject, this.getCause()));
-		} else if(action.equals(PermOtherEvent.Action.OTHER_REMOVED)) {
+		} else if (action.equals(PermOtherEvent.Action.OTHER_REMOVED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermOtherRemoveEvent(subject, this.getCause()));
-		} else if(action.equals(PermOtherEvent.Action.OTHER_PERMISSION_CHANGED)) {
+		} else if (action.equals(PermOtherEvent.Action.OTHER_PERMISSION_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermOtherPermissionEvent(subject, this.getCause()));
-		} else if(action.equals(PermOtherEvent.Action.OTHER_INHERITANCE_CHANGED)) {
+		} else if (action.equals(PermOtherEvent.Action.OTHER_INHERITANCE_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermOtherInheritanceEvent(subject, this.getCause()));
-		} else if(action.equals(PermOtherEvent.Action.OTHER_OPTION_CHANGED)) {
+		} else if (action.equals(PermOtherEvent.Action.OTHER_OPTION_CHANGED)) {
 			return this.plugin.getGame().getEventManager().post(new EPermOtherOptionEvent(subject, this.getCause()));
 		}
 		return false;

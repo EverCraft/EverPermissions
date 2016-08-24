@@ -39,7 +39,7 @@ public class EOthersCollection extends ESubjectCollection {
     public EOtherSubject get(String identifier) {
     	identifier = getIdentifier(identifier);
     	
-		if(!this.subjects.containsKey(identifier)) {
+		if (!this.subjects.containsKey(identifier)) {
 			Chronometer chronometer = new Chronometer();
 			
 			EOtherSubject subject = new EOtherSubject(this.plugin, identifier, EOthersCollection.this);
@@ -66,7 +66,7 @@ public class EOthersCollection extends ESubjectCollection {
 	
 	@Override
 	public void reload() {
-		for(EOtherSubject subject : this.subjects.values()) {
+		for (EOtherSubject subject : this.subjects.values()) {
 			subject.reload();
 		}
 	}
@@ -77,7 +77,7 @@ public class EOthersCollection extends ESubjectCollection {
 	 * @return Le nom
 	 */
 	public String getIdentifier(String identifier) {
-		if(identifier.equals("@")){
+		if (identifier.equals("@")){
     		identifier = EPermissionService.IDENTIFIER_COMMAND_BLOCK;
     	}
 		return identifier;

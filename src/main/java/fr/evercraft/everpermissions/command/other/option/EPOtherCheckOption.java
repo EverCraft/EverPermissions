@@ -62,14 +62,14 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
-			for(Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
+		if (args.size() == 1){
+			for (Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-			for(Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
+			for (Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.add("prefix");
 			suggests.add("suffix");
 		}
@@ -79,10 +79,10 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Résultat de la commande :
 		boolean resultat = false;
-		if(args.size() == 2) {
+		if (args.size() == 2) {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le subject existe
-			if(optSubject.isPresent()){
+			if (optSubject.isPresent()){
 				resultat = command(source, optSubject.get(), args.get(1));
 			// Le subject est introuvable
 			} else {
@@ -98,7 +98,7 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final EOtherSubject subject, final String type) {
 		String name = subject.getSubjectData().getOptions(new HashSet<Context>()).get(type);
 		// Il n'y a aucune valeur
-		if(name != null) {
+		if (name != null) {
 			staff.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
 					.append(EPMessages.OTHER_CHECK_OPTION_DEFINED.get()
 						.replaceAll("<subject>", subject.getIdentifier())

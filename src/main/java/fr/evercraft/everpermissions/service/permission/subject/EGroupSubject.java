@@ -68,7 +68,7 @@ public class EGroupSubject extends ESubject {
     public Tristate getPermissionValue(final Set<Context> type_contexts, final String permission) {
     	// TempoData : Permissions
     	Tristate value = this.getTransientSubjectData().getNodeTree(type_contexts).get(permission);
-		if(!value.equals(Tristate.UNDEFINED)) {
+		if (!value.equals(Tristate.UNDEFINED)) {
 			return value;
 		}
     	
@@ -76,14 +76,14 @@ public class EGroupSubject extends ESubject {
     	Iterator<Subject> subjects = this.getTransientSubjectData().getParents(type_contexts).iterator();
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(type_contexts, permission);
-    		if(!value.equals(Tristate.UNDEFINED)) {
+    		if (!value.equals(Tristate.UNDEFINED)) {
     			return value;
     		}
     	}
     	
     	// MemoryData : Permissions
 		value = this.getSubjectData().getNodeTree(type_contexts).getTristate(permission);
-		if(!value.equals(Tristate.UNDEFINED)) {
+		if (!value.equals(Tristate.UNDEFINED)) {
 			return value;
 		}
     	
@@ -91,7 +91,7 @@ public class EGroupSubject extends ESubject {
     	subjects = this.getSubjectData().getParents(type_contexts).iterator();
     	while(subjects.hasNext()) {
     		Tristate tristate = subjects.next().getPermissionValue(type_contexts, permission);
-    		if(!tristate.equals(Tristate.UNDEFINED)) {
+    		if (!tristate.equals(Tristate.UNDEFINED)) {
     			return tristate;
     		}
     	}

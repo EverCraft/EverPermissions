@@ -61,14 +61,14 @@ public class EPOtherDelOption extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
-			for(Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
+		if (args.size() == 1){
+			for (Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-			for(Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
+			for (Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.add("prefix");
 			suggests.add("suffix");
 		}
@@ -78,10 +78,10 @@ public class EPOtherDelOption extends ECommand<EverPermissions> {
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Résultat de la commande :
 		boolean resultat = false;
-		if(args.size() == 2) {
+		if (args.size() == 2) {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le joueur existe
-			if(optSubject.isPresent()){
+			if (optSubject.isPresent()){
 				resultat = command(source, optSubject.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
@@ -96,7 +96,7 @@ public class EPOtherDelOption extends ECommand<EverPermissions> {
 	
 	private boolean command(final CommandSource staff, final EOtherSubject subject, final String option) {
 		// L'option a bien été supprimé
-		if(subject.getSubjectData().setOption(new HashSet<Context>(), option, null)) {
+		if (subject.getSubjectData().setOption(new HashSet<Context>(), option, null)) {
 			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_DEL_OPTION_PLAYER.get()
 					.replaceAll("<subject>", subject.getIdentifier())
 					.replaceAll("<option>", option)));

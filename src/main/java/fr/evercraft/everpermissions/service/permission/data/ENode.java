@@ -172,7 +172,7 @@ public class ENode extends HashMap<String, ENode> {
         for (String part : parts) {
         	ENode oldChild = currentPtr.get(part);
         	ENode newChild;
-            if(oldChild == null) {
+            if (oldChild == null) {
             	newChild = new ENode();
             } else {
             	newChild = oldChild.copy();

@@ -60,14 +60,14 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
-			for(Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
+		if (args.size() == 1){
+			for (Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.add("true");
 			suggests.add("false");
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -77,16 +77,16 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le monde
-		if(args.size() == 2) {
+		if (args.size() == 2) {
 			// Si la source est un joueur
-			if(source instanceof EPlayer) {
+			if (source instanceof EPlayer) {
 				resultat = command(source, args.get(0), args.get(1), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
 				resultat = command(source, args.get(0), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connais le joueur
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			resultat = command(source, args.get(0), args.get(1), args.get(2));
 		// Nombre d'argument monde
 		} else {
@@ -98,16 +98,16 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource player, final String group_name, final String value_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde existant
-		if(type_group.isPresent()) {
+		if (type_group.isPresent()) {
 			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
 			// Groupe existant
-			if(group != null && group.hasWorld(type_group.get())) {
+			if (group != null && group.hasWorld(type_group.get())) {
 				Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
 				// La value est un boolean
-				if(value.isPresent()) {
-					if(value.get()) {
+				if (value.isPresent()) {
+					if (value.get()) {
 						// Le groupe a bien été mit par défaut
-						if(this.plugin.getService().getGroupSubjects().registerDefault(group, type_group.get())) {
+						if (this.plugin.getService().getGroupSubjects().registerDefault(group, type_group.get())) {
 							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_DEFAULT_GROUP_TRUE.get()
 									.replaceAll("<group>", group_name)
 									.replaceAll("<type>", type_group.get())));
@@ -117,7 +117,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 						} else {
 							Optional<EGroupSubject> group_default = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
 							// C'est déjà le groupe par défaut
-							if(group_default.isPresent() && group_default.get().equals(group)) {
+							if (group_default.isPresent() && group_default.get().equals(group)) {
 								player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_DEFAULT_GROUP_ERROR_EQUALS.get()
 										.replaceAll("<group>", group_name)
 										.replaceAll("<type>", type_group.get())));
@@ -130,7 +130,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 						}
 					} else {
 						// Le groupe n'est plus un groupe par défaut
-						if(this.plugin.getService().getGroupSubjects().removeDefault(group, type_group.get())) {
+						if (this.plugin.getService().getGroupSubjects().removeDefault(group, type_group.get())) {
 							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_DEFAULT_GROUP_FALSE.get()
 									.replaceAll("<group>", group_name)
 									.replaceAll("<type>", type_group.get())));

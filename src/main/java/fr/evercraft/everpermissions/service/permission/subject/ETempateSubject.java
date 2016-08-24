@@ -61,7 +61,7 @@ public class ETempateSubject extends ESubject {
     public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {
     	// TempoData : Permissions
     	Tristate value = this.getTransientSubjectData().getNodeTree(contexts).get(permission);
-		if(!value.equals(Tristate.UNDEFINED)) {
+		if (!value.equals(Tristate.UNDEFINED)) {
 			return value;
 		}
     	
@@ -69,14 +69,14 @@ public class ETempateSubject extends ESubject {
     	Iterator<Subject> subjects = this.getTransientSubjectData().getParents(contexts).iterator();
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts, permission);
-    		if(!value.equals(Tristate.UNDEFINED)) {
+    		if (!value.equals(Tristate.UNDEFINED)) {
     			return value;
     		}
     	}
     	
     	// MemoryData : Permissions
 		value = this.getSubjectData().getNodeTree(contexts).get(permission);
-		if(!value.equals(Tristate.UNDEFINED)) {
+		if (!value.equals(Tristate.UNDEFINED)) {
 			return value;
 		}
     	
@@ -84,7 +84,7 @@ public class ETempateSubject extends ESubject {
     	subjects = this.getSubjectData().getParents(contexts).iterator();
     	while(subjects.hasNext()) {
     		Tristate tristate = subjects.next().getPermissionValue(contexts, permission);
-    		if(!tristate.equals(Tristate.UNDEFINED)) {
+    		if (!tristate.equals(Tristate.UNDEFINED)) {
     			return tristate;
     		}
     	}

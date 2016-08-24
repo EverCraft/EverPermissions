@@ -62,11 +62,11 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
+		if (args.size() == 1){
 			suggests = null;
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.add("ever");
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -76,12 +76,12 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le joueur
-		if(args.size() == 2) {
+		if (args.size() == 2) {
 			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optUser.isPresent()){
+			if (optUser.isPresent()){
 				// Si la source est un joueur
-				if(source instanceof EPlayer) {
+				if (source instanceof EPlayer) {
 					resultat = command(source, optUser.get(), args.get(1), ((EPlayer) source).getWorld().getName());
 				// La source n'est pas un joueur
 				} else {
@@ -92,10 +92,10 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// On connais le joueur
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optPlayer.isPresent()){
+			if (optPlayer.isPresent()){
 				resultat = command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
@@ -111,12 +111,12 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final User user, final String permission, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
-		if(type_user.isPresent()) {
+		if (type_user.isPresent()) {
 			Tristate value = user.getPermissionValue(EContextCalculator.getContextWorld(world_name), permission);
 			// Permission : True
-			if(value.equals(Tristate.TRUE)) {
+			if (value.equals(Tristate.TRUE)) {
 				// La source et le joueur sont identique
-				if(staff.equals(user)) {
+				if (staff.equals(user)) {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CHECK_PERMISSION_TRUE_EQUALS.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
@@ -129,9 +129,9 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 							.replaceAll("<type>", type_user.get())));
 				}
 			// Permission : False
-			} else if(value.equals(Tristate.FALSE)) {
+			} else if (value.equals(Tristate.FALSE)) {
 				// La source et le joueur sont identique
-				if(staff.equals(user)) {
+				if (staff.equals(user)) {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CHECK_PERMISSION_FALSE_EQUALS.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
@@ -146,7 +146,7 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			// Permission : Undefined
 			} else {
 				// La source et le joueur sont identique
-				if(staff.equals(user)) {
+				if (staff.equals(user)) {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CHECK_PERMISSION_UNDEFINED_EQUALS.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)

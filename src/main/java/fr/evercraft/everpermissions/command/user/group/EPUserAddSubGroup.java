@@ -65,13 +65,13 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
+		if (args.size() == 1){
 			suggests = null;
-		} else if(args.size() == 2) {
-			for(Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
+		} else if (args.size() == 2) {
+			for (Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -81,12 +81,12 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 		// Résultat de la commande :
 		boolean resultat = false;
 		// Si on ne connait pas le monde
-		if(args.size() == 2) {
+		if (args.size() == 2) {
 			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optUser.isPresent()){
+			if (optUser.isPresent()){
 				// Si la source est un joueur
-				if(source instanceof EPlayer) {
+				if (source instanceof EPlayer) {
 					resultat = command(source, optUser.get(), args.get(1), ((EPlayer) source).getWorld().getName());
 				// La source n'est pas un joueur
 				} else {
@@ -97,10 +97,10 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// On connais le monde
-		} else if(args.size() == 3) {
+		} else if (args.size() == 3) {
 			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
-			if(optPlayer.isPresent()){
+			if (optPlayer.isPresent()){
 				resultat = command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
@@ -117,21 +117,21 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde existant
-		if(type_user.isPresent() && type_group.isPresent()) {
+		if (type_user.isPresent() && type_group.isPresent()) {
 			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
 			// Groupe existant
-			if(group != null && group.hasWorld(type_group.get())) {
+			if (group != null && group.hasWorld(type_group.get())) {
 				EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
 				// Joueur existant
-				if(subject != null) {
+				if (subject != null) {
 					// Le sous-groupe a bien été ajouté
-					if(subject.getSubjectData().addSubParent(EContextCalculator.getContextWorld(world_name), group)) {
-						if(staff.equals(user)) {
+					if (subject.getSubjectData().addSubParent(EContextCalculator.getContextWorld(world_name), group)) {
+						if (staff.equals(user)) {
 							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_SUBGROUP_EQUALS.get()
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<group>", group.getIdentifier())
 									.replaceAll("<type>", type_user.get())));
-							if(EPMessages.USER_ADD_SUBGROUP_BROADCAST_EQUALS.has()) {
+							if (EPMessages.USER_ADD_SUBGROUP_BROADCAST_EQUALS.has()) {
 								this.plugin.getService().broadcastMessage(staff,
 									EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_SUBGROUP_BROADCAST_EQUALS.get()
 										.replaceAll("<staff>", staff.getName())
@@ -146,13 +146,13 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 									.replaceAll("<type>", type_user.get())));
 							// Le joueur est connecté
 							Optional<Player> player = user.getPlayer();
-							if(player.isPresent()) {
+							if (player.isPresent()) {
 								player.get().sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_SUBGROUP_PLAYER.get()
 										.replaceAll("<staff>", staff.getName())
 										.replaceAll("<group>", group.getIdentifier())
 										.replaceAll("<type>", type_user.get())));
 							}
-							if(EPMessages.USER_ADD_SUBGROUP_BROADCAST_PLAYER.has()) {
+							if (EPMessages.USER_ADD_SUBGROUP_BROADCAST_PLAYER.has()) {
 								this.plugin.getService().broadcastMessage(staff, user.getUniqueId(), 
 									EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_SUBGROUP_BROADCAST_PLAYER.get()
 										.replaceAll("<staff>", staff.getName())
@@ -164,7 +164,7 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 						return true;
 					// Le sous-groupe n'a pas été ajouté
 					} else {
-						if(staff.equals(user)) {
+						if (staff.equals(user)) {
 							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_SUBGROUP_ERROR_EQUALS.get()
 									.replaceAll("<player>", user.getName())
 									.replaceAll("<group>", group.getIdentifier())

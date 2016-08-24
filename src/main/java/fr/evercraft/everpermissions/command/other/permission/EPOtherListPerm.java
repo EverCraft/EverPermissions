@@ -63,14 +63,14 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if(args.size() == 1){
-			for(Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
+		if (args.size() == 1){
+			for (Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-			for(Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
+			for (Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
-		} else if(args.size() == 2) {
+		} else if (args.size() == 2) {
 			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
 		}
 		return suggests;
@@ -79,10 +79,10 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Résultat de la commande :
 		boolean resultat = false;
-		if(args.size() == 1) {
+		if (args.size() == 1) {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le joueur existe
-			if(optSubject.isPresent()){
+			if (optSubject.isPresent()){
 				resultat = command(source, optSubject.get());
 			// Le joueur est introuvable
 			} else {
@@ -101,12 +101,12 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 		
 		// La liste des permissions
 		Map<String, Boolean> permissions = subject.getSubjectData().getPermissions(contexts);
-		if(permissions.isEmpty()) {
+		if (permissions.isEmpty()) {
 			list.add(EPMessages.OTHER_LIST_PERMISSION_PERMISSION_EMPTY.getText());
 		} else {
 			list.add(EPMessages.OTHER_LIST_PERMISSION_PERMISSION.getText());
-			for(Entry<String, Boolean> permission : permissions.entrySet()) {
-				if(permission.getValue()) {
+			for (Entry<String, Boolean> permission : permissions.entrySet()) {
+				if (permission.getValue()) {
 					list.add(EChat.of(EPMessages.OTHER_LIST_PERMISSION_PERMISSION_LINE_TRUE.get()
 							.replaceAll("<permission>", permission.getKey())));
 				} else {
@@ -118,10 +118,10 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 		
 		// La liste des permissions temporaires
 		permissions = subject.getTransientSubjectData().getPermissions(contexts);
-		if(!permissions.isEmpty()) {
+		if (!permissions.isEmpty()) {
 			list.add(EPMessages.OTHER_LIST_PERMISSION_TRANSIENT.getText());
-			for(Entry<String, Boolean> permission : permissions.entrySet()) {
-				if(permission.getValue()) {
+			for (Entry<String, Boolean> permission : permissions.entrySet()) {
+				if (permission.getValue()) {
 					list.add(EChat.of(EPMessages.OTHER_LIST_PERMISSION_TRANSIENT_LINE_TRUE.get()
 							.replaceAll("<permission>", permission.getKey())));
 				} else {

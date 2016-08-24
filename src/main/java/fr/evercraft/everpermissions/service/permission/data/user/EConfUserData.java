@@ -44,14 +44,14 @@ public class EConfUserData implements IUserData {
     
     public void load(final EUserData subject) {
     	// Pour tous les types de joueur
-    	for(Entry<String, EPConfUsers> world : this.plugin.getManagerData().getConfUsers().entrySet()) {
+    	for (Entry<String, EPConfUsers> world : this.plugin.getManagerData().getConfUsers().entrySet()) {
     		ConfigurationNode user = world.getValue().get(subject.getIdentifier());
     		// Si le fichier de configuration existe
-    		if(user.getValue() != null) {
+    		if (user.getValue() != null) {
     			Set<Context> contexts = EContextCalculator.getContextWorld(world.getKey());
     			// Chargement des permissions
     			for (Entry<Object, ? extends ConfigurationNode> permission : user.getNode("permissions").getChildrenMap().entrySet()) {
-	    			if(permission.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
+	    			if (permission.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
 	    				subject.setPermissionExecute(contexts, (String) permission.getKey(), Tristate.fromBoolean(permission.getValue().getBoolean(false)));
 	    				this.plugin.getLogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
@@ -69,7 +69,7 @@ public class EConfUserData implements IUserData {
     			// Chargement des options
     			for (Entry<Object, ? extends ConfigurationNode> option : user.getNode("options").getChildrenMap().entrySet()) {
     				String value = option.getValue().getString(null);
-	    			if(option.getKey() instanceof String && value != null) {
+	    			if (option.getKey() instanceof String && value != null) {
 	    				subject.setOptionExecute(contexts, (String) option.getKey(), value);
 	    				this.plugin.getLogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
@@ -88,7 +88,7 @@ public class EConfUserData implements IUserData {
     			try {
 					for (String subgroup : user.getNode("subgroups").getList(TypeToken.of(String.class))) {
 						EGroupSubject group = this.plugin.getService().getGroupSubjects().get(subgroup);
-						if(group != null) {
+						if (group != null) {
 							subject.addSubParentExecute(contexts, group);
 							this.plugin.getLogger().debug("Loading : ("
 		    						+ "identifier=" + subject.getIdentifier() + ";"
@@ -105,9 +105,9 @@ public class EConfUserData implements IUserData {
     			
     			// Chargement du groupe
     			String groups = user.getNode("group").getString(null);
-    			if(groups != null) {
+    			if (groups != null) {
     				EGroupSubject group = this.plugin.getService().getGroupSubjects().get(groups);
-    				if(group != null) {
+    				if (group != null) {
     					subject.addParentExecute(contexts, group);
     					this.plugin.getLogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
@@ -131,10 +131,10 @@ public class EConfUserData implements IUserData {
     public boolean setPermission(final String subject, final String world, final String permission, final Tristate value, final boolean insert) {
 		Optional<EPConfUsers> conf = this.plugin.getManagerData().getConfUser(world);
 		// Si le fichier de configuration existe
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			ConfigurationNode permissions = conf.get().getNode().getNode(subject, "permissions");
 			// Supprime une permission
-			if(value.equals(Tristate.UNDEFINED)) {
+			if (value.equals(Tristate.UNDEFINED)) {
 				permissions.removeChild(permission);
 				this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject + "';permission='" + permission + "';type='" + world + "')");
 			// Ajoute une permission
@@ -151,7 +151,7 @@ public class EConfUserData implements IUserData {
     public boolean clearPermissions(final String subject, final String world) {
 		Optional<EPConfUsers> conf = this.plugin.getManagerData().getConfUser(world);
 		// Si le fichier de configuration existe
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			conf.get().get(subject).removeChild("permissions");
 			
 			this.plugin.getLogger().debug("Removed the permissions configuration file : (identifier='" + subject + "';type='" + world + "')");
@@ -163,7 +163,7 @@ public class EConfUserData implements IUserData {
     
     public boolean clearPermissions(final String subject) {
     	// Pour tous les types de joueur
-		for(Entry<String, EPConfUsers> conf : this.plugin.getManagerData().getConfUsers().entrySet()) {
+		for (Entry<String, EPConfUsers> conf : this.plugin.getManagerData().getConfUsers().entrySet()) {
 			conf.getValue().get(subject).removeChild("permissions");
 		}
 		this.plugin.getLogger().debug("Removed the permissions configuration file : (identifier='" + subject + "')");
@@ -178,9 +178,9 @@ public class EConfUserData implements IUserData {
     public boolean setOption(final String subject, final String world, final String option, final String value, final boolean insert) {
 		Optional<EPConfUsers> conf = this.plugin.getManagerData().getConfUser(world);
 		// Si le fichier de configuration existe
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			ConfigurationNode options = conf.get().get(subject + ".options");
-			if(value == null) {
+			if (value == null) {
 				options.removeChild(option);
 				this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject + "';option='" + option + "';type='" + world + "')");
 			} else {
@@ -196,7 +196,7 @@ public class EConfUserData implements IUserData {
     public boolean clearOptions(final String subject, final String world) {
 		Optional<EPConfUsers> conf = this.plugin.getManagerData().getConfUser(world);
 		// Si le fichier de configuration existe
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			conf.get().get(subject).removeChild("options");
 			this.plugin.getLogger().debug("Removed the options configuration file : (identifier='" + subject + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
@@ -207,7 +207,7 @@ public class EConfUserData implements IUserData {
 
     public boolean clearOptions(final String subject) {
     	// Pour tous les types de joueur
-		for(Entry<String, EPConfUsers> world : this.plugin.getManagerData().getConfUsers().entrySet()) {
+		for (Entry<String, EPConfUsers> world : this.plugin.getManagerData().getConfUsers().entrySet()) {
 			world.getValue().get(subject).removeChild("options");
 		}
 		this.plugin.getLogger().debug("Removed the options configuration file : (identifier='" + subject + "')");
@@ -222,7 +222,7 @@ public class EConfUserData implements IUserData {
     public boolean addParent(final String subject, final String world, final String parent) {
 		Optional<EPConfUsers> users = this.plugin.getManagerData().getConfUser(world);
 		// Si le fichier de configuration existe
-		if(users.isPresent()) {
+		if (users.isPresent()) {
 			users.get().get(subject + ".group").setValue(parent);
 			this.plugin.getLogger().debug("Added to the configs file : (identifier='" + subject + "';group='" + parent + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
@@ -234,7 +234,7 @@ public class EConfUserData implements IUserData {
     public boolean removeParent(final String subject, final String world, final String parent) {
 		Optional<EPConfUsers> conf = this.plugin.getManagerData().getConfUser(world);
 		// Si le fichier de configuration existe
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			conf.get().get(subject).removeChild("group");
 			this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject + "';group='" + parent + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
@@ -246,7 +246,7 @@ public class EConfUserData implements IUserData {
     public boolean clearParents(final String subject, final String world) {
 		Optional<EPConfUsers> conf = this.plugin.getManagerData().getConfUser(world);
 		// Si le fichier de configuration existe
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			conf.get().get(subject).removeChild("group");
 			this.plugin.getLogger().debug("Removed the group configuration file : (identifier='" + subject + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
@@ -257,7 +257,7 @@ public class EConfUserData implements IUserData {
 
     public boolean clearParents(final String subject) {
     	// Pour tous les types de joueur
-		for(Entry<String, EPConfUsers> conf : this.plugin.getManagerData().getConfUsers().entrySet()) {
+		for (Entry<String, EPConfUsers> conf : this.plugin.getManagerData().getConfUsers().entrySet()) {
 			conf.getValue().get(subject).removeChild("group");
 		}
 		this.plugin.getLogger().debug("Removed the group configuration file : (identifier='" + subject + "')");
@@ -272,7 +272,7 @@ public class EConfUserData implements IUserData {
     public boolean addSubParent(final String subject, final String world, final String parent) {
 		Optional<EPConfUsers> conf = this.plugin.getManagerData().getConfUser(world);
 		// Si le fichier de configuration existe
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			List<String> subgroups;
 			try {
 				subgroups = new ArrayList<String>(conf.get().get(subject + ".subgroups").getList(TypeToken.of(String.class)));
@@ -289,12 +289,12 @@ public class EConfUserData implements IUserData {
     public boolean removeSubParent(final String subject, final String world, final String parent) {
 		Optional<EPConfUsers> conf = this.plugin.getManagerData().getConfUser(world);
 		// Si le fichier de configuration existe
-		if(conf.isPresent()) {
+		if (conf.isPresent()) {
 			List<String> subgroups;
 			try {
 				subgroups = new ArrayList<String>(conf.get().get(subject + ".subgroups").getList(TypeToken.of(String.class)));
 				subgroups.remove(parent);
-				if(subgroups.isEmpty()) {
+				if (subgroups.isEmpty()) {
 					conf.get().get(subject).removeChild("subgroups");
 				} else {
 					conf.get().get(subject + ".subgroups").setValue(subgroups);
@@ -310,7 +310,7 @@ public class EConfUserData implements IUserData {
     public boolean clearSubParents(final String subject, final String world) {
 		Optional<EPConfUsers> users = this.plugin.getManagerData().getConfUser(world);
 		// Si le fichier de configuration existe
-		if(users.isPresent()) {
+		if (users.isPresent()) {
 			users.get().get(subject).removeChild("subgroups");
 			this.plugin.getLogger().debug("Removed the subgroups configuration file : (identifier='" + subject + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
@@ -321,7 +321,7 @@ public class EConfUserData implements IUserData {
 
     public boolean clearSubParents(final String subject) {
     	// Pour tous les types de joueur
-    	for(Entry<String, EPConfUsers> conf : this.plugin.getManagerData().getConfUsers().entrySet()) {
+    	for (Entry<String, EPConfUsers> conf : this.plugin.getManagerData().getConfUsers().entrySet()) {
     		conf.getValue().get(subject).removeChild("group");
 		}
     	this.plugin.getLogger().debug("Removed the subgroups configuration file : (identifier='" + subject + "')");
