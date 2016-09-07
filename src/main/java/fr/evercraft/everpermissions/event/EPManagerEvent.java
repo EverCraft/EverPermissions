@@ -16,32 +16,20 @@
  */
 package fr.evercraft.everpermissions.event;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 
+import fr.evercraft.everapi.event.ESpongeEventFactory;
 import fr.evercraft.everapi.event.PermGroupEvent;
 import fr.evercraft.everapi.event.PermOtherEvent;
 import fr.evercraft.everapi.event.PermSystemEvent;
 import fr.evercraft.everapi.event.PermUserEvent;
+import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.event.group.EPermGroupAddEvent;
-import fr.evercraft.everpermissions.event.group.EPermGroupInheritanceEvent;
-import fr.evercraft.everpermissions.event.group.EPermGroupOptionEvent;
-import fr.evercraft.everpermissions.event.group.EPermGroupPermissionEvent;
-import fr.evercraft.everpermissions.event.group.EPermGroupRemoveEvent;
-import fr.evercraft.everpermissions.event.other.EPermOtherAddEvent;
-import fr.evercraft.everpermissions.event.other.EPermOtherInheritanceEvent;
-import fr.evercraft.everpermissions.event.other.EPermOtherOptionEvent;
-import fr.evercraft.everpermissions.event.other.EPermOtherPermissionEvent;
-import fr.evercraft.everpermissions.event.other.EPermOtherRemoveEvent;
-import fr.evercraft.everpermissions.event.system.EPermSystemDefaultEvent;
-import fr.evercraft.everpermissions.event.system.EPermSystemReloadEvent;
-import fr.evercraft.everpermissions.event.user.EPermUserAddEvent;
-import fr.evercraft.everpermissions.event.user.EPermUserGroupEvent;
-import fr.evercraft.everpermissions.event.user.EPermUserOptionEvent;
-import fr.evercraft.everpermissions.event.user.EPermUserPermissionEvent;
-import fr.evercraft.everpermissions.event.user.EPermUserRemoveEvent;
-import fr.evercraft.everpermissions.event.user.EPermUserSubGroupEvent;
 
 public class EPManagerEvent {
 	private EverPermissions plugin;
@@ -58,28 +46,38 @@ public class EPManagerEvent {
 		this.plugin.getLogger().debug("Event PermSystemEvent : (Action='" + action.name() +"')");
 		
 		if (action.equals(PermSystemEvent.Action.RELOADED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermSystemReloadEvent(this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermSystemEventReloaded(this.getCause()));
 		} else if (action.equals(PermSystemEvent.Action.DEFAULT_GROUP_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermSystemDefaultEvent(this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermSystemEventDefault(this.getCause()));
 		}
 		return false;
 	}
 	
 	public boolean post(final Subject subject, final PermUserEvent.Action action) {
+		Optional<EPlayer> player = Optional.empty();
+		if (subject.getContainingCollection().getIdentifier().equals(PermissionService.SUBJECTS_USER)) {
+    		try {
+    			player = plugin.getEServer().getEPlayer(UUID.fromString(subject.getIdentifier()));
+    		} catch(IllegalArgumentException e) {}
+    	}
+		return this.post(subject, player, action);
+	}
+	
+	public boolean post(final Subject subject, Optional<EPlayer> player, final PermUserEvent.Action action) {
 		this.plugin.getLogger().debug("Event PermUserEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
 		
 		if (action.equals(PermUserEvent.Action.USER_ADDED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermUserAddEvent(subject, this.getCause(), this.plugin));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermUserEventAdd(subject, player, this.getCause()));
 		} else if (action.equals(PermUserEvent.Action.USER_REMOVED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermUserRemoveEvent(subject, this.getCause(), this.plugin));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermUserEventRemove(subject, player, this.getCause()));
 		} else if (action.equals(PermUserEvent.Action.USER_PERMISSION_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermUserPermissionEvent(subject, this.getCause(), this.plugin));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermUserEventPermission(subject, player, this.getCause()));
 		} else if (action.equals(PermUserEvent.Action.USER_OPTION_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermUserOptionEvent(subject, this.getCause(), this.plugin));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermUserEventOption(subject, player, this.getCause()));
 		} else if (action.equals(PermUserEvent.Action.USER_GROUP_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermUserGroupEvent(subject, this.getCause(), this.plugin));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermUserEventGroup(subject, player, this.getCause()));
 		} else if (action.equals(PermUserEvent.Action.USER_SUBGROUP_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermUserSubGroupEvent(subject, this.getCause(), this.plugin));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermUserEventSubGroup(subject, player, this.getCause()));
 		}
 		return false;
 	}
@@ -88,15 +86,15 @@ public class EPManagerEvent {
 		this.plugin.getLogger().debug("Event PermGroupEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
 		
 		if (action.equals(PermGroupEvent.Action.GROUP_ADDED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermGroupAddEvent(subject, this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermGroupEventAdd(subject, this.getCause()));
 		} else if (action.equals(PermGroupEvent.Action.GROUP_REMOVED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermGroupRemoveEvent(subject, this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermGroupEventRemove(subject, this.getCause()));
 		} else if (action.equals(PermGroupEvent.Action.GROUP_PERMISSION_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermGroupPermissionEvent(subject, this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermGroupEventPermission(subject, this.getCause()));
 		} else if (action.equals(PermGroupEvent.Action.GROUP_INHERITANCE_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermGroupInheritanceEvent(subject, this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermGroupEventInheritance(subject, this.getCause()));
 		} else if (action.equals(PermGroupEvent.Action.GROUP_OPTION_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermGroupOptionEvent(subject, this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermGroupEventOption(subject, this.getCause()));
 		}
 		return false;
 	}
@@ -105,15 +103,15 @@ public class EPManagerEvent {
 		this.plugin.getLogger().debug("Event PermOtherEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
 		
 		if (action.equals(PermOtherEvent.Action.OTHER_ADDED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermOtherAddEvent(subject, this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermOtherEventAdd(subject, this.getCause()));
 		} else if (action.equals(PermOtherEvent.Action.OTHER_REMOVED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermOtherRemoveEvent(subject, this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermOtherEventRemove(subject, this.getCause()));
 		} else if (action.equals(PermOtherEvent.Action.OTHER_PERMISSION_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermOtherPermissionEvent(subject, this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermOtherEventPermission(subject, this.getCause()));
 		} else if (action.equals(PermOtherEvent.Action.OTHER_INHERITANCE_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermOtherInheritanceEvent(subject, this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermOtherEventInheritance(subject, this.getCause()));
 		} else if (action.equals(PermOtherEvent.Action.OTHER_OPTION_CHANGED)) {
-			return this.plugin.getGame().getEventManager().post(new EPermOtherOptionEvent(subject, this.getCause()));
+			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermOtherEventOption(subject, this.getCause()));
 		}
 		return false;
 	}
