@@ -45,11 +45,11 @@ public class EPGroupAddOption extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.USER_ADD_OPTION.get());
+		return source.hasPermission(EPPermissions.GROUP_ADD_OPTION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.USER_ADD_OPTION_DESCRIPTION.getText();
+		return EPMessages.GROUP_ADD_OPTION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {

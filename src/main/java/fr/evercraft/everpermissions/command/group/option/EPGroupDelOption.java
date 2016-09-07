@@ -44,11 +44,11 @@ public class EPGroupDelOption extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.USER_DEL_OPTION.get());
+		return source.hasPermission(EPPermissions.GROUP_DEL_OPTION.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.USER_DEL_OPTION_DESCRIPTION.getText();
+		return EPMessages.GROUP_DEL_OPTION_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {

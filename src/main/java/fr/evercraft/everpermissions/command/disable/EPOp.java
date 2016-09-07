@@ -53,7 +53,7 @@ public class EPOp extends ECommand<EverPermissions> {
 	}
 	
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.COMMAND_DEOP.getText()));
+		source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.COMMAND_OP.getText()));
 		return false;
 	}
 }
