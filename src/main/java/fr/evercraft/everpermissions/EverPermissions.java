@@ -20,6 +20,7 @@ import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.permission.PermissionService;
 
+import fr.evercraft.everapi.EverAPI;
 import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.EPlugin;
@@ -28,15 +29,15 @@ import fr.evercraft.everpermissions.data.EPManagerData;
 import fr.evercraft.everpermissions.event.EPManagerEvent;
 import fr.evercraft.everpermissions.service.EPermissionService;
 
-@Plugin(id = "fr.evercraft.everpermissions", 
+@Plugin(id = "everpermissions", 
 		name = "EverPermissions", 
-		version = "1.2", 
+		version = EverAPI.VERSION, 
 		description = "Permissions management",
 		url = "http://evercraft.fr/",
 		authors = {"rexbut"},
 		dependencies = {
-		    @Dependency(id = "fr.evercraft.everapi", version = "1.2"),
-		    @Dependency(id = "fr.evercraft.everchat", optional = true)
+		    @Dependency(id = "everapi", version = EverAPI.VERSION),
+		    @Dependency(id = "everchat", version = EverAPI.VERSION, optional = true)
 		})
 public class EverPermissions extends EPlugin {
 	private EPConfig config;
