@@ -37,7 +37,8 @@ import fr.evercraft.everpermissions.service.EPermissionService;
 		authors = {"rexbut"},
 		dependencies = {
 		    @Dependency(id = "everapi", version = EverAPI.VERSION),
-		    @Dependency(id = "everchat", version = EverAPI.VERSION, optional = true)
+		    @Dependency(id = "everchat", version = EverAPI.VERSION, optional = true),
+		    @Dependency(id = "spongeapi", version = EverAPI.SPONGEAPI_VERSION)
 		})
 public class EverPermissions extends EPlugin {
 	private EPConfig config;
