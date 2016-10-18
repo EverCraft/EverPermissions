@@ -19,7 +19,7 @@ package fr.evercraft.everpermissions;
 import fr.evercraft.everapi.plugin.file.EConfig;
 import fr.evercraft.everapi.plugin.file.EMessage;
 
-public class EPConfig extends EConfig {
+public class EPConfig extends EConfig<EverPermissions> {
 	
 	private static final String DEFAULT = "default";
 	

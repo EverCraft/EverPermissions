@@ -21,12 +21,12 @@ import java.util.HashMap;
 
 import java.util.Map;
 
-import fr.evercraft.everapi.plugin.EPlugin;
 import fr.evercraft.everapi.plugin.file.EConfig;
+import fr.evercraft.everpermissions.EverPermissions;
 
-public class EPConfGroups extends EConfig {
+public class EPConfGroups extends EConfig<EverPermissions> {
 
-	public EPConfGroups(final EPlugin plugin, final String name) {
+	public EPConfGroups(final EverPermissions plugin, final String name) {
 		super(plugin, name, false);
 	}
 

@@ -40,7 +40,7 @@ import fr.evercraft.everpermissions.service.EPermissionService;
 		    @Dependency(id = "everchat", version = EverAPI.VERSION, optional = true),
 		    @Dependency(id = "spongeapi", version = EverAPI.SPONGEAPI_VERSION)
 		})
-public class EverPermissions extends EPlugin {
+public class EverPermissions extends EPlugin<EverPermissions> {
 	private EPConfig config;
 	private EPMessage messages;
 	

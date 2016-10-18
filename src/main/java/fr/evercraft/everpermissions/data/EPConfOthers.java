@@ -22,7 +22,7 @@ import java.util.Map;
 import fr.evercraft.everapi.plugin.file.EConfig;
 import fr.evercraft.everpermissions.EverPermissions;
 
-public class EPConfOthers extends EConfig {
+public class EPConfOthers extends EConfig<EverPermissions> {
 	
 	public EPConfOthers(final EverPermissions plugin) {
 		super(plugin, "others", false);		
