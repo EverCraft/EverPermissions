@@ -156,13 +156,4 @@ public abstract class ESubject implements Subject {
 	public String toString() {
 		return "ESubject [identifier=" + identifier + ", data=" + this.getSubjectData() + ", transientData=" + this.getTransientSubjectData() + "]";
 	}
-	
-	/*
-     * Jamais utilisé
-     */
-	
-    @Override
-    public boolean hasPermission(final Set<Context> contexts, final String permission) {
-        return getPermissionValue(contexts, permission).asBoolean();
-    }
 }
