@@ -55,7 +55,7 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permolistp <" + EAMessages.ARGS_SUBJECT.get() + ">")
+		return Text.builder("/permolistp <" + EAMessages.ARGS_SUBJECT.getString() + ">")
 					.onClick(TextActions.suggestCommand("/permolistp "))
 					.color(TextColors.RED)
 					.build();
@@ -90,7 +90,7 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 			}
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}

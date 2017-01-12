@@ -31,7 +31,6 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -54,9 +53,9 @@ public class EPGroupAddInheritance extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permgaddi <" + EAMessages.ARGS_GROUP.get() + "> "
-									 + "<" + EAMessages.ARGS_INHERITANCE.get() + "> "
-									 + "[" + EAMessages.ARGS_WORLD.get() + "]")
+		return Text.builder("/permgaddi <" + EAMessages.ARGS_GROUP.getString() + "> "
+									 + "<" + EAMessages.ARGS_INHERITANCE.getString() + "> "
+									 + "[" + EAMessages.ARGS_WORLD.getString() + "]")
 					.onClick(TextActions.suggestCommand("/permgaddi "))
 					.color(TextColors.RED)
 					.build();
@@ -86,69 +85,74 @@ public class EPGroupAddInheritance extends ECommand<EverPermissions> {
 		if (args.size() == 2) {
 			// Si la source est un joueur
 			if (source instanceof EPlayer) {
-				resultat = command(source, args.get(0), args.get(1), ((EPlayer) source).getWorld().getName());
+				resultat = this.command(source, args.get(0), args.get(1), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
-				resultat = command(source, args.get(0), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
+				resultat = this.command(source, args.get(0), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connais le monde
 		} else if (args.size() == 3) {
-			resultat = command(source, args.get(0), args.get(1), args.get(2));
+			resultat = this.command(source, args.get(0), args.get(1), args.get(2));
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}
 	
 	private boolean command(final CommandSource player, final String group_name, final String inheritance_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
-		// Monde existant
-		if (type_group.isPresent()) {
-			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-			// Groupe existant
-			if (group != null && group.hasWorld(type_group.get())) {
-				Subject inheritance = this.plugin.getService().getGroupSubjects().get(inheritance_name);
-				// Inheritance existant
-				if (inheritance != null) {
-					// Si groupe et l'inheritance sont différente
-					if (!group.equals(inheritance)) {
-						Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
-						// L'inheritance a bien été ajouté
-						if (group.getSubjectData().addParent(contexts, inheritance)) {
-							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_INHERITANCE_STAFF.get()
-									.replaceAll("<inheritance>", inheritance.getIdentifier())
-									.replaceAll("<group>", group.getIdentifier())
-									.replaceAll("<type>", type_group.get())));
-							return true;
-						// L'inheritance n'a pas été ajouté
-						} else {
-							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_INHERITANCE_ERROR_HAVE.get()
-									.replaceAll("<inheritance>", inheritance.getIdentifier())
-									.replaceAll("<group>", group.getIdentifier())
-									.replaceAll("<type>", type_group.get())));
-						}
-					// Le groupe et l'inheritance sont égale
-					} else {
-						player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_INHERITANCE_ERROR_EQUALS.get()));
-					}
-				// L'inheritance est introuvable
-				} else {
-					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
-							.replaceAll("<inheritance>", inheritance_name)
-							.replaceAll("<type>", type_group.get())));
-				}
-			// Le groupe est introuvable
-			} else {
-				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
-						.replaceAll("<group>", group_name)
-						.replaceAll("<type>", type_group.get())));
-			}
-		// Le monde est introuvable
-		} else {
-			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+		// Monde introuvable
+		if (!type_group.isPresent()) {
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(player);
+			return false;
 		}
-		return false;
+		
+		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (group == null || !group.hasWorld(type_group.get())) {
+			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
+				.replace("<group>", group_name)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+			return false;
+		}
+		
+		Subject inheritance = this.plugin.getService().getGroupSubjects().get(inheritance_name);
+		// Groupe inheritance existant
+		if (inheritance == null) {
+			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
+				.replace("<group>", inheritance_name)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+			return false;
+		}
+		
+		// Le groupe et l'inheritance sont égale
+		if (group.equals(inheritance)) {
+			EPMessages.GROUP_ADD_INHERITANCE_ERROR_EQUALS.sendTo(player);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		// L'inheritance n'a pas été ajouté
+		if (!group.getSubjectData().addParent(contexts, inheritance)) {
+			EPMessages.GROUP_ADD_INHERITANCE_ERROR_HAVE.sender()
+				.replace("<inheritance>", inheritance.getIdentifier())
+				.replace("<group>", group.getIdentifier())
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+			return false;
+		}
+		
+		EPMessages.GROUP_ADD_INHERITANCE_STAFF.sender()
+			.replace("<inheritance>", inheritance.getIdentifier())
+			.replace("<group>", group.getIdentifier())
+			.replace("<type>", type_group.get())
+			.sendTo(player);
+		return true;
 	}
 }

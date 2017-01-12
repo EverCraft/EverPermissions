@@ -54,7 +54,9 @@ public class EPMessage extends EMessage<EverPermissions> {
 		TRANSFERT_CONF_CONFIRMATION_VALID("commands.transfert.confConfirmationValid", 				"&2&nConfirmer"),
 		TRANSFERT_CONF_CONFIRMATION_VALID_HOVER("commands.transfert.confConfirmationValidHover", 	"&cCliquez ici pour réaliser le transfert"),
 		TRANSFERT_SQL("commands.transfert.sql", 						"&7Les données des joueurs ont bien été transférées dans la base de données."),
+		TRANSFERT_SQL_LOG("commands.transfert.sqlLog", 					"&7Les données des joueurs ont bien été transférées dans la base de données."),
 		TRANSFERT_CONF("commands.transfert.conf", 						"&7Les données des joueurs ont bien été transférées dans les fichiers de configurations."),
+		TRANSFERT_CONF_LOG("commands.transfert.confLog", 				"&7Les données des joueurs ont bien été transférées dans les fichiers de configurations."),
 		TRANSFERT_DISABLE("commands.transfert.disable", 				"&cErreur : Vous devez être connecté à une base de données pour faire le transfert des données."),
 		TRANSFERT_ERROR("commands.transfert.error", 					"&cErreur : Pendant le transfert des données."),
 		
@@ -295,7 +297,6 @@ public class EPMessage extends EMessage<EverPermissions> {
 		// Group : Option
 		GROUP_ADD_OPTION_DESCRIPTION("group.option.add.description", 			"Ajoute une option à un groupe"),
 		GROUP_ADD_OPTION_STAFF("group.option.add.staff", 						"&7Le groupe &6<group> &7possède désormais l'option '&6<option>&7' avec la valeur '&6<value>&7' dans les mondes de type &6<type>&7."),
-		GROUP_ADD_OPTION_STAFF_NAME_COLOR("group.option.add.staffNameColor", 	"&6"),
 	
 		GROUP_DEL_OPTION_DESCRIPTION("group.option.del.description", 			"Supprime une option à un groupe"),
 		GROUP_DEL_OPTION_STAFF("group.option.del.staff", 						"&7Le groupe &6<group> &7ne possède plus l'option '&6<option>&7' dans les mondes de type &6<type>&7."),

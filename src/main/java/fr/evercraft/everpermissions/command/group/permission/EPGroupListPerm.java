@@ -56,8 +56,8 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permglistp <" + EAMessages.ARGS_GROUP.get() + "> "
-									  + "[" + EAMessages.ARGS_WORLD.get() + "]")
+		return Text.builder("/permglistp <" + EAMessages.ARGS_GROUP.getString() + "> "
+									  + "[" + EAMessages.ARGS_WORLD.getString() + "]")
 					.onClick(TextActions.suggestCommand("/permglistp "))
 					.color(TextColors.RED)
 					.build();
@@ -82,17 +82,17 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 		if (args.size() == 1) {
 			// Si la source est un joueur
 			if (source instanceof EPlayer) {
-				resultat = command(source, args.get(0), ((EPlayer) source).getWorld().getName());
+				resultat = this.command(source, args.get(0), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
-				resultat = command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
+				resultat = this.command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connait le monde
 		} else if (args.size() == 2) {
-			resultat = command(source, args.get(0), args.get(1));
+			resultat = this.command(source, args.get(0), args.get(1));
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}

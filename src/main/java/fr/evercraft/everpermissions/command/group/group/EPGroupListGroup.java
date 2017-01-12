@@ -29,7 +29,6 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -51,7 +50,8 @@ public class EPGroupListGroup extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permglist [" + EAMessages.ARGS_WORLD.get() + "]").onClick(TextActions.suggestCommand("/permglist "))
+		return Text.builder("/permglist [" + EAMessages.ARGS_WORLD.getString() + "]")
+					.onClick(TextActions.suggestCommand("/permglist "))
 					.color(TextColors.RED).build();
 	}
 	
@@ -70,58 +70,60 @@ public class EPGroupListGroup extends ECommand<EverPermissions> {
 		if (args.size() == 0) {
 			// Si la source est un joueur
 			if (source instanceof EPlayer) {
-				resultat = command(source, ((EPlayer) source).getWorld().getName());
+				resultat = this.command(source, ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
-				resultat = command(source, this.plugin.getGame().getServer().getDefaultWorldName());
+				resultat = this.command(source, this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connait le monde
 		} else if (args.size() == 1) {
-			resultat = command(source, args.get(0));
+			resultat = this.command(source, args.get(0));
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}
 	
 	private boolean command(final CommandSource player, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
-		// Monde existant
-		if (type_group.isPresent()) {
-			List<Text> list = new ArrayList<Text>();
-			Set<EGroupSubject> groups = this.plugin.getService().getGroupSubjects().getGroups(type_group.get());
-			
-			// Aucun groupe
-			if (groups.isEmpty()) {
-				list.add(EPMessages.GROUP_LIST_GROUP_EMPTY.getText());
-			// Les groupes
-			} else {
-				// Le groupe par défaut
-				Optional<EGroupSubject> subject = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
-				if (subject.isPresent()) {
-					list.add(EChat.of(EPMessages.GROUP_LIST_GROUP_DEFAULT.get()
-							.replaceAll("<group>", subject.get().getIdentifier())));
-				}
-				
-				// La liste des groupes
-				list.add(EPMessages.GROUP_LIST_GROUP_NAME.getText());
-				for (EGroupSubject group : groups) {
-					list.add(EChat.of(EPMessages.GROUP_LIST_GROUP_LINE.get()
-							.replaceAll("<group>", group.getIdentifier())));
-				}
+		// Monde introuvable
+		if (!type_group.isPresent()) {
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(player);
+			return false;
+		}
+		
+		List<Text> list = new ArrayList<Text>();
+		Set<EGroupSubject> groups = this.plugin.getService().getGroupSubjects().getGroups(type_group.get());
+		
+		// Aucun groupe
+		if (groups.isEmpty()) {
+			list.add(EPMessages.GROUP_LIST_GROUP_EMPTY.getText());
+		// Les groupes
+		} else {
+			// Le groupe par défaut
+			Optional<EGroupSubject> subject = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
+			if (subject.isPresent()) {
+				list.add(EPMessages.GROUP_LIST_GROUP_DEFAULT.getFormat()
+						.toText("<group>", subject.get().getIdentifier()));
 			}
 			
-			this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-					EPMessages.GROUP_LIST_GROUP_TITLE.get()
-					.replaceAll("<type>", type_group.get())), 
-					list, player);
-			return true;
-		// Le monde est introuvable
-		} else {
-			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+			// La liste des groupes
+			list.add(EPMessages.GROUP_LIST_GROUP_NAME.getText());
+			for (EGroupSubject group : groups) {
+				list.add(EPMessages.GROUP_LIST_GROUP_LINE.getFormat()
+						.toText("<group>", group.getIdentifier()));
+			}
 		}
-		return false;
+		
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
+				EPMessages.GROUP_LIST_GROUP_TITLE.getFormat()
+					.toText("<type>", type_group.get()), 
+				list, player);
+		return true;
+
 	}
 }

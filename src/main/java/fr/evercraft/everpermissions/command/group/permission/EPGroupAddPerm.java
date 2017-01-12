@@ -54,10 +54,10 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permgaddp <" + EAMessages.ARGS_GROUP.get() + "> "
-									 + "<" + EAMessages.ARGS_PERMISSION.get() + "> "
+		return Text.builder("/permgaddp <" + EAMessages.ARGS_GROUP.getString() + "> "
+									 + "<" + EAMessages.ARGS_PERMISSION.getString() + "> "
 									 + "<true|false> "
-									 + "[" + EAMessages.ARGS_WORLD.get() + "]")
+									 + "[" + EAMessages.ARGS_WORLD.getString() + "]")
 					.onClick(TextActions.suggestCommand("/permgaddp "))
 					.color(TextColors.RED)
 					.build();
@@ -87,17 +87,17 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 		if (args.size() == 3) {
 			// Si la source est un joueur
 			if (source instanceof EPlayer) {
-				resultat = command(source, args.get(0), args.get(1), args.get(2), ((EPlayer) source).getWorld().getName());
+				resultat = this.command(source, args.get(0), args.get(1), args.get(2), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
-				resultat = command(source, args.get(0), args.get(1), args.get(2), this.plugin.getGame().getServer().getDefaultWorldName());
+				resultat = this.command(source, args.get(0), args.get(1), args.get(2), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connais le monde
 		} else if (args.size() == 4) {
-			resultat = command(source, args.get(0), args.get(1), args.get(2), args.get(3));
+			resultat = this.command(source, args.get(0), args.get(1), args.get(2), args.get(3));
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}

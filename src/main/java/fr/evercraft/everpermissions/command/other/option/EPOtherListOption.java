@@ -56,7 +56,7 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permolisto <" + EAMessages.ARGS_SUBJECT.get() + ">")
+		return Text.builder("/permolisto <" + EAMessages.ARGS_SUBJECT.getString() + ">")
 					.onClick(TextActions.suggestCommand("/permolisto "))
 					.color(TextColors.RED)
 					.build();
@@ -82,14 +82,14 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le joueur existe
 			if (optSubject.isPresent()){
-				resultat = command(source, optSubject.get());
+				resultat = this.command(source, optSubject.get());
 			// Le joueur est introuvable
 			} else {
 				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}

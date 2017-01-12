@@ -30,7 +30,6 @@ import org.spongepowered.api.text.format.TextColors;
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.java.UtilsBoolean;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -52,7 +51,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permgdefault <" + EAMessages.ARGS_GROUP.get() + "> <true|false> [" + EAMessages.ARGS_WORLD.get() + "]")
+		return Text.builder("/permgdefault <" + EAMessages.ARGS_GROUP.getString() + "> <true|false> [" + EAMessages.ARGS_WORLD.getString() + "]")
 				.onClick(TextActions.suggestCommand("/permgdefault "))
 				.color(TextColors.RED)
 				.build();
@@ -80,83 +79,91 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 		if (args.size() == 2) {
 			// Si la source est un joueur
 			if (source instanceof EPlayer) {
-				resultat = command(source, args.get(0), args.get(1), ((EPlayer) source).getWorld().getName());
+				resultat = this.command(source, args.get(0), args.get(1), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
-				resultat = command(source, args.get(0), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
+				resultat = this.command(source, args.get(0), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connais le joueur
 		} else if (args.size() == 3) {
-			resultat = command(source, args.get(0), args.get(1), args.get(2));
+			resultat = this.command(source, args.get(0), args.get(1), args.get(2));
 		// Nombre d'argument monde
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}
 	
 	private boolean command(final CommandSource player, final String group_name, final String value_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
-		// Monde existant
-		if (type_group.isPresent()) {
-			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-			// Groupe existant
-			if (group != null && group.hasWorld(type_group.get())) {
-				Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
-				// La value est un boolean
-				if (value.isPresent()) {
-					if (value.get()) {
-						// Le groupe a bien été mit par défaut
-						if (this.plugin.getService().getGroupSubjects().registerDefault(group, type_group.get())) {
-							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_DEFAULT_GROUP_TRUE.get()
-									.replaceAll("<group>", group_name)
-									.replaceAll("<type>", type_group.get())));
-							this.plugin.getService().getUserSubjects().reload();
-							return true;
-						// Le groupe n'a pas été mit par défaut
-						} else {
-							Optional<EGroupSubject> group_default = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
-							// C'est déjà le groupe par défaut
-							if (group_default.isPresent() && group_default.get().equals(group)) {
-								player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_DEFAULT_GROUP_ERROR_EQUALS.get()
-										.replaceAll("<group>", group_name)
-										.replaceAll("<type>", type_group.get())));
-							// Il y a déja un autre groupe par défaut
-							} else {
-								player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_DEFAULT_GROUP_ERROR_TRUE.get()
-										.replaceAll("<group>", group_name)
-										.replaceAll("<type>", type_group.get())));
-							}
-						}
-					} else {
-						// Le groupe n'est plus un groupe par défaut
-						if (this.plugin.getService().getGroupSubjects().removeDefault(group, type_group.get())) {
-							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_DEFAULT_GROUP_FALSE.get()
-									.replaceAll("<group>", group_name)
-									.replaceAll("<type>", type_group.get())));
-							this.plugin.getService().getUserSubjects().reload();
-							return true;
-						// Le groupe n'a pas un groupe par défaut
-						} else {
-							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_DEFAULT_GROUP_ERROR_FALSE.get()
-									.replaceAll("<group>", group_name)
-									.replaceAll("<type>", type_group.get())));
-						}
-					}
-				// La value n'est pas un boolean
-				} else {
-					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_DEFAULT_GROUP_ERROR_BOOLEAN.get()));
-				}
-			// Le groupe est introuvable
+		// Monde introuvable
+		if (!type_group.isPresent()) {
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(player);
+			return false;
+		}
+		
+		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe introuvable
+		if (group == null || !group.hasWorld(type_group.get())) {
+			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
+				.replace("<group>", group_name)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+			return false;
+		}
+		
+		Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
+		// La value n'est pas un boolean
+		if (!value.isPresent()) {
+			EPMessages.GROUP_DEFAULT_GROUP_ERROR_BOOLEAN.sendTo(player);
+			return false;
+		}
+		
+		if (value.get()) {
+			// Le groupe a bien été mit par défaut
+			if (this.plugin.getService().getGroupSubjects().registerDefault(group, type_group.get())) {
+				EPMessages.GROUP_DEFAULT_GROUP_TRUE.sender()
+					.replace("<group>", group_name)
+					.replace("<type>", type_group.get())
+					.sendTo(player);
+				this.plugin.getService().getUserSubjects().reload();
+				return true;
+			// Le groupe n'a pas été mit par défaut
 			} else {
-				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
-						.replaceAll("<group>", group_name)
-						.replaceAll("<type>", type_group.get())));
+				Optional<EGroupSubject> group_default = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
+				// C'est déjà le groupe par défaut
+				if (group_default.isPresent() && group_default.get().equals(group)) {
+					EPMessages.GROUP_DEFAULT_GROUP_ERROR_EQUALS.sender()
+						.replace("<group>", group_name)
+						.replace("<type>", type_group.get())
+						.sendTo(player);
+				// Il y a déja un autre groupe par défaut
+				} else {
+					EPMessages.GROUP_DEFAULT_GROUP_ERROR_TRUE.sender()
+						.replace("<group>", group_name)
+						.replace("<type>", type_group.get())
+						.sendTo(player);
+				}
 			}
-		// Le monde est introuvable
 		} else {
-			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+			// Le groupe n'est plus un groupe par défaut
+			if (this.plugin.getService().getGroupSubjects().removeDefault(group, type_group.get())) {
+				EPMessages.GROUP_DEFAULT_GROUP_FALSE.sender()
+					.replace("<group>", group_name)
+					.replace("<type>", type_group.get())
+					.sendTo(player);
+				this.plugin.getService().getUserSubjects().reload();
+				return true;
+			// Le groupe n'a pas un groupe par défaut
+			} else {
+				EPMessages.GROUP_DEFAULT_GROUP_ERROR_FALSE.sender()
+					.replace("<group>", group_name)
+					.replace("<type>", type_group.get())
+					.sendTo(player);
+			}
 		}
 		return false;
 	}

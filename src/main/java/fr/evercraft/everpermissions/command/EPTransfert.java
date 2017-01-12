@@ -41,7 +41,6 @@ import com.google.common.reflect.TypeToken;
 
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.command.ECommand;
-import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -91,23 +90,21 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			if (this.plugin.getManagerData().isSQL()) {
 				// Transféré vers une base de donnée SQL
 				if (args.get(0).equalsIgnoreCase("sql")) {
-					source.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
-							.append(EPMessages.TRANSFERT_SQL_CONFIRMATION.get())
-							.replace("<confirmation>", getButtonConfirmationSQL())
-							.build());
+					EPMessages.TRANSFERT_SQL_CONFIRMATION.sender()
+						.replace("<confirmation>", () -> this.getButtonConfirmationSQL())
+						.sendTo(source);
 				// Transféré vers un fichier de config
 				} else if (args.get(0).equalsIgnoreCase("conf")) {
-					source.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
-							.append(EPMessages.TRANSFERT_CONF_CONFIRMATION.get())
-							.replace("<confirmation>", getButtonConfirmationConf())
-							.build());
+					EPMessages.TRANSFERT_CONF_CONFIRMATION.sender()
+						.replace("<confirmation>", () -> this.getButtonConfirmationConf())
+						.sendTo(source);
 				// Erreur : sql ou conf
 				} else {
-					source.sendMessage(help(source));
+					source.sendMessage(this.help(source));
 				}
 			// Error : SQL disable
 			} else {
-				source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_DISABLE.getText()));
+				EPMessages.TRANSFERT_DISABLE.sendTo(source);
 			}
 		} else if (args.size() == 2 && args.get(1).equalsIgnoreCase("confirmation")) {
 			//Si la base de donnée est activé
@@ -122,14 +119,14 @@ public class EPTransfert extends ECommand<EverPermissions> {
 					resultat = true;
 				// Erreur : sql ou conf
 				} else {
-					source.sendMessage(help(source));
+					source.sendMessage(this.help(source));
 				}
 			// Error : SQL disable
 			} else {
-				source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_DISABLE.getText()));
+				EPMessages.TRANSFERT_DISABLE.sendTo(source);
 			}
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}
@@ -267,10 +264,10 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	    }
 		
 		if (resultat) {
-			this.plugin.getLogger().info(EPMessages.TRANSFERT_SQL.get());
-			player.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_SQL.getText()));
+			this.plugin.getLogger().info(EPMessages.TRANSFERT_SQL_LOG.getString());
+			EPMessages.TRANSFERT_SQL.sendTo(player);
 		} else {
-			player.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_ERROR.getText()));
+			EPMessages.TRANSFERT_ERROR.sendTo(player);
 		}
 		
 		return resultat;
@@ -374,10 +371,10 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	    }
 		
 		if (resultat) {
-			this.plugin.getLogger().info(EPMessages.TRANSFERT_CONF.get());
-			source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_CONF.getText()));
+			this.plugin.getLogger().info(EPMessages.TRANSFERT_CONF_LOG.getString());
+			EPMessages.TRANSFERT_CONF.sendTo(source);
 		} else {
-			source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.TRANSFERT_ERROR.getText()));
+			EPMessages.TRANSFERT_ERROR.sendTo(source);
 		}
 	}
 	

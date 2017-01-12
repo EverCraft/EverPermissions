@@ -31,7 +31,6 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -54,7 +53,7 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permglisti " + EAMessages.ARGS_GROUP.get() + "> [" + EAMessages.ARGS_WORLD.get() + "]")
+		return Text.builder("/permglisti " + EAMessages.ARGS_GROUP.getString() + "> [" + EAMessages.ARGS_WORLD.getString() + "]")
 					.onClick(TextActions.suggestCommand("/permglisti "))
 					.color(TextColors.RED)
 					.build();
@@ -79,68 +78,70 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 		if (args.size() == 1) {
 			// Si la source est un joueur
 			if (source instanceof EPlayer) {
-				resultat = command(source, args.get(0), ((EPlayer) source).getWorld().getName());
+				resultat = this.command(source, args.get(0), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
-				resultat = command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
+				resultat = this.command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connait le monde
 		} else if (args.size() == 2) {
-			resultat = command(source, args.get(0), args.get(1));
+			resultat = this.command(source, args.get(0), args.get(1));
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}
 	
 	private boolean command(final CommandSource player, final String group_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
-		// Monde existant
-		if (type_group.isPresent()) {
-			Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
-			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-			// Groupe existant
-			if (group != null && group.hasWorld(type_group.get())) {
-				List<Text> list = new ArrayList<Text>();
-
-				// La liste des inheritances
-				List<Subject> groups = group.getSubjectData().getParents(contexts);
-				if (groups.isEmpty()) {
-					list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_EMPTY.getText());
-				} else {
-					list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE.getText());
-					for (Subject inheritance : groups) {
-						list.add(EChat.of(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_LINE.get().replaceAll("<inheritance>", inheritance.getIdentifier())));
-					}
-				}
-				
-				// La liste des inheritances temporaires
-				groups = group.getTransientSubjectData().getParents(contexts);
-				if (!groups.isEmpty()) {
-					list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT.getText());
-					for (Subject inheritance : groups) {
-						list.add(EChat.of(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.get().replaceAll("<inheritance>", inheritance.getIdentifier())));
-					}
-				}
-				
-				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-						EPMessages.GROUP_LIST_INHERITANCE_TITLE.get()
-						.replaceAll("<group>", group.getIdentifier())
-						.replaceAll("<type>", type_group.get())), 
-						list, player);
-				return true;
-			// Le groupe n'existe pas dans le service de permissions
-			} else {
-				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
-						.replaceAll("<group>", group_name)
-						.replaceAll("<type>", type_group.get())));
-			}
-		// Le monde est introuvable
-		} else {
-			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+		// Monde introuvable
+		if (!type_group.isPresent()) {
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(player);
+			return false;
 		}
-		return false;
+		
+		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (group == null || !group.hasWorld(type_group.get())) {
+			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
+				.replace("<group>", group_name)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		List<Text> list = new ArrayList<Text>();
+
+		// La liste des inheritances
+		List<Subject> groups = group.getSubjectData().getParents(contexts);
+		if (groups.isEmpty()) {
+			list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_EMPTY.getText());
+		} else {
+			list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE.getText());
+			for (Subject inheritance : groups) {
+				list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_LINE.getFormat().toText("<inheritance>", inheritance.getIdentifier()));
+			}
+		}
+		
+		// La liste des inheritances temporaires
+		groups = group.getTransientSubjectData().getParents(contexts);
+		if (!groups.isEmpty()) {
+			list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT.getText());
+			for (Subject inheritance : groups) {
+				list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.getFormat().toText("<inheritance>", inheritance.getIdentifier()));
+			}
+		}
+		
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
+				EPMessages.GROUP_LIST_INHERITANCE_TITLE.getFormat().toText(
+					"<group>", group.getIdentifier(),
+					"<type>", type_group.get()), 
+				list, player);
+		return true;
 	}
 }

@@ -29,9 +29,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
-import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -53,10 +51,10 @@ public class EPGroupAddOption extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permgaddo <" + EAMessages.ARGS_GROUP.get() + "> "
-									 + "<" + EAMessages.ARGS_OPTION.get() + "> "
-									 + "<" + EAMessages.ARGS_VALUE.get() + "> "
-									 + "[" + EAMessages.ARGS_WORLD.get() + "]")
+		return Text.builder("/permgaddo <" + EAMessages.ARGS_GROUP.getString() + "> "
+									 + "<" + EAMessages.ARGS_OPTION.getString() + "> "
+									 + "<" + EAMessages.ARGS_VALUE.getString() + "> "
+									 + "[" + EAMessages.ARGS_WORLD.getString() + "]")
 					.onClick(TextActions.suggestCommand("/permgaddo "))
 					.color(TextColors.RED)
 					.build();
@@ -86,55 +84,56 @@ public class EPGroupAddOption extends ECommand<EverPermissions> {
 		if (args.size() == 3) {
 			// Si la source est un joueur
 			if (source instanceof EPlayer) {
-				resultat = command(source, args.get(0), args.get(1), args.get(2), ((EPlayer) source).getWorld().getName());
+				resultat = this.command(source, args.get(0), args.get(1), args.get(2), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
-				resultat = command(source, args.get(0), args.get(1), args.get(2), this.plugin.getGame().getServer().getDefaultWorldName());
+				resultat = this.command(source, args.get(0), args.get(1), args.get(2), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connais le monde
 		} else if (args.size() == 4) {
-			resultat = command(source, args.get(0), args.get(1), args.get(2), args.get(3));
+			resultat = this.command(source, args.get(0), args.get(1), args.get(2), args.get(3));
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}
 	
 	private boolean command(final CommandSource player, final String group_name, final String option, String value, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
-		// Monde existant
-		if (type_group.isPresent()) {
-			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-			// Groupe existant
-			if (group != null && group.hasWorld(type_group.get())) {
-				// L'option a bien été ajouté
-				if (group.getSubjectData().setOption(EContextCalculator.getContextWorld(type_group.get()), option, value)) {
-					player.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
-							.append(EPMessages.GROUP_ADD_OPTION_STAFF.get()
-								.replaceAll("<group>", group.getIdentifier())
-								.replaceAll("<option>", option)
-								.replaceAll("<type>", type_group.get()))
-							.replace("<value>", Text.builder(value)
-								.color(EChat.getTextColor(EPMessages.GROUP_ADD_OPTION_STAFF_NAME_COLOR.get()))
-								.build())
-							.build());
-					return true;
-				// L'option n'a pas été ajouté
-				} else {
-					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.COMMAND_ERROR.get()));
-				}
-			// Le groupe est introuvable
-			} else {
-				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
-						.replaceAll("<group>", group_name)
-						.replaceAll("<type>", type_group.get())));
-			}
-		// Le monde est introuvable
-		} else {
-			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+		// Monde introuvable
+		if (!type_group.isPresent()) {
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(player);
+			return false;
 		}
-		return false;
+		
+		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe introuvable
+		if (group == null || !group.hasWorld(type_group.get())) {
+			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
+				.replace("<group>", group_name)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+			return false;
+		}
+		
+		// L'option n'a pas été ajouté
+		if (!group.getSubjectData().setOption(EContextCalculator.getContextWorld(type_group.get()), option, value)) {
+			EAMessages.COMMAND_ERROR.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(player);
+			return false;
+		}
+		
+		EPMessages.GROUP_ADD_OPTION_STAFF.sender()
+				.replace("<group>", group.getIdentifier())
+				.replace("<option>", option)
+				.replace("<type>", type_group.get())
+				.replace("<value>", Text.of(value))
+				.sendTo(player);
+		return true;
 	}
 }

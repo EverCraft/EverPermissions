@@ -57,8 +57,8 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permglisto <" + EAMessages.ARGS_GROUP.get() + "> "
-									  + "[" + EAMessages.ARGS_WORLD.get() + "]")
+		return Text.builder("/permglisto <" + EAMessages.ARGS_GROUP.getString() + "> "
+									  + "[" + EAMessages.ARGS_WORLD.getString() + "]")
 					.onClick(TextActions.suggestCommand("/permglisto "))
 					.color(TextColors.RED).build();
 	}

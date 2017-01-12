@@ -28,7 +28,6 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -50,7 +49,7 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permgadd <" + EAMessages.ARGS_GROUP.get() + "> [" + EAMessages.ARGS_WORLD + "]")
+		return Text.builder("/permgadd <" + EAMessages.ARGS_GROUP.getString() + "> [" + EAMessages.ARGS_WORLD.getString() + "]")
 				.onClick(TextActions.suggestCommand("/permgadd "))
 				.color(TextColors.RED)
 				.build();
@@ -73,49 +72,54 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 		if (args.size() == 1) {
 			// Si la source est un joueur
 			if (source instanceof EPlayer) {
-				resultat = command(source, args.get(0), ((EPlayer) source).getWorld().getName());
+				resultat = this.command(source, args.get(0), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
-				resultat = command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
+				resultat = this.command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connais le monde
 		} else if (args.size() == 2) {
-			resultat = command(source, args.get(0), args.get(1));
+			resultat = this.command(source, args.get(0), args.get(1));
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}
 	
 	private boolean command(final CommandSource player, final String group_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
-		// Monde existant
-		if (type_group.isPresent()) {
-			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-			// Groupe introuvable
-			if (group == null || !group.hasWorld(type_group.get())) {
-				// Le groupe a bien été ajouté
-				if (this.plugin.getService().getGroupSubjects().register(group_name, type_group.get())) {
-					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_GROUP_STAFF.get()
-							.replaceAll("<group>", group_name)
-							.replaceAll("<type>", type_group.get())));
-					return true;
-				// Le groupe n'a pas été ajouté
-				} else {
-					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.COMMAND_ERROR.get()));
-				}
-			// Groupe existant
-			} else {
-				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_GROUP_ERROR.get()
-						.replaceAll("<group>", group_name)
-						.replaceAll("<type>", type_group.get())));
-			}
-		// Le monde est introuvable
-		} else {
-			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+		// Monde introuvable
+		if (!type_group.isPresent()) {
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(player);
+			return false;
 		}
-		return false;
+		
+		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (group != null && group.hasWorld(type_group.get())) {
+			EPMessages.GROUP_ADD_GROUP_ERROR.sender()
+				.replace("<group>", group_name)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+			return false;
+		}
+		
+		// Le groupe n'a pas été ajouté
+		if (!this.plugin.getService().getGroupSubjects().register(group_name, type_group.get())) {
+			EAMessages.COMMAND_ERROR.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(player);
+			return false;
+		}
+		
+		EPMessages.GROUP_ADD_GROUP_STAFF.sender()
+			.replace("<group>", group_name)
+			.replace("<type>", type_group.get())
+			.sendTo(player);
+		return true;
 	}
 }

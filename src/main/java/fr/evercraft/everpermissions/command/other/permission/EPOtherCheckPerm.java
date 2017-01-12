@@ -50,8 +50,8 @@ public class EPOtherCheckPerm extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permocheckp <" + EAMessages.ARGS_SUBJECT.get() + "> "
-									   + "<" + EAMessages.ARGS_PERMISSION.get() + ">")
+		return Text.builder("/permocheckp <" + EAMessages.ARGS_SUBJECT.getString() + "> "
+									   + "<" + EAMessages.ARGS_PERMISSION.getString() + ">")
 					.onClick(TextActions.suggestCommand("/permocheckp "))
 					.color(TextColors.RED)
 					.build();
@@ -79,14 +79,14 @@ public class EPOtherCheckPerm extends ECommand<EverPermissions> {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le joueur existe
 			if (optSubject.isPresent()){
-				resultat = command(source, optSubject.get(), args.get(1));
+				resultat = this.command(source, optSubject.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
 				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}

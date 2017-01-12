@@ -52,9 +52,9 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permudelp <" + EAMessages.ARGS_PLAYER.get() + "> "
-									 + "<" + EAMessages.ARGS_PERMISSION.get() + "> "
-									 + "[" + EAMessages.ARGS_WORLD.get() + "]")
+		return Text.builder("/permudelp <" + EAMessages.ARGS_PLAYER.getString() + "> "
+									 + "<" + EAMessages.ARGS_PERMISSION.getString() + "> "
+									 + "[" + EAMessages.ARGS_WORLD.getString() + "]")
 					.onClick(TextActions.suggestCommand("/permudelp "))
 					.color(TextColors.RED)
 					.build();
@@ -82,10 +82,10 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 			if (optUser.isPresent()){
 				// Si la source est un joueur
 				if (source instanceof EPlayer) {
-					resultat = command(source, optUser.get(), args.get(1), ((EPlayer) source).getWorld().getName());
+					resultat = this.command(source, optUser.get(), args.get(1), ((EPlayer) source).getWorld().getName());
 				// La source n'est pas un joueur
 				} else {
-					resultat = command(source, optUser.get(), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
+					resultat = this.command(source, optUser.get(), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
 				}
 			// Le joueur est introuvable
 			} else {
@@ -96,14 +96,14 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
 			// Le joueur existe
 			if (optPlayer.isPresent()){
-				resultat = command(source, optPlayer.get(), args.get(1), args.get(2));
+				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
 				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
 			}
 		// Nombre d'argument incorrect
 		} else {
-			source.sendMessage(help(source));
+			source.sendMessage(this.help(source));
 		}
 		return resultat;
 	}
