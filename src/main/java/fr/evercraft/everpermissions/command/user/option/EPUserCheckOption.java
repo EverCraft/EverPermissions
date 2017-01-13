@@ -19,19 +19,19 @@ package fr.evercraft.everpermissions.command.user.option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everapi.plugin.command.ECommand;
-import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -79,7 +79,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 		boolean resultat = false;
 		// Si on ne connait pas le monde
 		if (args.size() == 2) {
-			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optUser = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optUser.isPresent()){
 				// Si la source est un joueur
@@ -97,7 +97,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 			}
 		// On connais le monde
 		} else if (args.size() == 3) {
-			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optPlayer = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optPlayer.isPresent()){
 				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2));
@@ -114,65 +114,66 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 		return resultat;
 	}
 	
-	private boolean command(final CommandSource staff, final User user, final String type, final String world_name) {
+	private boolean command(final CommandSource staff, final EUser user, final String type, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
 		if (type_user.isPresent()) {
-			EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-			// Joueur existant
-			if (subject != null) {
-				Optional<String> name = subject.getOption(EContextCalculator.getContextWorld(world_name), type);
-				// Il y a une valeur
-				if (name.isPresent()) {
-					// La source et le joueur sont identique
-					if (staff.getIdentifier().equals(user.getIdentifier())) {
-						staff.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
-							.append(EPMessages.USER_CHECK_OPTION_DEFINED_EQUALS.get()
-								.replaceAll("<player>", user.getName())
-								.replaceAll("<option>", type)
-								.replaceAll("<type>", type_user.get()))
-							.replace("<value>", Text.builder(name.get())
-								.color(EChat.getTextColor(EPMessages.USER_CHECK_OPTION_DEFINED_EQUALS_NAME_COLOR.get()))
-								.build())
-							.build());
-					// La source et le joueur ne sont pas identique
-					} else {
-						staff.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
-								.append(EPMessages.USER_CHECK_OPTION_DEFINED_STAFF.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<option>", type)
-									.replaceAll("<type>", type_user.get()))
-								.replace("<value>", Text.builder(name.get())
-									.color(EChat.getTextColor(EPMessages.USER_CHECK_OPTION_DEFINED_STAFF_NAME_COLOR.get()))
-									.build())
-								.build());
-					}
-					return true;
-				// Il n'y a pas de valeur
-				} else {
-					// La source et le joueur sont identique
-					if (staff.getIdentifier().equals(user.getIdentifier())) {
-						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CHECK_OPTION_UNDEFINED_EQUALS.get()
-								.replaceAll("<player>", user.getName())
-								.replaceAll("<option>", type)
-								.replaceAll("<type>", type_user.get())));
-					// La source et le joueur ne sont pas identique
-					} else {
-						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CHECK_OPTION_UNDEFINED_STAFF.get()
-								.replaceAll("<player>", user.getName())
-								.replaceAll("<option>", type)
-								.replaceAll("<type>", type_user.get())));
-					}
-				}
-			// Le joueur n'existe pas dans le service de permissions
-			} else {
-				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
-			}
-		// Le monde est introuvable
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+		
+		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
+		// User inexistant
+		if (subject == null) {
+			EAMessages.PLAYER_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(staff);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+
+		Optional<String> name = subject.getOption(contexts, type);
+		// Il y a une valeur
+		if (!name.isPresent()) {
+			// La source et le joueur sont identique
+			if (staff.getIdentifier().equals(user.getIdentifier())) {
+				EPMessages.USER_CHECK_OPTION_UNDEFINED_EQUALS.sender()
+					.replace("<player>", user.getName())
+					.replace("<option>", type)
+					.replace("<type>", type_user.get())
+					.sendTo(staff);
+			// La source et le joueur ne sont pas identique
+			} else {
+				EPMessages.USER_CHECK_OPTION_UNDEFINED_STAFF.sender()
+					.replace("<player>", user.getName())
+					.replace("<option>", type)
+					.replace("<type>", type_user.get())
+					.sendTo(staff);
+			}
+			return false;
+		}
+		
+		// La source et le joueur sont identique
+		if (staff.getIdentifier().equals(user.getIdentifier())) {
+			EPMessages.USER_CHECK_OPTION_DEFINED_EQUALS.sender()
+				.replace("<player>", user.getName())
+				.replace("<option>", type)
+				.replace("<type>", type_user.get())
+				.replace("<value>", Text.of(name.get()))
+				.sendTo(staff);
+		// La source et le joueur ne sont pas identique
+		} else {
+			EPMessages.USER_CHECK_OPTION_DEFINED_STAFF.sender()
+				.replace("<player>", user.getName())
+				.replace("<option>", type)
+				.replace("<type>", type_user.get())
+				.replace("<value>", Text.of(name.get()))
+				.sendTo(staff);
+		}
+		return true;
 	}
 }

@@ -19,17 +19,18 @@ package fr.evercraft.everpermissions.command.user.option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -117,46 +118,55 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
 		if (type_user.isPresent()) {
-			EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-			// Joueur existant
-			if (subject != null) {
-				// L'option a bien été supprimé
-				if (subject.getSubjectData().setOption(EContextCalculator.getContextWorld(world_name), type, null)) {
-					if (staff.getIdentifier().equals(user.getIdentifier())) {
-						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_OPTION_EQUALS.get()
-								.replaceAll("<player>", user.getName())
-								.replaceAll("<option>", type)
-								.replaceAll("<type>", type_user.get())));
-					} else {
-						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_OPTION_STAFF.get()
-								.replaceAll("<player>", user.getName())
-								.replaceAll("<option>", type)
-								.replaceAll("<type>", type_user.get())));
-					}
-					return true;
-				// L'option n'a pas été supprimé
-				} else {
-					if (staff.getIdentifier().equals(user.getIdentifier())) {
-						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_OPTION_ERROR_EQUALS.get()
-								.replaceAll("<player>", user.getName())
-								.replaceAll("<option>", type)
-								.replaceAll("<type>", type_user.get())));
-					} else {
-						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_OPTION_ERROR_STAFF.get()
-								.replaceAll("<player>", user.getName())
-								.replaceAll("<option>", type)
-								.replaceAll("<type>", type_user.get())));
-					}
-				}
-			// Le joueur n'existe pas dans le service de permissions
-			} else {
-				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
-			}
-		// Le monde est introuvable
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+		
+		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
+		// User inexistant
+		if (subject == null) {
+			EAMessages.PLAYER_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(staff);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		
+		// L'option n'a pas été supprimé
+		if (!subject.getSubjectData().setOption(contexts, type, null)) {
+			if (staff.getIdentifier().equals(user.getIdentifier())) {
+				EPMessages.USER_DEL_OPTION_ERROR_EQUALS.sender()
+					.replace("<player>", user.getName())
+					.replace("<option>", type)
+					.replace("<type>", type_user.get())
+					.sendTo(staff);
+			} else {
+				EPMessages.USER_DEL_OPTION_ERROR_STAFF.sender()
+					.replace("<player>", user.getName())
+					.replace("<option>", type)
+					.replace("<type>", type_user.get())
+					.sendTo(staff);
+			}
+			return false;
+		}
+		
+		if (staff.getIdentifier().equals(user.getIdentifier())) {
+			EPMessages.USER_DEL_OPTION_EQUALS.sender()
+				.replace("<player>", user.getName())
+				.replace("<option>", type)
+				.replace("<type>", type_user.get())
+				.sendTo(staff);
+		} else {
+			EPMessages.USER_DEL_OPTION_STAFF.sender()
+				.replace("<player>", user.getName())
+				.replace("<option>", type)
+				.replace("<type>", type_user.get())
+				.sendTo(staff);
+		}
+		return true;
 	}
 }

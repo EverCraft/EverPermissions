@@ -19,19 +19,19 @@ package fr.evercraft.everpermissions.command.user.option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
-import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -120,48 +120,49 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
 		if (type_user.isPresent()) {
-			EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-			// Joueur existant
-			if (subject != null) {
-				// La permission a bien été ajouté
-				if (subject.getSubjectData().setOption(EContextCalculator.getContextWorld(world_name), type, name)) {
-					// La source et le joueur sont identique
-					if (staff.getIdentifier().equals(user.getIdentifier())) {
-						staff.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
-								.append(EPMessages.USER_ADD_OPTION_EQUALS.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<option>", type)
-									.replaceAll("<type>", type_user.get()))
-								.replace("<value>", Text.builder(name)
-									.color(EChat.getTextColor(EPMessages.USER_ADD_OPTION_EQUALS_NAME_COLOR.get()))
-									.build())
-								.build());
-					// La source et le joueur ne sont pas identique
-					} else {
-						staff.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
-								.append(EPMessages.USER_ADD_OPTION_STAFF.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<option>", type)
-									.replaceAll("<type>", type_user.get()))
-								.replace("<value>", Text.builder(name)
-									.color(EChat.getTextColor(EPMessages.USER_ADD_OPTION_STAFF_NAME_COLOR.get()))
-									.build())
-								.build());
-					}
-					return true;
-				// La permission n'a pas été ajouté
-				} else {
-					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.COMMAND_ERROR.get()));
-				}
-			// Le joueur n'existe pas dans le service de permissions
-			} else {
-				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
-			}
-		// Le monde est introuvable
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+		
+		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
+		// User inexistant
+		if (subject == null) {
+			EAMessages.PLAYER_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(staff);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		
+		// La permission n'a pas été ajouté
+		if (!subject.getSubjectData().setOption(contexts, type, name)) {
+			EAMessages.COMMAND_ERROR.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(staff);
+			return false;
+		}
+		
+		// La source et le joueur sont identique
+		if (staff.getIdentifier().equals(user.getIdentifier())) {
+			EPMessages.USER_ADD_OPTION_EQUALS.sender()
+				.replace("<player>", user.getName())
+				.replace("<option>", type)
+				.replace("<type>", type_user.get())
+				.replace("<value>", Text.of(name))
+				.sendTo(staff);
+		// La source et le joueur ne sont pas identique
+		} else {
+			EPMessages.USER_ADD_OPTION_STAFF.sender()
+				.replace("<player>", user.getName())
+				.replace("<option>", type)
+				.replace("<type>", type_user.get())
+				.replace("<value>", Text.of(name))
+				.sendTo(staff);
+		}
+		return true;
 	}
 }

@@ -197,9 +197,7 @@ public class EPMessage extends EMessage<EverPermissions> {
 		USER_ADD_OPTION_DESCRIPTION("user.option.add.description", 				"Ajoute ou remplace une option à un joueur",
 																				"Add, or replaces, a option to a user"),
 		USER_ADD_OPTION_STAFF("user.option.add.staff", 							"&6<player> &7possède désormais l'option '&6<option>&7' avec la valeur '&6<value>&7' dans les mondes de type &6<type>&7."),
-		USER_ADD_OPTION_STAFF_NAME_COLOR("user.option.add.staffNameColor", 		"&6"),
 		USER_ADD_OPTION_EQUALS("user.option.add.equals", 						"&7Vous possédez désormais l'option '&6<option>&7' avec la valeur '&6<value>&7' dans les mondes de type &6<type>&7."),
-		USER_ADD_OPTION_EQUALS_NAME_COLOR("user.option.add.equalsNameColor", 	"&6"),
 		
 		USER_DEL_OPTION_DESCRIPTION("user.option.del.description", 				"Supprime une option à un joueur",
 																				"Remove a option from a user."),
@@ -211,9 +209,7 @@ public class EPMessage extends EMessage<EverPermissions> {
 		USER_CHECK_OPTION_DESCRIPTION("user.option.check.description", 							"Vérifie si un joueur a une option",
 																								"Verify a value of a option of user"),
 		USER_CHECK_OPTION_DEFINED_STAFF("user.option.check.define.staff", 						"&6<player> &7possède l'option '&6<option>&7' avec la valeur '&6<value>&7' dans les mondes de type &6<type>&7."),
-		USER_CHECK_OPTION_DEFINED_STAFF_NAME_COLOR("user.option.check.define.staffNameColor", 	"&6"),
 		USER_CHECK_OPTION_DEFINED_EQUALS("user.option.check.define.equals", 					"&7Vous possédez l'option '&6<option>&7' avec la valeur '&6<value>&7' dans les mondes de type &6<type>&7."),
-		USER_CHECK_OPTION_DEFINED_EQUALS_NAME_COLOR("user.option.check.define.equalsNameColor", "&6"),
 		USER_CHECK_OPTION_UNDEFINED_EQUALS("user.option.check.undefined.staff", 				"&6<player> &7ne possède pas l'option '&6<option>&7' dans les mondes de type &6<type>&7."),
 		USER_CHECK_OPTION_UNDEFINED_STAFF("user.option.check.undefined.equals", 				"&7Vous ne possédez pas l'option '&6<option>&7' dans les mondes de type &6<type>&7."),
 		
@@ -223,10 +219,8 @@ public class EPMessage extends EMessage<EverPermissions> {
 		USER_LIST_OPTION_OPTION("user.option.list.option", 							"    &6&l➤  Options : "),
 		USER_LIST_OPTION_OPTION_LINE("user.option.list.optionLine", 				"        &7&l●  &7<option> : &7'<value>&7'"),
 		USER_LIST_OPTION_OPTION_EMPTY("user.option.list.optionEmpty", 				"    &6&l➤ Options : &7Aucune"),
-		USER_LIST_OPTION_OPTION_NAME_COLOR("user.option.list.optionNameColor", 		"&7"),
 		USER_LIST_OPTION_TRANSIENT("user.option.list.transient", 					"    &6&l➤ Options temporaires : "),
 		USER_LIST_OPTION_TRANSIENT_LINE("user.option.list.transientLine", 			"        &7&l●  &7<option> : &7'<value>&7'"),
-		USER_LIST_OPTION_TRANSIENT_NAME_COLOR("user.option.list.transientNameColor","&7"),
 		
 		// Group : Group
 		GROUP_ADD_GROUP_DESCRIPTION("group.group.add.description", 		"Ajoute un groupe à un monde"),

@@ -33,9 +33,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
-import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -113,61 +111,58 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 		return resultat;
 	}
 	
-	private boolean command(final CommandSource staff, final User player, final String world_name) {
+	private boolean command(final CommandSource staff, final User user, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
 		if (type_user.isPresent()) {
-			Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
-			EUserSubject user = this.plugin.getService().getUserSubjects().get(player.getIdentifier());
-			// Joueur existant
-			if (user != null) {
-				List<Text> list = new ArrayList<Text>();
-				
-				// La liste des options
-				Map<String, String> options = user.getSubjectData().getOptions(contexts);
-				if (options.isEmpty()) {
-					list.add(EPMessages.USER_LIST_OPTION_OPTION_EMPTY.getText());
-				} else {
-					list.add(EPMessages.USER_LIST_OPTION_OPTION.getText());
-					for (Entry<String, String> permission : options.entrySet()) {
-						list.add(ETextBuilder.toBuilder(EPMessages.USER_LIST_OPTION_OPTION_LINE.get()
-									.replaceAll("<option>", permission.getKey()))
-								.replace("<value>", Text.builder(permission.getValue())
-									.color(EChat.getTextColor(EPMessages.USER_LIST_OPTION_OPTION_NAME_COLOR.get()))
-									.build())
-								.build());
-					}
-				}
-				
-				// La liste des options temporaires
-				options = user.getTransientSubjectData().getOptions(contexts);
-				if (!options.isEmpty()) {
-					list.add(EPMessages.USER_LIST_OPTION_TRANSIENT.getText());
-					for (Entry<String, String> permission : options.entrySet()) {
-						list.add(ETextBuilder.toBuilder(EPMessages.USER_LIST_OPTION_TRANSIENT_LINE.get()
-									.replaceAll("<option>", permission.getKey()))
-								.replace("<value>", Text.builder(permission.getValue())
-									.color(EChat.getTextColor(EPMessages.USER_LIST_OPTION_TRANSIENT_NAME_COLOR.get()))
-									.build())
-								.build());
-					}
-				}
-				
-				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-						EPMessages.USER_LIST_OPTION_TITLE.get()
-						.replaceAll("<player>", player.getName())
-						.replaceAll("<type>", type_user.get())), 
-						list, staff);
-				return true;
-			// Le joueur n'existe pas dans le service de permissions
-			} else {
-				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
-			}
-		// Le monde est introuvable
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+			
+		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
+		// User inexistant
+		if (subject == null) {
+			EAMessages.PLAYER_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(staff);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		List<Text> list = new ArrayList<Text>();
+		
+		// La liste des options
+		Map<String, String> options = subject.getSubjectData().getOptions(contexts);
+		if (options.isEmpty()) {
+			list.add(EPMessages.USER_LIST_OPTION_OPTION_EMPTY.getText());
+		} else {
+			list.add(EPMessages.USER_LIST_OPTION_OPTION.getText());
+			for (Entry<String, String> permission : options.entrySet()) {
+				list.add(EPMessages.USER_LIST_OPTION_OPTION_LINE.getFormat().toText(
+							"<option>", permission.getKey(),
+							"<value>", Text.builder(permission.getValue())));
+			}
+		}
+		
+		// La liste des options temporaires
+		options = user.getTransientSubjectData().getOptions(contexts);
+		if (!options.isEmpty()) {
+			list.add(EPMessages.USER_LIST_OPTION_TRANSIENT.getText());
+			for (Entry<String, String> permission : options.entrySet()) {
+				list.add(EPMessages.USER_LIST_OPTION_TRANSIENT_LINE.getFormat().toText(
+							"<option>", permission.getKey(),
+							"<value>", Text.builder(permission.getValue())));
+			}
+		}
+		
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
+			EPMessages.USER_LIST_OPTION_TITLE.getFormat().toText(
+				"<player>", user.getName(),
+				"<type>", type_user.get()), 
+			list, staff);
+		return true;
 	}
 }

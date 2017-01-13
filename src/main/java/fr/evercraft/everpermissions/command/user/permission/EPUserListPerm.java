@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -33,7 +32,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -78,7 +77,7 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 		boolean resultat = false;
 		// Si on ne connait pas le joueur
 		if (args.size() == 1) {
-			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optUser = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optUser.isPresent()){
 				// Si la source est un joueur
@@ -96,7 +95,7 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 			}
 		// On connait le joueur
 		} else if (args.size() == 2) {
-			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optPlayer = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optPlayer.isPresent()){
 				resultat = this.command(source, optPlayer.get(), args.get(1));
@@ -113,63 +112,66 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 		return resultat;
 	}
 	
-	private boolean command(final CommandSource staff, final User user, final String world_name) {
+	private boolean command(final CommandSource staff, final EUser user, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
 		if (type_user.isPresent()) {
-			Set<Context> contexts = EContextCalculator.getContextWorld(type_user.get());
-			EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-			// Joueur existant
-			if (subject != null) {
-				List<Text> list = new ArrayList<Text>();
-				
-				// La liste des permissions
-				Map<String, Boolean> permissions = subject.getSubjectData().getNodeTree(contexts).asMap();
-				if (permissions.isEmpty()) {
-					list.add(EPMessages.USER_LIST_PERMISSION_PERMISSION_EMPTY.getText());
-				} else {
-					list.add(EPMessages.USER_LIST_PERMISSION_PERMISSION.getText());
-					for (Entry<String, Boolean> permission : permissions.entrySet()) {
-						if (permission.getValue()) {
-							list.add(EChat.of(EPMessages.USER_LIST_PERMISSION_PERMISSION_LINE_TRUE.get()
-									.replaceAll("<permission>", permission.getKey())));
-						} else {
-							list.add(EChat.of(EPMessages.USER_LIST_PERMISSION_PERMISSION_LINE_FALSE.get()
-									.replaceAll("<permission>", permission.getKey())));
-						}
-					}
-				}
-				
-				// La liste des permissions temporaires
-				permissions = subject.getTransientSubjectData().getNodeTree(contexts).asMap();
-				if (!permissions.isEmpty()) {
-					list.add(EPMessages.USER_LIST_PERMISSION_TRANSIENT.getText());
-					for (Entry<String, Boolean> permission : permissions.entrySet()) {
-						if (permission.getValue()) {
-							list.add(EChat.of(EPMessages.USER_LIST_PERMISSION_TRANSIENT_LINE_TRUE.get()
-									.replaceAll("<permission>", permission.getKey())));
-						} else {
-							list.add(EChat.of(EPMessages.USER_LIST_PERMISSION_TRANSIENT_LINE_FALSE.get()
-									.replaceAll("<permission>", permission.getKey())));
-						}
-					}
-				}
-				
-				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-						EPMessages.USER_LIST_PERMISSION_TITLE.get()
-						.replaceAll("<player>", user.getName())
-						.replaceAll("<type>", type_user.get())), 
-						list, staff);
-				return true;
-			// Le joueur n'existe pas dans le service de permissions
-			} else {
-				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
-			}
-		// Le monde est introuvable
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+		
+		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
+		// User inexistant
+		if (subject == null) {
+			EAMessages.PLAYER_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(staff);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		List<Text> list = new ArrayList<Text>();
+				
+		// La liste des permissions
+		Map<String, Boolean> permissions = subject.getSubjectData().getNodeTree(contexts).asMap();
+		if (permissions.isEmpty()) {
+			list.add(EPMessages.USER_LIST_PERMISSION_PERMISSION_EMPTY.getText());
+		} else {
+			list.add(EPMessages.USER_LIST_PERMISSION_PERMISSION.getText());
+			for (Entry<String, Boolean> permission : permissions.entrySet()) {
+				if (permission.getValue()) {
+					list.add(EPMessages.USER_LIST_PERMISSION_PERMISSION_LINE_TRUE.getFormat()
+							.toText("<permission>", permission.getKey()));
+				} else {
+					list.add(EPMessages.USER_LIST_PERMISSION_PERMISSION_LINE_FALSE.getFormat()
+							.toText("<permission>", permission.getKey()));
+				}
+			}
+		}
+		
+		// La liste des permissions temporaires
+		permissions = subject.getTransientSubjectData().getNodeTree(contexts).asMap();
+		if (!permissions.isEmpty()) {
+			list.add(EPMessages.USER_LIST_PERMISSION_TRANSIENT.getText());
+			for (Entry<String, Boolean> permission : permissions.entrySet()) {
+				if (permission.getValue()) {
+					list.add(EPMessages.USER_LIST_PERMISSION_TRANSIENT_LINE_TRUE.getFormat()
+							.toText("<permission>", permission.getKey()));
+				} else {
+					list.add(EPMessages.USER_LIST_PERMISSION_TRANSIENT_LINE_FALSE.getFormat()
+							.toText("<permission>", permission.getKey()));
+				}
+			}
+		}
+		
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
+				EPMessages.USER_LIST_PERMISSION_TITLE.getFormat().toText(
+					"<player>", user.getName(),
+					"<type>", type_user.get()), 
+				list, staff);
+		return true;
 	}
 }

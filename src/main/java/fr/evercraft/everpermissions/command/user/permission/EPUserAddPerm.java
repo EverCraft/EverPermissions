@@ -19,10 +19,11 @@ package fr.evercraft.everpermissions.command.user.permission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -31,7 +32,7 @@ import org.spongepowered.api.util.Tristate;
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.java.UtilsBoolean;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -82,7 +83,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 		boolean resultat = false;
 		// Si on ne connait pas le joueur
 		if (args.size() == 3) {
-			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optUser = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optUser.isPresent()){
 				// Si la source est un joueur
@@ -100,7 +101,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 			}
 		// On connais le joueur
 		} else if (args.size() == 4) {
-			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optPlayer = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optPlayer.isPresent()){
 				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2), args.get(3));
@@ -117,110 +118,122 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 		return resultat;
 	}
 	
-	private boolean command(final CommandSource staff, final User user, final String permission, final String value_name, final String world_name) {
+	private boolean command(final CommandSource staff, final EUser user, final String permission, final String value_name, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
 		if (type_user.isPresent()) {
-			Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
-			// La value est un boolean
-			if (value.isPresent()) {
-				// La permission a bien été ajouté
-				if (user.getSubjectData().setPermission(EContextCalculator.getContextWorld(world_name), permission, Tristate.fromBoolean(value.get()))) {
-					// Permission : True
-					if (value.get()) {
-						if (staff.getIdentifier().equals(user.getIdentifier())) {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_TRUE_EQUALS.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_user.get())));
-							
-							this.plugin.getService().broadcastMessage(staff,
-								EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_EQUALS.sender()
-									.replace("<staff>", staff.getName())
-									.replace("<player>", user.getName())
-									.replace("<permission>", permission)
-									.replace("<type>", type_user.get()));
-						} else {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_TRUE_STAFF.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_user.get())));
-							
-							this.plugin.getService().broadcastMessage(staff,
-								EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_PLAYER.sender()
-									.replace("<staff>", staff.getName())
-									.replace("<player>", user.getName())
-									.replace("<permission>", permission)
-									.replace("<type>", type_user.get()));
-						}
-					// Permission : False
-					} else {
-						if (staff.getIdentifier().equals(user.getIdentifier())) {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_FALSE_EQUALS.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_user.get())));
-							
-							this.plugin.getService().broadcastMessage(staff,
-								EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_EQUALS.sender()
-									.replace("<staff>", staff.getName())
-									.replace("<player>", user.getName())
-									.replace("<permission>", permission)
-									.replace("<type>", type_user.get()));
-						} else {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_FALSE_STAFF.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_user.get())));
-							
-							this.plugin.getService().broadcastMessage(staff,
-								EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_PLAYER.sender()
-									.replace("<staff>", staff.getName())
-									.replace("<player>", user.getName())
-									.replace("<permission>", permission)
-									.replace("<type>", type_user.get()));
-						}
-					}
-					return true;
-				// La permission n'a pas été ajouté
-				} else {
-					// Permission : True
-					if (value.get()) {
-						if (staff.getIdentifier().equals(user.getIdentifier())) {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_TRUE_ERROR_EQUALS.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_user.get())));
-						} else {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_TRUE_ERROR_STAFF.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_user.get())));
-						}
-					// Permission : False
-					} else {
-						if (staff.getIdentifier().equals(user.getIdentifier())) {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_FALSE_ERROR_EQUALS.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_user.get())));
-						} else {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_ADD_PERMISSION_FALSE_ERROR_STAFF.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_user.get())));
-						}
-					}
-				}
-			// La value n'est pas un boolean
-			} else {
-				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.ERROR_BOOLEAN.get()));
-			}
-		// Le monde est introuvable
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+		
+		Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
+		// La value n'est pas un boolean
+		if (!value.isPresent()) {
+			EPMessages.ERROR_BOOLEAN.sender()
+				.replace("<boolean>", value_name)
+				.sendTo(staff);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		
+		// La permission n'a pas été ajouté
+		if (!user.getSubjectData().setPermission(contexts, permission, Tristate.fromBoolean(value.get()))) {
+			// Permission : True
+			if (value.get()) {
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
+					EPMessages.USER_ADD_PERMISSION_TRUE_ERROR_EQUALS.sender()
+						.replace("<player>", user.getName())
+						.replace("<permission>", permission)
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+				} else {
+					EPMessages.USER_ADD_PERMISSION_TRUE_ERROR_STAFF.sender()
+						.replace("<player>", user.getName())
+						.replace("<permission>", permission)
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+				}
+			// Permission : False
+			} else {
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
+					EPMessages.USER_ADD_PERMISSION_FALSE_ERROR_EQUALS.sender()
+						.replace("<player>", user.getName())
+						.replace("<permission>", permission)
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+				} else {
+					EPMessages.USER_ADD_PERMISSION_FALSE_ERROR_STAFF.sender()
+						.replace("<player>", user.getName())
+						.replace("<permission>", permission)
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+				}
+			}
+		}
+		
+		// Permission : True
+		if (value.get()) {
+			if (staff.getIdentifier().equals(user.getIdentifier())) {
+				EPMessages.USER_ADD_PERMISSION_TRUE_EQUALS.sender()
+					.replace("<player>", user.getName())
+					.replace("<permission>", permission)
+					.replace("<type>", type_user.get())
+					.sendTo(staff);
+				
+				this.plugin.getService().broadcastMessage(staff,
+					EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_EQUALS.sender()
+						.replace("<staff>", staff.getName())
+						.replace("<player>", user.getName())
+						.replace("<permission>", permission)
+						.replace("<type>", type_user.get()));
+			} else {
+				EPMessages.USER_ADD_PERMISSION_TRUE_STAFF.sender()
+					.replace("<player>", user.getName())
+					.replace("<permission>", permission)
+					.replace("<type>", type_user.get())
+					.sendTo(staff);
+				
+				this.plugin.getService().broadcastMessage(staff,
+					EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_PLAYER.sender()
+						.replace("<staff>", staff.getName())
+						.replace("<player>", user.getName())
+						.replace("<permission>", permission)
+						.replace("<type>", type_user.get()));
+			}
+		// Permission : False
+		} else {
+			if (staff.getIdentifier().equals(user.getIdentifier())) {
+				EPMessages.USER_ADD_PERMISSION_FALSE_EQUALS.sender()
+					.replace("<player>", user.getName())
+					.replace("<permission>", permission)
+					.replace("<type>", type_user.get())
+					.sendTo(staff);
+				
+				this.plugin.getService().broadcastMessage(staff,
+					EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_EQUALS.sender()
+						.replace("<staff>", staff.getName())
+						.replace("<player>", user.getName())
+						.replace("<permission>", permission)
+						.replace("<type>", type_user.get()));
+			} else {
+				EPMessages.USER_ADD_PERMISSION_FALSE_STAFF.sender()
+					.replace("<player>", user.getName())
+					.replace("<permission>", permission)
+					.replace("<type>", type_user.get())
+					.sendTo(staff);
+				
+				this.plugin.getService().broadcastMessage(staff,
+					EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_PLAYER.sender()
+						.replace("<staff>", staff.getName())
+						.replace("<player>", user.getName())
+						.replace("<permission>", permission)
+						.replace("<type>", type_user.get()));
+			}
+		}
+		return true;
 	}
 }
