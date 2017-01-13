@@ -31,9 +31,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
-import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -102,43 +100,44 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 	
 	private boolean command(final CommandSource player, final String group_name, final String option, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
-		// Monde existant
-		if (type_group.isPresent()) {
-			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-			// Groupe existant
-			if (group != null && group.hasWorld(type_group.get())) {
-				Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
-				String name = group.getSubjectData().getOptions(contexts).get(option);
-				// Si il y a une valeur
-				if (name != null) {
-					player.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
-							.append(EPMessages.GROUP_CHECK_OPTION_DEFINED.get()
-								.replaceAll("<group>", group.getIdentifier())
-								.replaceAll("<option>", option)
-								.replaceAll("<type>", type_group.get()))
-							.replace("<value>", Text.builder(name)
-								.color(EChat.getTextColor(EPMessages.GROUP_CHECK_OPTION_DEFINED_NAME_COLOR.get()))
-								.build())
-							.build());
-					return true;
-				// Il n'y a pas de valeur
-				} else {
-					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_CHECK_OPTION_UNDEFINED.get()
-							.replaceAll("<group>", group.getIdentifier())
-							.replaceAll("<option>", option)
-							.replaceAll("<type>", type_group.get())));
-				}
-			// Le groupe est introuvable
-			} else {
-				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
-						.replaceAll("<group>", group_name)
-						.replaceAll("<type>", type_group.get())));
-			}
-		// Le monde est introuvable
-		} else {
-			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+		// Monde introuvable
+		if (!type_group.isPresent()) {
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(player);
+			return false;
 		}
-		return false;
+		
+		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe introuvable
+		if (group == null || !group.hasWorld(type_group.get())) {
+			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
+				.replace("<group>", group_name)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+			return false;
+		}
+
+
+		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		String name = group.getSubjectData().getOptions(contexts).get(option);
+		// Si il y a une valeur
+		if (name == null) {
+			EPMessages.GROUP_CHECK_OPTION_DEFINED.sender()
+				.replace("<group>", group.getIdentifier())
+				.replace("<option>", option)
+				.replace("<type>", type_group.get())
+				.replace("<value>", Text.of(name))
+				.sendTo(player);
+		// Il n'y a pas de valeur
+		} else {
+			EPMessages.GROUP_CHECK_OPTION_UNDEFINED.sender()
+				.replace("<group>", group.getIdentifier())
+				.replace("<option>", option)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+		}
+		return true;
 	}
 }

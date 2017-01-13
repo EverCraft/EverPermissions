@@ -22,14 +22,13 @@ import java.util.Optional;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
+import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -69,13 +68,15 @@ public class EPUserClear extends ECommand<EverPermissions> {
 		boolean resultat = false;
 		// Si on ne connait pas le monde
 		if (args.size() == 1) {
-			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optUser = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optUser.isPresent()){
 				resultat = this.command(source, optUser.get());
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -84,36 +85,41 @@ public class EPUserClear extends ECommand<EverPermissions> {
 		return resultat;
 	}
 	
-	private boolean command(final CommandSource staff, final User user) {
+	private boolean command(final CommandSource staff, final EUser user) {
 		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-		// User existant
-		if (subject != null) {
-			subject.getSubjectData().clearParents();
-			subject.getSubjectData().clearSubParents();
-			subject.getSubjectData().clearPermissions();
-			subject.getSubjectData().clearOptions();
-			subject.reload();
-			if (staff.equals(user)) {
-				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_EQUALS.get()
-						.replaceAll("<player>", user.getName())));
-				if (EPMessages.USER_CLEAR_BROADCAST_EQUALS.has()) {
-					this.plugin.getService().broadcastMessage(staff,
-						EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_STAFF.get()
-							.replaceAll("<staff>", staff.getName())
-							.replaceAll("<player>", user.getName())));
-				}
-			} else {
-				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_STAFF.get()
-						.replaceAll("<player>", user.getName())));
-				if (EPMessages.USER_CLEAR_BROADCAST_PLAYER.has()) {
-					this.plugin.getService().broadcastMessage(staff, user.getUniqueId(),
-						EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CLEAR_BROADCAST_PLAYER.get()
-							.replaceAll("<staff>", staff.getName())
-							.replaceAll("<player>", user.getName())));
-				}
-			}
+		// User inexistant
+		if (subject == null) {
+			EAMessages.PLAYER_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(staff);
+			return false;
+		}
+		
+		subject.getSubjectData().clearParents();
+		subject.getSubjectData().clearSubParents();
+		subject.getSubjectData().clearPermissions();
+		subject.getSubjectData().clearOptions();
+		subject.reload();
+		if (staff.getIdentifier().equals(user.getIdentifier())) {
+			EPMessages.USER_CLEAR_EQUALS.sender()
+				.replace("<player>", user.getName())
+				.sendTo(staff);
+			this.plugin.getService().broadcastMessage(staff,
+				EPMessages.USER_CLEAR_BROADCAST_EQUALS.sender()
+					.replace("<staff>", staff.getName())
+					.replace("<player>", user.getName()));
 		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+			EPMessages.USER_CLEAR_STAFF.sender()
+				.replace("<player>", user.getName())
+				.sendTo(staff);
+			EPMessages.USER_CLEAR_PLAYER.sender()
+				.replace("<staff>", staff.getName())
+				.replace("<player>", user.getName())
+				.sendTo(user);
+			this.plugin.getService().broadcastMessage(staff, user.getUniqueId(),
+				EPMessages.USER_CLEAR_BROADCAST_PLAYER.sender()
+					.replace("<staff>", staff.getName())
+					.replace("<player>", user.getName()));
 		}
 		return true;
 	}

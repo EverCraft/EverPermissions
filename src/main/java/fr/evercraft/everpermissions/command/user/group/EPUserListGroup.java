@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
@@ -32,7 +31,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -77,7 +76,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		boolean resultat = false;
 		// Si on ne connait pas le monde
 		if (args.size() == 1) {
-			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optUser = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optUser.isPresent()){
 				// Si la source est un joueur
@@ -89,17 +88,21 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// On connait le monde
 		} else if (args.size() == 2) {
-			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optPlayer = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optPlayer.isPresent()){
 				resultat = this.command(source, optPlayer.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -108,59 +111,62 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		return resultat;
 	}
 	
-	private boolean command(final CommandSource staff, final User player, final String world_name) {
+	private boolean command(final CommandSource staff, final EUser user, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
 		if (type_user.isPresent()) {
-			Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
-			EUserSubject user = this.plugin.getService().getUserSubjects().get(player.getIdentifier());
-			// Joueur existant
-			if (user != null) {
-				List<Text> list = new ArrayList<Text>();
-				
-				// Le groupe
-				Optional<Subject> group = user.getSubjectData().getParent(contexts);
-				if (group.isPresent()) {
-					list.add(EChat.of(EPMessages.USER_LIST_GROUP_GROUP.get().replaceAll("<group>", group.get().getIdentifier())));
-				} else {
-					list.add(EPMessages.USER_LIST_GROUP_GROUP_EMPTY.getText());
-				}
-				
-				// Les sous-groupes
-				List<Subject> groups = user.getSubjectData().getSubParents(contexts);
-				if (groups.isEmpty()) {
-					list.add(EPMessages.USER_LIST_GROUP_SUBGROUP_EMPTY.getText());
-				} else {
-					list.add(EPMessages.USER_LIST_GROUP_SUBGROUP.getText());
-					for (Subject subject : groups) {
-						list.add(EChat.of(EPMessages.USER_LIST_GROUP_SUBGROUP_LINE.get().replaceAll("<group>", subject.getIdentifier())));
-					}
-				}
-				
-				// Les groupes temporaires
-				groups = user.getTransientSubjectData().getParents(contexts);
-				if (!groups.isEmpty()) {
-					list.add(EPMessages.USER_LIST_GROUP_TRANSIENT.getText());
-					for (Subject subject : groups) {
-						list.add(EChat.of(EPMessages.USER_LIST_GROUP_TRANSIENT_LINE.get().replaceAll("<group>", subject.getIdentifier())));
-					}
-				}
-				
-				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-						EPMessages.USER_LIST_GROUP_TITLE.get()
-						.replaceAll("<player>", player.getName())
-						.replaceAll("<type>", type_user.get())), 
-						list, staff);
-				return true;
-			// Le joueur n'existe pas dans le service de permissions
-			} else {
-				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.COMMAND_ERROR.get()));
-			}
-		// Le monde est introuvable
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+		
+		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
+		// User inexistant
+		if (subject == null) {
+			EAMessages.PLAYER_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(staff);
+			return false;
+		}
+		
+		List<Text> list = new ArrayList<Text>();
+		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		Optional<Subject> group = subject.getSubjectData().getParent(contexts);
+		
+		// Le groupe
+		if (group.isPresent()) {
+			list.add(EPMessages.USER_LIST_GROUP_GROUP.getFormat().toText("<group>", group.get().getIdentifier()));
+		} else {
+			list.add(EPMessages.USER_LIST_GROUP_GROUP_EMPTY.getText());
+		}
+		
+		// Les sous-groupes
+		List<Subject> groups = subject.getSubjectData().getSubParents(contexts);
+		if (groups.isEmpty()) {
+			list.add(EPMessages.USER_LIST_GROUP_SUBGROUP_EMPTY.getText());
+		} else {
+			list.add(EPMessages.USER_LIST_GROUP_SUBGROUP.getText());
+			for (Subject sub : groups) {
+				list.add(EPMessages.USER_LIST_GROUP_SUBGROUP_LINE.getFormat().toText("<group>", sub.getIdentifier()));
+			}
+		}
+		
+		// Les groupes temporaires
+		groups = subject.getTransientSubjectData().getParents(contexts);
+		if (!groups.isEmpty()) {
+			list.add(EPMessages.USER_LIST_GROUP_TRANSIENT.getText());
+			for (Subject tempo : groups) {
+				list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_LINE.getFormat().toText("<group>", tempo.getIdentifier()));
+			}
+		}
+		
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
+				EPMessages.USER_LIST_GROUP_TITLE.getFormat().toText(
+					"<player>", user.getName(),
+					"<type>", type_user.get()), 
+				list, staff);
+		return true;
 	}
 }

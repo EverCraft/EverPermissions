@@ -28,7 +28,6 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -82,7 +81,9 @@ public class EPOtherCheckPerm extends ECommand<EverPermissions> {
 				resultat = this.command(source, optSubject.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
+				EPMessages.OTHER_NOT_FOUND.sender()
+					.replace("<other>", args.get(0))
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -94,15 +95,17 @@ public class EPOtherCheckPerm extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final Subject subject, final String permission) {
 		// Permission : True
 		if (subject.hasPermission(permission)) {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_CHECK_PERMISSION_TRUE.get()
-					.replaceAll("<subject>", subject.getIdentifier())
-					.replaceAll("<permission>", permission)));
+			EPMessages.OTHER_CHECK_PERMISSION_TRUE.sender()
+				.replace("<subject>", subject.getIdentifier())
+				.replace("<permission>", permission)
+				.sendTo(staff);
 		// Permission : False
 		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_CHECK_PERMISSION_FALSE.get()
-					.replaceAll("<subject>", subject.getIdentifier())
-					.replaceAll("<permission>", permission)));
+			EPMessages.OTHER_CHECK_PERMISSION_FALSE.sender()
+				.replace("<subject>", subject.getIdentifier())
+				.replace("<permission>", permission)
+				.sendTo(staff);
 		}
-		return false;
+		return true;
 	}
 }

@@ -33,9 +33,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
-import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -99,61 +97,57 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 	
 	private boolean command(final CommandSource player, final String group_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
-		// Monde existant
-		if (type_group.isPresent()) {
-			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-			// Groupe existant
-			if (group != null && group.hasWorld(type_group.get())) {
-				Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
-				List<Text> list = new ArrayList<Text>();
-				
-				// La liste des options
-				Map<String, String> options = group.getSubjectData().getOptions(contexts);
-				if (options.isEmpty()) {
-					list.add(EPMessages.GROUP_LIST_OPTION_OPTION_EMPTY.getText());
-				} else {
-					list.add(EPMessages.GROUP_LIST_OPTION_OPTION.getText());
-					for (Entry<String, String> permission : options.entrySet()) {
-						list.add(ETextBuilder.toBuilder(EPMessages.GROUP_LIST_OPTION_OPTION_LINE.get()
-									.replaceAll("<option>", permission.getKey()))
-								.replace("<value>", Text.builder(permission.getValue())
-									.color(EChat.getTextColor(EPMessages.GROUP_LIST_OPTION_OPTION_NAME_COLOR.get()))
-									.build())
-								.build());
-					}
-				}
-				
-				// La liste des options temporaires
-				options = group.getTransientSubjectData().getOptions(contexts);
-				if (!options.isEmpty()) {
-					list.add(EPMessages.GROUP_LIST_OPTION_TRANSIENT.getText());
-					for (Entry<String, String> permission : options.entrySet()) {
-						list.add(ETextBuilder.toBuilder(EPMessages.GROUP_LIST_OPTION_TRANSIENT_LINE.get()
-									.replaceAll("<option>", permission.getKey()))
-								.replace("<value>", Text.builder(permission.getValue())
-									.color(EChat.getTextColor(EPMessages.GROUP_LIST_OPTION_TRANSIENT_NAME_COLOR.get()))
-									.build())
-								.build());
-					}
-				}
-				
-				this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-						EPMessages.GROUP_LIST_OPTION_TITLE.get()
-						.replaceAll("<player>", player.getName())
-						.replaceAll("<type>", type_group.get())), 
-						list, player);
-				return true;
-			// Le groupe est introuvable
-			} else {
-				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
-						.replaceAll("<group>", group_name)
-						.replaceAll("<type>", type_group.get())));
-			}
-		// Le monde est introuvable
-		} else {
-			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+		// Monde introuvable
+		if (!type_group.isPresent()) {
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(player);
+			return false;
 		}
-		return false;
+		
+		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe introuvable
+		if (group == null || !group.hasWorld(type_group.get())) {
+			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
+				.replace("<group>", group_name)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		List<Text> list = new ArrayList<Text>();
+		
+		// La liste des options
+		Map<String, String> options = group.getSubjectData().getOptions(contexts);
+		if (options.isEmpty()) {
+			list.add(EPMessages.GROUP_LIST_OPTION_OPTION_EMPTY.getText());
+		} else {
+			list.add(EPMessages.GROUP_LIST_OPTION_OPTION.getText());
+			for (Entry<String, String> permission : options.entrySet()) {
+				list.add(EPMessages.GROUP_LIST_OPTION_OPTION_LINE.getFormat().toText(
+							"<option>", permission.getKey(),
+							"<value>", Text.of(permission.getValue())));
+			}
+		}
+				
+		// La liste des options temporaires
+		options = group.getTransientSubjectData().getOptions(contexts);
+		if (!options.isEmpty()) {
+			list.add(EPMessages.GROUP_LIST_OPTION_TRANSIENT.getText());
+			for (Entry<String, String> permission : options.entrySet()) {
+				list.add(EPMessages.GROUP_LIST_OPTION_TRANSIENT_LINE.getFormat().toText(
+							"<option>", permission.getKey(),
+							"<value>", Text.of(permission.getValue())));
+			}
+		}
+		
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
+				EPMessages.GROUP_LIST_OPTION_TITLE.getFormat().toText(
+						"<player>", player.getName(),
+						"<type>", type_group.get()), 
+				list, player);
+		return true;
 	}
 }

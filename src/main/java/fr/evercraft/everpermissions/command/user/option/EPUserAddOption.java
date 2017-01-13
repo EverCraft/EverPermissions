@@ -82,19 +82,20 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 		boolean resultat = false;
 		// Si on ne connait pas le monde
 		if (args.size() == 3) {
-			// Si la source est un joueur
-			if (source instanceof EPlayer) {
-				Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
-				// Le joueur existe
-				if (optUser.isPresent()){
+			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
+			// Le joueur existe
+			if (optUser.isPresent()){
+				// Si la source est un joueur
+				if (source instanceof EPlayer) {
 					resultat = this.command(source, optUser.get(), args.get(1), args.get(2), ((EPlayer) source).getWorld().getName());
-				// Le joueur est introuvable
 				} else {
-					source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+					resultat = this.command(source, optUser.get(), args.get(1), args.get(2), this.plugin.getGame().getServer().getDefaultWorldName());
 				}
-			// La source n'est pas un joueur
+			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EPMessages.WORLD_EMPTY.getText());
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// On connais le monde
 		} else if (args.size() == 4) {
@@ -104,7 +105,9 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2), args.get(3));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -123,7 +126,7 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 				// La permission a bien été ajouté
 				if (subject.getSubjectData().setOption(EContextCalculator.getContextWorld(world_name), type, name)) {
 					// La source et le joueur sont identique
-					if (staff.equals(user)) {
+					if (staff.getIdentifier().equals(user.getIdentifier())) {
 						staff.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
 								.append(EPMessages.USER_ADD_OPTION_EQUALS.get()
 									.replaceAll("<player>", user.getName())

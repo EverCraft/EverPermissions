@@ -67,6 +67,7 @@ public class EPMessage extends EMessage<EverPermissions> {
 		// User :
 		USER_CLEAR_DESCRIPTION("user.clear.description", 		"Supprime un joueur"),
 		USER_CLEAR_STAFF("user.clear.staff", 					"&7Vous avez réinitialisé toutes les données de &6<player>&7."),
+		USER_CLEAR_PLAYER("user.clear.player", 					"&7Vos données ont été réinitialisé."),
 		USER_CLEAR_EQUALS("user.clear.equals", 					"&7Vous avez réinitialisé toutes vos données."),
 		USER_CLEAR_BROADCAST_PLAYER("user.clear.broadcastPlayer", 	"&7Tous les données de &6<player> &7 ont été réinitialisé par &6<staff>&7."),
 		USER_CLEAR_BROADCAST_EQUALS("user.clear.broadcastEquals", 	"&7Tous les données de &6<player> &7 ont été réinitialisé."),
@@ -304,7 +305,6 @@ public class EPMessage extends EMessage<EverPermissions> {
 		
 		GROUP_CHECK_OPTION_DESCRIPTION("group.option.check.description", 					"Vérifie si un groupe a une option"),
 		GROUP_CHECK_OPTION_DEFINED("group.option.check.define", 						"&7Le groupe &6<group> &7possède l'option '&6<option>&7' avec la valeur '&6<value>&7' dans les mondes de type &6<type>&7."),
-		GROUP_CHECK_OPTION_DEFINED_NAME_COLOR("group.option.check.defineNameColor", 	"&6"),
 		GROUP_CHECK_OPTION_UNDEFINED("group.option.check.undefined", 						"&7Le groupe &6<group> &7ne possède pas l'option '&6<option>&7' dans les mondes de type &6<type>&7."),
 		
 		GROUP_LIST_OPTION_DESCRIPTION("group.option.list.description", 					"Affiche la liste des options d'un groupe"),
@@ -312,10 +312,8 @@ public class EPMessage extends EMessage<EverPermissions> {
 		GROUP_LIST_OPTION_OPTION("group.option.list.option", 							"    &6&l➤  Options : "),
 		GROUP_LIST_OPTION_OPTION_LINE("group.option.list.optionLine",					"        &7&l●  &7<option> : &7'<value>&7'"),
 		GROUP_LIST_OPTION_OPTION_EMPTY("group.option.list.optionEmpty", 				"    &6&l➤ Options : &7Aucune"),
-		GROUP_LIST_OPTION_OPTION_NAME_COLOR("group.option.list.optionNameColor", 		"&7"),
 		GROUP_LIST_OPTION_TRANSIENT("group.option.list.transient", 						"    &6&l➤ Options temporaires : "),
 		GROUP_LIST_OPTION_TRANSIENT_LINE("group.option.list.transientLine", 			"        &7&l●  &7<option> : &7'<value>&7'"),
-		GROUP_LIST_OPTION_TRANSIENT_NAME_COLOR("group.option.list.transientNameColor", 	"&7"),
 		
 		// Other
 		OTHER_NOT_FOUND("other.notFound", 												"&cErreur : Ce subject n'existe pas."),
@@ -356,7 +354,6 @@ public class EPMessage extends EMessage<EverPermissions> {
 		
 		OTHER_CHECK_OPTION_DESCRIPTION("other.option.check.description", 				"Vérifie si un Subject a une option"),
 		OTHER_CHECK_OPTION_DEFINED("other.option.check.define", 						"&6<subject> &7possède l'option '&6<option>&7' avec la valeur '&6<value>&7'."),
-		OTHER_CHECK_OPTION_DEFINED_NAME_COLOR("other.option.check.defineNameColor", 	"&7"),
 		OTHER_CHECK_OPTION_UNDEFINED("other.option.check.undefined", 					"&6<subject> &7ne possède pas l'option '&6<option>&7'."),
 		
 		OTHER_LIST_OPTION_DESCRIPTION("other.option.list.description", 					"Affiche la liste des options d'un Subject"),
@@ -364,10 +361,8 @@ public class EPMessage extends EMessage<EverPermissions> {
 		OTHER_LIST_OPTION_OPTION("other.option.list.option", 							"    &6&l➤  Options : "),
 		OTHER_LIST_OPTION_OPTION_LINE("other.option.list.optionLine", 					"        &7&l●  &7<option> : &7'<value>&7'"),
 		OTHER_LIST_OPTION_OPTION_EMPTY("other.option.list.optionEmpty", 				"    &6&l➤ Options : &7Aucune"),
-		OTHER_LIST_OPTION_OPTION_NAME_COLOR("other.option.list.optionNameColor", 		"&7"),
 		OTHER_LIST_OPTION_TRANSIENT("other.option.list.transient", 						"    &6&l➤ Options temporaires : "),
-		OTHER_LIST_OPTION_TRANSIENT_LINE("other.option.list.transientLine", 			"        &7&l●  &7<option> : &7'<value>&7'"),
-		OTHER_LIST_OPTION_TRANSIENT_NAME_COLOR("other.option.list.transientNameColor", 	"&7");
+		OTHER_LIST_OPTION_TRANSIENT_LINE("other.option.list.transientLine", 			"        &7&l●  &7<option> : &7'<value>&7'");
 		
 		private final String path;
 	    private final EMessageBuilder french;

@@ -19,9 +19,11 @@ package fr.evercraft.everpermissions.command.group.permission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -31,7 +33,6 @@ import org.spongepowered.api.util.Tristate;
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.java.UtilsBoolean;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -104,61 +105,71 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 	
 	private boolean command(final CommandSource player, final String group_name, final String permission, final String value_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
-		// Monde existant
-		if (type_group.isPresent()) {
-			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-			// Groupe existant
-			if (group != null && group.hasWorld(type_group.get())) {
-				Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
-				// La value est un boolean
-				if (value.isPresent()) {
-					// La permission a bien été ajouté
-					if (group.getSubjectData().setPermission(EContextCalculator.getContextWorld(type_group.get()), permission, Tristate.fromBoolean(value.get()))) {
-						// Permission : True
-						if (value.get()) {
-							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_PERMISSION_TRUE.get()
-									.replaceAll("<group>", group.getIdentifier())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_group.get())));
-						// Permission : False
-						} else {
-							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_PERMISSION_FALSE.get()
-									.replaceAll("<group>", group.getIdentifier())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_group.get())));
-						}
-						return true;
-					// La permission n'a pas été ajouté
-					} else {
-						// Permission : True
-						if (value.get()) {
-							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_PERMISSION_ERROR_TRUE.get()
-									.replaceAll("<group>", group.getIdentifier())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_group.get())));
-						// Permission : False
-						} else {
-							player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_ADD_PERMISSION_ERROR_FALSE.get()
-									.replaceAll("<group>", group.getIdentifier())
-									.replaceAll("<permission>", permission)
-									.replaceAll("<type>", type_group.get())));
-						}
-					}
-				// La value n'est pas un boolean
-				} else {
-					player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.ERROR_BOOLEAN.get()));
-				}
-			// Le groupe est introuvable
-			} else {
-				player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
-						.replaceAll("<group>", group_name)
-						.replaceAll("<type>", type_group.get())));
-			}
-		// Le monde est introuvable
-		} else {
-			player.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+		// Monde introuvable
+		if (!type_group.isPresent()) {
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(player);
+			return false;
 		}
-		return false;
+		
+		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe introuvable
+		if (group == null || !group.hasWorld(type_group.get())) {
+			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
+				.replace("<group>", group_name)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+			return false;
+		}
+
+		Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
+		// La value n'est pas un boolean
+		if (!value.isPresent()) {
+			EPMessages.ERROR_BOOLEAN.sender()
+				.replace("<boolean>", value_name)
+				.sendTo(player);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		
+		// La permission n'a pas été ajouté
+		if (!group.getSubjectData().setPermission(contexts, permission, Tristate.fromBoolean(value.get()))) {
+			// Permission : True
+			if (value.get()) {
+				EPMessages.GROUP_ADD_PERMISSION_ERROR_TRUE.sender()
+					.replace("<group>", group.getIdentifier())
+					.replace("<permission>", permission)
+					.replace("<type>", type_group.get())
+					.sendTo(player);
+			// Permission : False
+			} else {
+				EPMessages.GROUP_ADD_PERMISSION_ERROR_FALSE.sender()
+					.replace("<group>", group.getIdentifier())
+					.replace("<permission>", permission)
+					.replace("<type>", type_group.get())
+					.sendTo(player);
+			}
+			return false;
+		}
+		
+		// Permission : True
+		if (value.get()) {
+			EPMessages.GROUP_ADD_PERMISSION_TRUE.sender()
+				.replace("<group>", group.getIdentifier())
+				.replace("<permission>", permission)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+		// Permission : False
+		} else {
+			EPMessages.GROUP_ADD_PERMISSION_FALSE.sender()
+				.replace("<group>", group.getIdentifier())
+				.replace("<permission>", permission)
+				.replace("<type>", type_group.get())
+				.sendTo(player);
+		}
+		return true;
 	}
 }

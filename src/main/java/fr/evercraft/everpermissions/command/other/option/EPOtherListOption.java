@@ -17,28 +17,24 @@
 package fr.evercraft.everpermissions.command.other.option;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
-import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
 public class EPOtherListOption extends ECommand<EverPermissions> {
@@ -85,7 +81,9 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 				resultat = this.command(source, optSubject.get());
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
+				EPMessages.OTHER_NOT_FOUND.sender()
+					.replace("<other>", args.get(0))
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -95,42 +93,35 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 	}
 	
 	private boolean command(final CommandSource staff, final EOtherSubject subject) {
-		Set<Context> contexts = new HashSet<Context>();
 		List<Text> list = new ArrayList<Text>();
 		
 		// La liste des options
-		Map<String, String> options = subject.getSubjectData().getOptions(contexts);
+		Map<String, String> options = subject.getSubjectData().getOptions(EContextCalculator.EMPTY);
 		if (options.isEmpty()) {
 			list.add(EPMessages.OTHER_LIST_OPTION_OPTION_EMPTY.getText());
 		} else {
 			list.add(EPMessages.OTHER_LIST_OPTION_OPTION.getText());
 			for (Entry<String, String> permission : options.entrySet()) {
-				list.add(ETextBuilder.toBuilder(EPMessages.OTHER_LIST_OPTION_OPTION_LINE.get()
-							.replaceAll("<option>", permission.getKey()))
-						.replace("<value>", Text.builder(permission.getValue())
-							.color(EChat.getTextColor(EPMessages.OTHER_LIST_OPTION_OPTION_NAME_COLOR.get()))
-							.build())
-						.build());
+				list.add(EPMessages.OTHER_LIST_OPTION_OPTION_LINE.getFormat().toText(
+							"<option>", permission.getKey(),
+							"<value>", Text.of(permission.getValue())));
 			}
 		}
 		
 		// La liste des options temporaires
-		options = subject.getTransientSubjectData().getOptions(contexts);
+		options = subject.getTransientSubjectData().getOptions(EContextCalculator.EMPTY);
 		if (!options.isEmpty()) {
 			list.add(EPMessages.OTHER_LIST_OPTION_TRANSIENT.getText());
 			for (Entry<String, String> permission : options.entrySet()) {
-				list.add(ETextBuilder.toBuilder(EPMessages.OTHER_LIST_OPTION_TRANSIENT_LINE.get()
-							.replaceAll("<option>", permission.getKey()))
-						.replace("<value>", Text.builder(permission.getValue())
-							.color(EChat.getTextColor(EPMessages.OTHER_LIST_OPTION_TRANSIENT_NAME_COLOR.get()))
-							.build())
-						.build());
+				list.add(EPMessages.OTHER_LIST_OPTION_TRANSIENT_LINE.getFormat().toText(
+							"<option>", permission.getKey(),
+							"<value>", Text.of(permission.getValue())));
 			}
 		}
 		
-		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(EChat.of(
-				EPMessages.OTHER_LIST_OPTION_TITLE.get()
-				.replaceAll("<subject>", subject.getIdentifier())), 
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
+				EPMessages.OTHER_LIST_OPTION_TITLE.getFormat()
+					.toText("<subject>", subject.getIdentifier()), 
 				list, staff);
 		return true;
 	}

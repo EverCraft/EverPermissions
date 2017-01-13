@@ -91,7 +91,9 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// On connais le monde
 		} else if (args.size() == 3) {
@@ -101,7 +103,9 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -121,7 +125,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 				// Il y a une valeur
 				if (name.isPresent()) {
 					// La source et le joueur sont identique
-					if (staff.equals(user)) {
+					if (staff.getIdentifier().equals(user.getIdentifier())) {
 						staff.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
 							.append(EPMessages.USER_CHECK_OPTION_DEFINED_EQUALS.get()
 								.replaceAll("<player>", user.getName())
@@ -147,7 +151,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 				// Il n'y a pas de valeur
 				} else {
 					// La source et le joueur sont identique
-					if (staff.equals(user)) {
+					if (staff.getIdentifier().equals(user.getIdentifier())) {
 						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CHECK_OPTION_UNDEFINED_EQUALS.get()
 								.replaceAll("<player>", user.getName())
 								.replaceAll("<option>", type)

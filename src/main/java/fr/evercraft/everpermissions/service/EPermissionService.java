@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
 import fr.evercraft.everapi.exception.PluginDisableException;
-import fr.evercraft.everapi.server.player.EPlayer;
+import fr.evercraft.everapi.message.EMessageSender;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
@@ -41,7 +41,6 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.context.ContextCalculator;
-import org.spongepowered.api.text.Text;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -205,32 +204,13 @@ public class EPermissionService implements PermissionService {
 	 * BroadCast
 	 */
 
-	public void broadcastMessage(CommandSource player, Text message) {
-		if (player instanceof EPlayer) {
-			((EPlayer) player).broadcastMessage(message, EPPermissions.BROADCAST.get());
-		} else {
-			for (EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
-				if (other.hasPermission(EPPermissions.BROADCAST.get())) {
-					other.sendMessage(message);
-				}
-			}
-		}
+	public void broadcastMessage(CommandSource player, EMessageSender message) {
+		message.sendAll(this.plugin.getEServer().getOnlineEPlayers(), other -> 
+			!other.equals(player) && other.hasPermission(EPPermissions.BROADCAST.get()));
 	}
 	
-	public void broadcastMessage(CommandSource staff, UUID uuid, Text message) {
-		if (staff instanceof EPlayer) {
-			EPlayer player = (EPlayer) staff;
-			for (EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
-				if (!player.equals(other) && !uuid.equals(other.getUniqueId()) && other.hasPermission(EPPermissions.BROADCAST.get())) {
-					other.sendMessage(message);
-				}
-			}
-		} else {
-			for (EPlayer other : this.plugin.getEServer().getOnlineEPlayers()) {
-				if (!uuid.equals(other.getUniqueId()) && other.hasPermission(EPPermissions.BROADCAST.get())) {
-					other.sendMessage(message);
-				}
-			}
-		}
+	public void broadcastMessage(CommandSource staff, UUID uuid, EMessageSender message) {
+		message.sendAll(this.plugin.getEServer().getOnlineEPlayers(), other -> 
+			!other.equals(staff) && !uuid.equals(other.getUniqueId()) &&  other.hasPermission(EPPermissions.BROADCAST.get()));
 	}
 }

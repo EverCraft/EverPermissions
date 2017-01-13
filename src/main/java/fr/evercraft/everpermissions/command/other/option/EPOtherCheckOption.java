@@ -17,25 +17,22 @@
 package fr.evercraft.everpermissions.command.other.option;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
-import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
 public class EPOtherCheckOption extends ECommand<EverPermissions> {
@@ -62,7 +59,7 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 	
 	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
-		if (args.size() == 1){
+		if (args.size() == 1) {
 			for (Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
 				suggests.add(subject.getIdentifier());
 			}
@@ -86,7 +83,9 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 				resultat = this.command(source, optSubject.get(), args.get(1));
 			// Le subject est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
+				EPMessages.OTHER_NOT_FOUND.sender()
+					.replace("<other>", args.get(0))
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -96,24 +95,21 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 	}
 	
 	private boolean command(final CommandSource staff, final EOtherSubject subject, final String type) {
-		String name = subject.getSubjectData().getOptions(new HashSet<Context>()).get(type);
-		// Il n'y a aucune valeur
-		if (name != null) {
-			staff.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
-					.append(EPMessages.OTHER_CHECK_OPTION_DEFINED.get()
-						.replaceAll("<subject>", subject.getIdentifier())
-						.replaceAll("<option>", type))
-					.replace("<value>", Text.builder(name)
-						.color(EChat.getTextColor(EPMessages.OTHER_CHECK_OPTION_DEFINED_NAME_COLOR.get()))
-						.build())
-					.build());
-			return true;
+		String name = subject.getSubjectData().getOptions(EContextCalculator.EMPTY).get(type);
 		// Il n'y a pas de valeur
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_CHECK_OPTION_UNDEFINED.get()
-					.replaceAll("<subject>", subject.getIdentifier())
-					.replaceAll("<option>", type)));
+		if (name == null) {
+			EPMessages.OTHER_CHECK_OPTION_UNDEFINED.sender()
+				.replace("<subject>", subject.getIdentifier())
+				.replace("<option>", type)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+		
+		EPMessages.OTHER_CHECK_OPTION_DEFINED.sender()
+			.replace("<subject>", subject.getIdentifier())
+			.replace("<option>", type)
+			.replace("<value>", Text.of(name))
+			.sendTo(staff);
+		return true;
 	}
 }

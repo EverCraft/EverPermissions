@@ -17,13 +17,11 @@
 package fr.evercraft.everpermissions.command.other.permission;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -31,11 +29,11 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
 public class EPOtherDelPerm extends ECommand<EverPermissions> {
@@ -85,7 +83,9 @@ public class EPOtherDelPerm extends ECommand<EverPermissions> {
 				resultat = this.command(source, optSubject.get(), args.get(1));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
+				EPMessages.OTHER_NOT_FOUND.sender()
+					.replace("<other>", args.get(0))
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -95,18 +95,19 @@ public class EPOtherDelPerm extends ECommand<EverPermissions> {
 	}
 	
 	private boolean command(final CommandSource staff, final Subject subject, final String permission) {
-		// La permission a bien été supprimé
-		if (subject.getSubjectData().setPermission(new HashSet<Context>(), permission, Tristate.UNDEFINED)) {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_DEL_PERMISSION_PLAYER.get()
-					.replaceAll("<subject>", subject.getIdentifier())
-					.replaceAll("<permission>", permission)));
-			return true;
 		// La permission n'a pas été supprimé
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_DEL_PERMISSION_ERROR.get()
-					.replaceAll("<subject>", subject.getIdentifier())
-					.replaceAll("<permission>", permission)));
+		if (!subject.getSubjectData().setPermission(EContextCalculator.EMPTY, permission, Tristate.UNDEFINED)) {
+			EPMessages.OTHER_DEL_PERMISSION_ERROR.sender()
+				.replace("<subject>", subject.getIdentifier())
+				.replace("<permission>", permission)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+		
+		EPMessages.OTHER_DEL_PERMISSION_PLAYER.sender()
+			.replace("<subject>", subject.getIdentifier())
+			.replace("<permission>", permission)
+			.sendTo(staff);
+		return true;
 	}
 }

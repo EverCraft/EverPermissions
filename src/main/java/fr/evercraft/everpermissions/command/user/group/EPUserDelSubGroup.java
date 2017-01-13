@@ -19,11 +19,11 @@ package fr.evercraft.everpermissions.command.user.group;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -31,7 +31,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
-import fr.evercraft.everapi.plugin.EChat;
+import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -82,7 +82,7 @@ public class EPUserDelSubGroup extends ECommand<EverPermissions> {
 		boolean resultat = false;
 		// Si on ne connait pas le monde
 		if (args.size() == 2) {
-			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optUser = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optUser.isPresent()){
 				// Si la source est un joueur
@@ -94,17 +94,21 @@ public class EPUserDelSubGroup extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// On connais le monde
 		} else if (args.size() == 3) {
-			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optPlayer = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optPlayer.isPresent()){
 				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -113,84 +117,90 @@ public class EPUserDelSubGroup extends ECommand<EverPermissions> {
 		return resultat;
 	}
 	
-	private boolean command(final CommandSource staff, final User user, final String group_name, final String world_name) {
+	private boolean command(final CommandSource staff, final EUser user, final String group_name, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde existant
 		if (type_user.isPresent() && type_group.isPresent()) {
-			EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-			// Groupe existant
-			if (group != null && group.hasWorld(type_group.get())) {
-				EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-				// Joueur existant
-				if (subject != null) {
-					// Le sous-groupe a bien été supprimé
-					if (subject.getSubjectData().removeSubParent(EContextCalculator.getContextWorld(world_name), group)) {
-						if (staff.equals(user)) {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_SUBGROUP_EQUALS.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<group>", group.getIdentifier())
-									.replaceAll("<type>", type_user.get())));
-							if (EPMessages.USER_DEL_SUBGROUP_BROADCAST_EQUALS.has()) {
-								this.plugin.getService().broadcastMessage(staff,
-									EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_SUBGROUP_BROADCAST_EQUALS.get()
-										.replaceAll("<staff>", staff.getName())
-										.replaceAll("<player>", user.getName())
-										.replaceAll("<group>", user.getIdentifier())
-										.replaceAll("<type>", type_user.get())));
-							}
-						} else {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_SUBGROUP_STAFF.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<group>", group.getIdentifier())
-									.replaceAll("<type>", type_user.get())));
-							// Le joueur est connecté
-							Optional<Player> player = user.getPlayer();
-							if (player.isPresent()) {
-								player.get().sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_SUBGROUP_PLAYER.get()
-										.replaceAll("<staff>", staff.getName())
-										.replaceAll("<group>", group.getIdentifier())
-										.replaceAll("<type>", type_user.get())));
-							}
-							if (EPMessages.USER_DEL_SUBGROUP_BROADCAST_PLAYER.has()) {
-								this.plugin.getService().broadcastMessage(staff, user.getUniqueId(), 
-									EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_SUBGROUP_BROADCAST_PLAYER.get()
-										.replaceAll("<staff>", staff.getName())
-										.replaceAll("<player>", user.getName())
-										.replaceAll("<group>", user.getIdentifier())
-										.replaceAll("<type>", type_user.get())));
-							}
-						}
-						return true;
-					// Le sous-groupe n'a pas été supprimé
-					} else {
-						if (staff.equals(user)) {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_SUBGROUP_ERROR_EQUALS.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<group>", group.getIdentifier())
-									.replaceAll("<type>", type_user.get())));
-						} else {
-							staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_SUBGROUP_ERROR_STAFF.get()
-									.replaceAll("<player>", user.getName())
-									.replaceAll("<group>", group.getIdentifier())
-									.replaceAll("<type>", type_user.get())));
-						}
-					}
-				// Le joueur n'existe pas dans le service de permissions
-				} else {
-					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
-				}
-			// Le groupe est introuvable
-			} else {
-				staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.GROUP_NOT_FOUND.get()
-						.replaceAll("<group>", group_name)
-						.replaceAll("<type>", type_user.get())));
-			}
-		// Le monde est introuvable
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.WORLD_NOT_FOUND.get()
-					.replaceAll("<world>", world_name)));
+			EAMessages.WORLD_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.replace("<world>", world_name)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+		
+		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe introuvable
+		if (group == null || !group.hasWorld(type_group.get())) {
+			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
+				.replace("<group>", group_name)
+				.replace("<type>", type_group.get())
+				.sendTo(staff);
+			return false;
+		}
+		
+		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
+		// User inexistant
+		if (subject == null) {
+			EAMessages.PLAYER_NOT_FOUND.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(staff);
+			return false;
+		}
+		
+		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);		
+
+		// Le sous-groupe n'a pas été supprimé
+		if (!subject.getSubjectData().removeSubParent(contexts, group)) {
+			if (staff.getIdentifier().equals(user.getIdentifier())) {
+				EPMessages.USER_DEL_SUBGROUP_ERROR_EQUALS.sender()
+					.replace("<player>", user.getName())
+					.replace("<group>", group.getIdentifier())
+					.replace("<type>", type_user.get())
+					.sendTo(staff);
+			} else {
+				EPMessages.USER_DEL_SUBGROUP_ERROR_STAFF.sender()
+					.replace("<player>", user.getName())
+					.replace("<group>", group.getIdentifier())
+					.replace("<type>", type_user.get())
+					.sendTo(staff);
+			}
+			return false;
+		}
+		
+		if (staff.getIdentifier().equals(user.getIdentifier())) {
+			EPMessages.USER_DEL_SUBGROUP_EQUALS.sender()
+				.replace("<player>", user.getName())
+				.replace("<group>", group.getIdentifier())
+				.replace("<type>", type_user.get())
+				.sendTo(staff);
+			
+			this.plugin.getService().broadcastMessage(staff,
+				EPMessages.USER_DEL_SUBGROUP_BROADCAST_EQUALS.sender()
+					.replace("<staff>", staff.getName())
+					.replace("<player>", user.getName())
+					.replace("<group>", group.getIdentifier())
+					.replace("<type>", type_user.get()));
+		} else {
+			EPMessages.USER_DEL_SUBGROUP_STAFF.sender()
+				.replace("<player>", user.getName())
+				.replace("<group>", group.getIdentifier())
+				.replace("<type>", type_user.get())
+				.sendTo(staff);
+			
+			 EPMessages.USER_DEL_SUBGROUP_PLAYER.sender()
+				.replace("<staff>", staff.getName())
+				.replace("<group>", group.getIdentifier())
+				.replace("<type>", type_user.get())
+				.sendTo(user);
+			
+			this.plugin.getService().broadcastMessage(staff, user.getUniqueId(), 
+				EPMessages.USER_DEL_SUBGROUP_BROADCAST_PLAYER.sender()
+					.replace("<staff>", staff.getName())
+					.replace("<player>", user.getName())
+					.replace("<group>", user.getIdentifier())
+					.replace("<type>", type_user.get()));
+		}
+		return true;
 	}
 }

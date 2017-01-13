@@ -17,25 +17,22 @@
 package fr.evercraft.everpermissions.command.other.option;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
-import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.ECommand;
-import fr.evercraft.everapi.text.ETextBuilder;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
 public class EPOtherAddOption extends ECommand<EverPermissions> {
@@ -88,7 +85,9 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 				resultat = this.command(source, optSubject.get(), args.get(1), args.get(2));
 			// Le subject est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.OTHER_NOT_FOUND.get()));
+				EPMessages.OTHER_NOT_FOUND.sender()
+					.replace("<other>", args.get(0))
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -98,21 +97,19 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 	}
 	
 	private boolean command(final CommandSource staff, final EOtherSubject subject, final String option, String value) {
-		// L'option a bien été ajouté
-		if (subject.getSubjectData().setOption(new HashSet<Context>(), option, value)) {
-			staff.sendMessage(ETextBuilder.toBuilder(EPMessages.PREFIX.getText())
-					.append(EPMessages.OTHER_ADD_OPTION_PLAYER.get()
-						.replaceAll("<subject>", subject.getIdentifier())
-						.replaceAll("<option>", option))
-					.replace("<value>", Text.builder(value)
-						.color(EChat.getTextColor(EPMessages.OTHER_ADD_OPTION_NAME_COLOR.get()))
-						.build())
-					.build());
-			return true;
 		// L'option n'a pas été ajouté
-		} else {
-			staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.COMMAND_ERROR.get()));
+		if (!subject.getSubjectData().setOption(EContextCalculator.EMPTY, option, value)) {
+			EAMessages.COMMAND_ERROR.sender()
+				.prefix(EPMessages.PREFIX)
+				.sendTo(staff);
+			return false;
 		}
-		return false;
+		
+		EPMessages.OTHER_ADD_OPTION_PLAYER.sender()
+			.replace("<subject>", subject.getIdentifier())
+			.replace("<option>", option)
+			.replace("<value>", Text.of(value))
+			.sendTo(staff);
+		return true;
 	}
 }

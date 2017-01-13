@@ -28,9 +28,13 @@ import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.world.Locatable;
 
+import com.google.common.collect.ImmutableSet;
+
 import fr.evercraft.everpermissions.EverPermissions;
 
 public class EContextCalculator implements ContextCalculator<Subject> {
+	
+	public static final Set<Context> EMPTY = ImmutableSet.of();
 	private final EverPermissions plugin;
 	
     public EContextCalculator(final EverPermissions plugin) {

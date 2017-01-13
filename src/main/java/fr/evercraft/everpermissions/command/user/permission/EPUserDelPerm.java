@@ -89,7 +89,9 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// On connais le joueur
 		} else if (args.size() == 3) {
@@ -99,7 +101,9 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -114,7 +118,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 		if (type_user.isPresent()) {
 			// La permission a bien été supprimé
 			if (user.getSubjectData().setPermission(EContextCalculator.getContextWorld(world_name), permission, Tristate.UNDEFINED)) {
-				if (staff.equals(user)) {
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_PERMISSION_EQUALS.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
@@ -122,11 +126,11 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 					
 					if (EPMessages.USER_DEL_PERMISSION_BROADCAST_EQUALS.has()) {
 						this.plugin.getService().broadcastMessage(staff,
-							EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_PERMISSION_BROADCAST_EQUALS.get()
-								.replaceAll("<staff>", staff.getName())
-								.replaceAll("<player>", user.getName())
-								.replaceAll("<permission>", permission)
-								.replaceAll("<type>", type_user.get())));
+							EPMessages.USER_DEL_PERMISSION_BROADCAST_EQUALS.sender()
+								.replace("<staff>", staff.getName())
+								.replace("<player>", user.getName())
+								.replace("<permission>", permission)
+								.replace("<type>", type_user.get()));
 					}
 				} else {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_PERMISSION_STAFF.get()
@@ -136,17 +140,17 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 					
 					if (EPMessages.USER_DEL_PERMISSION_BROADCAST_PLAYER.has()) {
 						this.plugin.getService().broadcastMessage(staff,
-							EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_PERMISSION_BROADCAST_PLAYER.get()
-								.replaceAll("<staff>", staff.getName())
-								.replaceAll("<player>", user.getName())
-								.replaceAll("<permission>", permission)
-								.replaceAll("<type>", type_user.get())));
+							EPMessages.USER_DEL_PERMISSION_BROADCAST_PLAYER.sender()
+								.replace("<staff>", staff.getName())
+								.replace("<player>", user.getName())
+								.replace("<permission>", permission)
+								.replace("<type>", type_user.get()));
 					}
 				}
 				return true;
 			// La permission n'a pas été supprimé
 			} else {
-				if (staff.equals(user)) {
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_PERMISSION_ERROR_EQUALS.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)

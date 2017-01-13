@@ -89,7 +89,9 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// On connais le joueur
 		} else if (args.size() == 3) {
@@ -99,7 +101,9 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -116,7 +120,7 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			// Permission : True
 			if (value.equals(Tristate.TRUE)) {
 				// La source et le joueur sont identique
-				if (staff.equals(user)) {
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CHECK_PERMISSION_TRUE_EQUALS.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
@@ -131,7 +135,7 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			// Permission : False
 			} else if (value.equals(Tristate.FALSE)) {
 				// La source et le joueur sont identique
-				if (staff.equals(user)) {
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CHECK_PERMISSION_FALSE_EQUALS.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)
@@ -146,7 +150,7 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			// Permission : Undefined
 			} else {
 				// La source et le joueur sont identique
-				if (staff.equals(user)) {
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_CHECK_PERMISSION_UNDEFINED_EQUALS.get()
 							.replaceAll("<player>", user.getName())
 							.replaceAll("<permission>", permission)

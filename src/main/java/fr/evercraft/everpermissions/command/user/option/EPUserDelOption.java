@@ -90,7 +90,9 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 				}
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// On connais le monde
 		} else if (args.size() == 3) {
@@ -100,7 +102,9 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
-				source.sendMessage(EChat.of(EPMessages.PREFIX.get() + EAMessages.PLAYER_NOT_FOUND.get()));
+				EAMessages.PLAYER_NOT_FOUND.sender()
+					.prefix(EPMessages.PREFIX)
+					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
 		} else {
@@ -118,7 +122,7 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 			if (subject != null) {
 				// L'option a bien été supprimé
 				if (subject.getSubjectData().setOption(EContextCalculator.getContextWorld(world_name), type, null)) {
-					if (staff.equals(user)) {
+					if (staff.getIdentifier().equals(user.getIdentifier())) {
 						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_OPTION_EQUALS.get()
 								.replaceAll("<player>", user.getName())
 								.replaceAll("<option>", type)
@@ -132,7 +136,7 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 					return true;
 				// L'option n'a pas été supprimé
 				} else {
-					if (staff.equals(user)) {
+					if (staff.getIdentifier().equals(user.getIdentifier())) {
 						staff.sendMessage(EChat.of(EPMessages.PREFIX.get() + EPMessages.USER_DEL_OPTION_ERROR_EQUALS.get()
 								.replaceAll("<player>", user.getName())
 								.replaceAll("<option>", type)
