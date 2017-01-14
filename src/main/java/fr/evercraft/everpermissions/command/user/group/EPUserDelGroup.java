@@ -118,7 +118,7 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde existant
-		if (type_user.isPresent() && type_group.isPresent()) {
+		if (!type_user.isPresent() || !type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
 				.replace("<world>", world_name)

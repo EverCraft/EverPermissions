@@ -114,7 +114,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 	private boolean command(final CommandSource staff, final EUser user, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
-		if (type_user.isPresent()) {
+		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
 				.replace("<world>", world_name)
