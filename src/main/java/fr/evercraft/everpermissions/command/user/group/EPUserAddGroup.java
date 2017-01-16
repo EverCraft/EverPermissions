@@ -174,7 +174,8 @@ public class EPUserAddGroup extends ECommand<EverPermissions> {
 			EPMessages.USER_ADD_GROUP_STAFF.sender()
 				.replace("<player>", user.getName())
 				.replace("<group>", group.getIdentifier())
-				.replace("<type>", type_user.get());
+				.replace("<type>", type_user.get())
+				.sendTo(staff);
 			
 			EPMessages.USER_ADD_GROUP_PLAYER.sender()
 				.replace("<staff>", staff.getName())
