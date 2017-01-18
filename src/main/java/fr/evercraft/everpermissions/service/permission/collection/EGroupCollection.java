@@ -20,9 +20,9 @@ import fr.evercraft.everapi.event.PermSystemEvent;
 import fr.evercraft.everapi.event.PermGroupEvent.Action;
 import fr.evercraft.everapi.java.Chronometer;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.data.EPConfGroups;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.storage.EPConfGroups;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 

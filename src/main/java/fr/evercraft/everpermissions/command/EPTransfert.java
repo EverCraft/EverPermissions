@@ -44,9 +44,9 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.data.EPConfUsers;
-import fr.evercraft.everpermissions.data.EPManagerData;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.storage.EPConfUsers;
+import fr.evercraft.everpermissions.storage.EPManagerStorage;
 
 public class EPTransfert extends ECommand<EverPermissions> {
 	
@@ -181,7 +181,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
     			
     			// Pour tous les types de joueurs
     			for (String world : new HashSet<String>(this.plugin.getManagerData().getWorldUsers().values())) {
-    				file = this.plugin.getPath().resolve(EPManagerData.MKDIR_USERS + "/" + world + ".conf").toFile();
+    				file = this.plugin.getPath().resolve(EPManagerStorage.MKDIR_USERS + "/" + world + ".conf").toFile();
     				// Si le fichier existe
     				if (file.exists()) {
     					try {
@@ -308,13 +308,13 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			// Pour tous les types de joueurs
 			for (String world : new HashSet<String>(this.plugin.getManagerData().getWorldUsers().values())) {
 				// Supprime le fichier s'il existe on le supprime
-				file = this.plugin.getPath().resolve(EPManagerData.MKDIR_USERS + "/" + world + ".conf").toFile();
+				file = this.plugin.getPath().resolve(EPManagerStorage.MKDIR_USERS + "/" + world + ".conf").toFile();
 				if (file.exists()) {
 					file.delete();
 				}
 				
 				// Création du nouveau fichier
-				config = new EPConfUsers(this.plugin, EPManagerData.MKDIR_USERS + "/" + world);
+				config = new EPConfUsers(this.plugin, EPManagerStorage.MKDIR_USERS + "/" + world);
 				config.getNode().setValue(null);
 				
 				// Chargement des permissions

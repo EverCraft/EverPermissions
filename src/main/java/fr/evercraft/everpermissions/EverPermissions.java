@@ -25,9 +25,9 @@ import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.EPlugin;
 import fr.evercraft.everpermissions.command.EPManagerCommands;
-import fr.evercraft.everpermissions.data.EPManagerData;
 import fr.evercraft.everpermissions.event.EPManagerEvent;
 import fr.evercraft.everpermissions.service.EPermissionService;
+import fr.evercraft.everpermissions.storage.EPManagerStorage;
 
 @Plugin(id = "everpermissions", 
 		name = "EverPermissions", 
@@ -45,7 +45,7 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 	private EPMessage messages;
 	
 	private EPManagerEvent managerEvent;
-	private EPManagerData managerData;
+	private EPManagerStorage managerData;
 	private EPManagerCommands managerCommands;
 	
 	private EPermissionService service;
@@ -55,7 +55,7 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 		this.config = new EPConfig(this);
 		this.messages = new EPMessage(this);
 		
-		this.managerData = new EPManagerData(this);		
+		this.managerData = new EPManagerStorage(this);		
 		this.managerEvent = new EPManagerEvent(this);
 		
 		this.service = new EPermissionService(this);
@@ -97,7 +97,7 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 		return this.service;
 	}
 	
-	public EPManagerData getManagerData() {
+	public EPManagerStorage getManagerData() {
 		return this.managerData;
 	}
 	

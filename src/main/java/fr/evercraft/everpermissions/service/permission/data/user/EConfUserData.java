@@ -31,9 +31,9 @@ import org.spongepowered.api.util.Tristate;
 import com.google.common.reflect.TypeToken;
 
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.data.EPConfUsers;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.storage.EPConfUsers;
 
 public class EConfUserData implements IUserData {
 	private final EverPermissions plugin;
