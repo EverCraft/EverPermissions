@@ -17,6 +17,7 @@
 package fr.evercraft.everpermissions.command.group.option;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +62,7 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 					.color(TextColors.RED).build();
 	}
 	
-	public List<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
+	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
 		if (args.size() == 1){
 			for (Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
