@@ -92,7 +92,7 @@ public class EUserSubject extends ESubject {
      * Permission
      */
 	
-    public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {
+    public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {    	
 		Set<Context> contexts_user = this.plugin.getService().getContextCalculator().getContextUser(contexts);
 		// TempoData : Permissions
 		Tristate value = this.getTransientSubjectData().getNodeTree(contexts_user).get(permission);

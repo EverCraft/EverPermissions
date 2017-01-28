@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -74,12 +75,10 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
-		List<String> suggests = new ArrayList<String>();
 		if (args.size() == 1){
-			suggests.add("sql");
-			suggests.add("conf");
+			return Arrays.asList("sql", "conf");
 		}
-		return suggests;
+		return Arrays.asList();
 	}
 	
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {

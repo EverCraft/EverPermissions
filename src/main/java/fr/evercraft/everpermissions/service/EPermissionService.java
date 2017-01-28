@@ -44,6 +44,8 @@ import org.spongepowered.api.service.context.ContextCalculator;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -126,6 +128,17 @@ public class EPermissionService implements PermissionService {
     
     public EOthersCollection getSytemSubjects() {
     	return this.systemCollection;
+    }
+    
+    public Set<String> getSuggestsOthers() {
+    	TreeSet<String> suggests = new TreeSet<String>();
+    	for (Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
+			suggests.add(subject.getIdentifier());
+		}
+		for (Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
+			suggests.add(subject.getIdentifier());
+		}
+		return suggests;
     }
     
     @Override

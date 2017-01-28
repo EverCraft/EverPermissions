@@ -16,14 +16,13 @@
  */
 package fr.evercraft.everpermissions.command.group.group;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -59,18 +58,14 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
-		List<String> suggests = new ArrayList<String>();
-		if (args.size() == 1){
-			for (Subject subject : this.plugin.getService().getGroupSubjects().getAllSubjects()) {
-				suggests.add(subject.getIdentifier());
-			}
+		if (args.size() == 1) {
+			return this.getAllGroups();
 		} else if (args.size() == 2) {
-			suggests.add("true");
-			suggests.add("false");
+			return Arrays.asList("true", "false");
 		} else if (args.size() == 3) {
-			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
+			return this.getAllWorlds();
 		}
-		return suggests;
+		return Arrays.asList();
 	}
 	
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {

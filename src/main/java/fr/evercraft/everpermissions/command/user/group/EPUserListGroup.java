@@ -17,6 +17,7 @@
 package fr.evercraft.everpermissions.command.user.group;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -63,13 +64,12 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
-		List<String> suggests = new ArrayList<String>();
 		if (args.size() == 1){
-			suggests = null;
+			return this.getAllPlayers(source, false);
 		} else if (args.size() == 2) {
-			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
+			return this.getAllWorlds();
 		}
-		return suggests;
+		return Arrays.asList();
 	}
 	
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {

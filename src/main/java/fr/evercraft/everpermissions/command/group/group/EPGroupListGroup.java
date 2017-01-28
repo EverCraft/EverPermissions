@@ -59,7 +59,7 @@ public class EPGroupListGroup extends ECommand<EverPermissions> {
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		List<String> suggests = new ArrayList<String>();
 		if (args.size() == 1){
-			suggests.addAll(this.plugin.getManagerData().getTypeGroups().keySet());
+			return this.getAllWorlds();
 		}
 		return suggests;
 	}

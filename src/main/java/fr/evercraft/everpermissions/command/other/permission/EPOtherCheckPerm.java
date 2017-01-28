@@ -16,7 +16,7 @@
  */
 package fr.evercraft.everpermissions.command.other.permission;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -58,18 +58,12 @@ public class EPOtherCheckPerm extends ECommand<EverPermissions> {
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
-		List<String> suggests = new ArrayList<String>();
 		if (args.size() == 1){
-			for (Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
-				suggests.add(subject.getIdentifier());
-			}
-			for (Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
-				suggests.add(subject.getIdentifier());
-			}
+			return this.plugin.getService().getSuggestsOthers();
 		} else if (args.size() == 2) {
-			suggests.add("ever");
+			return this.getAllPermissions();
 		}
-		return suggests;
+		return Arrays.asList();
 	}
 	
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {

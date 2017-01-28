@@ -16,7 +16,7 @@
  */
 package fr.evercraft.everpermissions.command.disable;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class EPOp extends ECommand<EverPermissions> {
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
-		return new ArrayList<String>();
+		return Arrays.asList();
 	}
 	
 	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
