@@ -354,7 +354,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 						}
 					}
 				}
-				config.save();
+				config.save(true);
 			}
     		resultat = true;
     	} catch (SQLException e) {

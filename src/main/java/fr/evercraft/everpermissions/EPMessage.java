@@ -35,8 +35,6 @@ public class EPMessage extends EMessage<EverPermissions> {
 		PREFIX("plugin.prefix", 										"[&4Ever&6&lPermissions&f] "),
 		DESCRIPTION("plugin.description", 								"Gestion des permissions", 
 																		"Permissions management"),
-		GROUP_NOT_FOUND("plugin.messages.groupNotFound", 				"&cErreur : Ce groupe n'existe pas.", 
-																		"&cError: This group doesn't exist."),
 		GROUP_NOT_FOUND_WORLD("plugin.messages.groupNotFoundWorld", 	"&cErreur : Il n'existe pas de groupe &6<group> &cdans les mondes de type &6<type>&c.",
 																		"&cError : There is no group &6<group> &cin type worlds &6<type>&c."),
 		ERROR_BOOLEAN("plugin.messages.errorBoolean", 					"&cErreur : Une permission ne peut-être que &6&lTrue &cou &6&lFalse",

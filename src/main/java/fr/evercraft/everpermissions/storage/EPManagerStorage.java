@@ -262,7 +262,7 @@ public class EPManagerStorage {
 		final Optional<EPConfGroups> conf = this.getConfGroup(type);
 		if (conf.isPresent()) {
 			this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
-				conf.get().save();
+				conf.get().save(true);
 			}).name("Permissions : save group (type='" + type + "')").submit(this.plugin);
 		}
 	}
@@ -274,7 +274,7 @@ public class EPManagerStorage {
 	public void saveGroups(){
 		this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
 			for (EPConfGroups conf : conf_groups.values()) {
-				conf.save();
+				conf.save(true);
 			}
 		}).name("Permissions : save groups").submit(this.plugin);
 	}
@@ -287,7 +287,7 @@ public class EPManagerStorage {
 		final Optional<EPConfUsers> conf = this.getConfUser(type);
 		if (conf.isPresent()) {
 			this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
-				conf.get().save();
+				conf.get().save(true);
 			}).name("Permissions : save user (type='" + type + "')").submit(this.plugin);
 		}
 	}
@@ -299,7 +299,7 @@ public class EPManagerStorage {
 	public void saveUsers(){
 		this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
 			for (EPConfGroups conf : conf_groups.values()) {
-				conf.save();
+				conf.save(true);
 			}
 		}).name("Permissions : save users").submit(this.plugin);
 	}
@@ -309,7 +309,7 @@ public class EPManagerStorage {
 	 */
 	public void saveOther(){
 		this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
-			conf_others.save();
+			conf_others.save(true);
 		}).name("Permissions : save other").submit(this.plugin);
 	}
 }

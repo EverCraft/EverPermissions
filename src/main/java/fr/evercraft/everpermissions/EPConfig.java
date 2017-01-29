@@ -71,7 +71,7 @@ public class EPConfig extends EConfig<EverPermissions> {
 		if (name == null) {
 			name = EPConfig.DEFAULT;
 			this.get("groups." + world).setValue(name);
-			this.save();
+			this.save(true);
 		}		
 		return name;
 	}
@@ -86,7 +86,7 @@ public class EPConfig extends EConfig<EverPermissions> {
 		if (name == null) {
 			name = EPConfig.DEFAULT;
 			this.get("users." + world).setValue(name);
-			this.save();
+			this.save(true);
 		}		
 		return name;
 	}
