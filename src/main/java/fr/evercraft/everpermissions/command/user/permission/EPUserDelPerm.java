@@ -64,7 +64,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
 		if (args.size() == 1){
-			return this.getAllPlayers(source, false);
+			return this.getAllUsers(args.get(0), source);
 		} else if (args.size() == 2) {
 			return this.getAllPermissions();
 		} else if (args.size() == 3) {
