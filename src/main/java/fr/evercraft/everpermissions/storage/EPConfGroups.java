@@ -139,6 +139,9 @@ public class EPConfGroups extends EConfig<EverPermissions> {
 			permissions.put("evereconomy", true);
 			permissions.put("evermails", true);
 			permissions.put("everpermissions", true);
+			permissions.put("eversanctions", true);
+			permissions.put("everworlds", true);
+			permissions.put("everworldguard", true);
 			permissions.put("minecraft", true);
 			permissions.put("sponge", true);
 			
