@@ -45,7 +45,7 @@ public class EOthersCollection extends ESubjectCollection {
 			EOtherSubject subject = new EOtherSubject(this.plugin, identifier, EOthersCollection.this);
 			this.subjects.put(identifier, subject);
 			
-			this.plugin.getLogger().debug("Loading other '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
+			this.plugin.getELogger().debug("Loading other '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
 			this.plugin.getManagerEvent().post(subject, Action.OTHER_ADDED);
 			
 			return subject;

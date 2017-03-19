@@ -53,13 +53,13 @@ public class EConfUserData implements IUserData {
     			for (Entry<Object, ? extends ConfigurationNode> permission : user.getNode("permissions").getChildrenMap().entrySet()) {
 	    			if (permission.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
 	    				subject.setPermissionExecute(contexts, (String) permission.getKey(), Tristate.fromBoolean(permission.getValue().getBoolean(false)));
-	    				this.plugin.getLogger().debug("Loading : ("
+	    				this.plugin.getELogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "permission=" + permission.getKey().toString() + ";"
 	    						+ "value=" + permission.getValue().getBoolean(false) + ";"
 	    						+ "type=" + world.getKey() + ")");
 	    			} else {
-	    				this.plugin.getLogger().warn("Loading error : ("
+	    				this.plugin.getELogger().warn("Loading error : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "permission=" + permission.getKey().toString() + ";"
 	    						+ "type=" + world.getKey() + ")");
@@ -71,13 +71,13 @@ public class EConfUserData implements IUserData {
     				String value = option.getValue().getString(null);
 	    			if (option.getKey() instanceof String && value != null) {
 	    				subject.setOptionExecute(contexts, (String) option.getKey(), value);
-	    				this.plugin.getLogger().debug("Loading : ("
+	    				this.plugin.getELogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "option=" + option.getKey() + ";"
 	    						+ "name=" + value + ";"
 	    						+ "type=" + world.getKey() + ")");
 	    			} else {
-	    				this.plugin.getLogger().warn("Loading error : ("
+	    				this.plugin.getELogger().warn("Loading error : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "option=" + option.getValue().toString() + ";"
 	    						+ "type=" + world.getKey() + ")");
@@ -90,12 +90,12 @@ public class EConfUserData implements IUserData {
 						EGroupSubject group = this.plugin.getService().getGroupSubjects().get(subgroup);
 						if (group != null) {
 							subject.addSubParentExecute(contexts, group);
-							this.plugin.getLogger().debug("Loading : ("
+							this.plugin.getELogger().debug("Loading : ("
 		    						+ "identifier=" + subject.getIdentifier() + ";"
 		    						+ "subgroup=" + group.getIdentifier() + ";"
 		    						+ "type=" + world.getKey() + ")");
 						} else {
-							this.plugin.getLogger().warn("Loading error : ("
+							this.plugin.getELogger().warn("Loading error : ("
 									+ "identifier=" + subject.getIdentifier() + ";"
 									+ "subgroup=" + subgroup + ";"
 									+ "type=" + world.getKey() + ")");
@@ -109,12 +109,12 @@ public class EConfUserData implements IUserData {
     				EGroupSubject group = this.plugin.getService().getGroupSubjects().get(groups);
     				if (group != null) {
     					subject.addParentExecute(contexts, group);
-    					this.plugin.getLogger().debug("Loading : ("
+    					this.plugin.getELogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "group=" + group.getIdentifier() + ";"
 	    						+ "type=" + world.getKey() + ")");
 	    			} else {
-	    				this.plugin.getLogger().warn("Loading error : ("
+	    				this.plugin.getELogger().warn("Loading error : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "group=" + group + ";"
 	    						+ "type=" + world.getKey() + ")");
@@ -136,11 +136,11 @@ public class EConfUserData implements IUserData {
 			// Supprime une permission
 			if (value.equals(Tristate.UNDEFINED)) {
 				permissions.removeChild(permission);
-				this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject + "';permission='" + permission + "';type='" + world + "')");
+				this.plugin.getELogger().debug("Removed from configs file : (identifier='" + subject + "';permission='" + permission + "';type='" + world + "')");
 			// Ajoute une permission
 			} else {
 				permissions.getNode(permission).setValue(value.asBoolean());
-				this.plugin.getLogger().debug("Added to the configs file : (identifier='" + subject + "';permission='" + permission + "';value='" + value.asBoolean() + "';type='" + world + "')");
+				this.plugin.getELogger().debug("Added to the configs file : (identifier='" + subject + "';permission='" + permission + "';value='" + value.asBoolean() + "';type='" + world + "')");
 			}
 			this.plugin.getManagerData().saveUser(world);
 			return true;
@@ -154,7 +154,7 @@ public class EConfUserData implements IUserData {
 		if (conf.isPresent()) {
 			conf.get().get(subject).removeChild("permissions");
 			
-			this.plugin.getLogger().debug("Removed the permissions configuration file : (identifier='" + subject + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Removed the permissions configuration file : (identifier='" + subject + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
 			return true;
 		}
@@ -166,7 +166,7 @@ public class EConfUserData implements IUserData {
 		for (Entry<String, EPConfUsers> conf : this.plugin.getManagerData().getConfUsers().entrySet()) {
 			conf.getValue().get(subject).removeChild("permissions");
 		}
-		this.plugin.getLogger().debug("Removed the permissions configuration file : (identifier='" + subject + "')");
+		this.plugin.getELogger().debug("Removed the permissions configuration file : (identifier='" + subject + "')");
 		this.plugin.getManagerData().saveUsers();
 		return true;
     }
@@ -182,10 +182,10 @@ public class EConfUserData implements IUserData {
 			ConfigurationNode options = conf.get().get(subject + ".options");
 			if (value == null) {
 				options.removeChild(option);
-				this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject + "';option='" + option + "';type='" + world + "')");
+				this.plugin.getELogger().debug("Removed from configs file : (identifier='" + subject + "';option='" + option + "';type='" + world + "')");
 			} else {
 				options.getNode(option).setValue(value);
-				this.plugin.getLogger().debug("Added to the configs file : (identifier='" + subject + "';option='" + option + "';value='" + value + "';type='" + world + "')");
+				this.plugin.getELogger().debug("Added to the configs file : (identifier='" + subject + "';option='" + option + "';value='" + value + "';type='" + world + "')");
 			}
 			this.plugin.getManagerData().saveUser(world);
 			return true;
@@ -198,7 +198,7 @@ public class EConfUserData implements IUserData {
 		// Si le fichier de configuration existe
 		if (conf.isPresent()) {
 			conf.get().get(subject).removeChild("options");
-			this.plugin.getLogger().debug("Removed the options configuration file : (identifier='" + subject + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Removed the options configuration file : (identifier='" + subject + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
 			return true;
 		}
@@ -210,7 +210,7 @@ public class EConfUserData implements IUserData {
 		for (Entry<String, EPConfUsers> world : this.plugin.getManagerData().getConfUsers().entrySet()) {
 			world.getValue().get(subject).removeChild("options");
 		}
-		this.plugin.getLogger().debug("Removed the options configuration file : (identifier='" + subject + "')");
+		this.plugin.getELogger().debug("Removed the options configuration file : (identifier='" + subject + "')");
 		this.plugin.getManagerData().saveUsers();
 		return true;
     }
@@ -224,7 +224,7 @@ public class EConfUserData implements IUserData {
 		// Si le fichier de configuration existe
 		if (users.isPresent()) {
 			users.get().get(subject + ".group").setValue(parent);
-			this.plugin.getLogger().debug("Added to the configs file : (identifier='" + subject + "';group='" + parent + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Added to the configs file : (identifier='" + subject + "';group='" + parent + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
 			return true;
 		}
@@ -236,7 +236,7 @@ public class EConfUserData implements IUserData {
 		// Si le fichier de configuration existe
 		if (conf.isPresent()) {
 			conf.get().get(subject).removeChild("group");
-			this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject + "';group='" + parent + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Removed from configs file : (identifier='" + subject + "';group='" + parent + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
 			return true;
 		}
@@ -248,7 +248,7 @@ public class EConfUserData implements IUserData {
 		// Si le fichier de configuration existe
 		if (conf.isPresent()) {
 			conf.get().get(subject).removeChild("group");
-			this.plugin.getLogger().debug("Removed the group configuration file : (identifier='" + subject + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Removed the group configuration file : (identifier='" + subject + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
 			return true;
     	}
@@ -260,7 +260,7 @@ public class EConfUserData implements IUserData {
 		for (Entry<String, EPConfUsers> conf : this.plugin.getManagerData().getConfUsers().entrySet()) {
 			conf.getValue().get(subject).removeChild("group");
 		}
-		this.plugin.getLogger().debug("Removed the group configuration file : (identifier='" + subject + "')");
+		this.plugin.getELogger().debug("Removed the group configuration file : (identifier='" + subject + "')");
 		this.plugin.getManagerData().saveUsers();
         return true;
     }
@@ -278,7 +278,7 @@ public class EConfUserData implements IUserData {
 				subgroups = new ArrayList<String>(conf.get().get(subject + ".subgroups").getList(TypeToken.of(String.class)));
 				subgroups.add(parent);
 				conf.get().get(subject + ".subgroups").setValue(subgroups);
-				this.plugin.getLogger().debug("Added to the configs file : (identifier='" + subject + "';subgroup='" + parent + "';type='" + world + "')");
+				this.plugin.getELogger().debug("Added to the configs file : (identifier='" + subject + "';subgroup='" + parent + "';type='" + world + "')");
 				this.plugin.getManagerData().saveUser(world);
 				return true;
 			} catch (ObjectMappingException e) {}
@@ -299,7 +299,7 @@ public class EConfUserData implements IUserData {
 				} else {
 					conf.get().get(subject + ".subgroups").setValue(subgroups);
 				}
-				this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject + "';subgroup='" + parent + "';type='" + world + "')");
+				this.plugin.getELogger().debug("Removed from configs file : (identifier='" + subject + "';subgroup='" + parent + "';type='" + world + "')");
 				this.plugin.getManagerData().saveUser(world);
 				return true;
 			} catch (ObjectMappingException e) {}
@@ -312,7 +312,7 @@ public class EConfUserData implements IUserData {
 		// Si le fichier de configuration existe
 		if (users.isPresent()) {
 			users.get().get(subject).removeChild("subgroups");
-			this.plugin.getLogger().debug("Removed the subgroups configuration file : (identifier='" + subject + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Removed the subgroups configuration file : (identifier='" + subject + "';type='" + world + "')");
 			this.plugin.getManagerData().saveUser(world);
 			return true;
 		}
@@ -324,7 +324,7 @@ public class EConfUserData implements IUserData {
     	for (Entry<String, EPConfUsers> conf : this.plugin.getManagerData().getConfUsers().entrySet()) {
     		conf.getValue().get(subject).removeChild("group");
 		}
-    	this.plugin.getLogger().debug("Removed the subgroups configuration file : (identifier='" + subject + "')");
+    	this.plugin.getELogger().debug("Removed the subgroups configuration file : (identifier='" + subject + "')");
     	this.plugin.getManagerData().saveUsers();
 		return true;
     }

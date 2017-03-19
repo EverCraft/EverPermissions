@@ -97,7 +97,7 @@ public class EUserSubject extends ESubject {
 		// TempoData : Permissions
 		Tristate value = this.getTransientSubjectData().getNodeTree(contexts_user).get(permission);
 		if (!value.equals(Tristate.UNDEFINED)) {
-			this.plugin.getLogger().debug("TransientSubjectData 'Permissions' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
+			this.plugin.getELogger().debug("TransientSubjectData 'Permissions' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
 			return value;
 		}
     	
@@ -107,7 +107,7 @@ public class EUserSubject extends ESubject {
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts_group, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
-    			this.plugin.getLogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
+    			this.plugin.getELogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
@@ -115,7 +115,7 @@ public class EUserSubject extends ESubject {
     	// SubjectData : Permissions
     	value = this.getSubjectData().getNodeTree(contexts_user).getTristate(permission);
 		if (!value.equals(Tristate.UNDEFINED)) {
-			this.plugin.getLogger().debug("SubjectData 'Permissions' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
+			this.plugin.getELogger().debug("SubjectData 'Permissions' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
 			return value;
 		}
     	
@@ -124,7 +124,7 @@ public class EUserSubject extends ESubject {
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts_group, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
-    			this.plugin.getLogger().debug("SubjectData 'SubGroup' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
+    			this.plugin.getELogger().debug("SubjectData 'SubGroup' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
@@ -134,11 +134,11 @@ public class EUserSubject extends ESubject {
     	while(subjects.hasNext()) {
     		value = subjects.next().getPermissionValue(contexts_group, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
-    			this.plugin.getLogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
+    			this.plugin.getELogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
-    	this.plugin.getLogger().debug("SubjectData '' : (identifier='" + this.identifier + "';permission='" + permission + "';value='UNDEFINED')");
+    	this.plugin.getELogger().debug("SubjectData '' : (identifier='" + this.identifier + "';permission='" + permission + "';value='UNDEFINED')");
         return Tristate.UNDEFINED;
     }
     

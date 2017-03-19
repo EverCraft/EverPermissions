@@ -244,14 +244,14 @@ public class EPTransfert extends ECommand<EverPermissions> {
 				    	    	}
 		    				}
     					} catch (IOException e) {
-    						this.plugin.getLogger().warn("Error while loading the file '" + world + "': " + e.getMessage());
+    						this.plugin.getELogger().warn("Error while loading the file '" + world + "': " + e.getMessage());
 						}
     				}
     			}
     		}
     		resultat = true;
     	} catch (SQLException e) {
-			this.plugin.getLogger().warn("Error during the transfer of the database : " + e.getMessage());
+			this.plugin.getELogger().warn("Error during the transfer of the database : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -264,7 +264,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	    }
 		
 		if (resultat) {
-			this.plugin.getLogger().info(EPMessages.TRANSFERT_SQL_LOG.getString());
+			this.plugin.getELogger().info(EPMessages.TRANSFERT_SQL_LOG.getString());
 			EPMessages.TRANSFERT_SQL.sendTo(player);
 		} else {
 			EPMessages.TRANSFERT_ERROR.sendTo(player);
@@ -358,7 +358,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			}
     		resultat = true;
     	} catch (SQLException e) {
-			this.plugin.getLogger().warn("Error during the transfer of the database : " + e.getMessage());
+			this.plugin.getELogger().warn("Error during the transfer of the database : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -371,7 +371,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	    }
 		
 		if (resultat) {
-			this.plugin.getLogger().info(EPMessages.TRANSFERT_CONF_LOG.getString());
+			this.plugin.getELogger().info(EPMessages.TRANSFERT_CONF_LOG.getString());
 			EPMessages.TRANSFERT_CONF.sendTo(source);
 		} else {
 			EPMessages.TRANSFERT_ERROR.sendTo(source);

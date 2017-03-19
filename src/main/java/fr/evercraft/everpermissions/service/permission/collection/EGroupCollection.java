@@ -153,7 +153,7 @@ public class EGroupCollection extends ESubjectCollection {
 			    			if (group.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
 			    				subject.getSubjectData().setPermissionExecute(contexts, (String) permission.getKey(), Tristate.fromBoolean(permission.getValue().getBoolean(false)));
 			    			} else {
-			    				this.plugin.getLogger().warn("Error : Loading group ("
+			    				this.plugin.getELogger().warn("Error : Loading group ("
 			    						+ "type='" + type.get() + "';"
 			    						+ "permission='" + permission.getValue().toString() + "')");
 			    			}
@@ -163,7 +163,7 @@ public class EGroupCollection extends ESubjectCollection {
 			    			if (group.getKey() instanceof String && options.getValue().getValue() instanceof String) {
 			    				subject.getSubjectData().setOptionExecute(contexts, (String) options.getKey(), options.getValue().getString(""));
 			    			} else {
-			    				this.plugin.getLogger().warn("Error : Loading group ("
+			    				this.plugin.getELogger().warn("Error : Loading group ("
 			    						+ "type='" + type.get() + "';"
 			    						+ "option='" + options.getValue().toString() + "')");
 			    			}
@@ -181,7 +181,7 @@ public class EGroupCollection extends ESubjectCollection {
 								if (parent != null && !parent.equals(subject)) {
 									subject.getSubjectData().addParentExecute(contexts, parent);
 								} else {
-									this.plugin.getLogger().warn("Error : Loading group ("
+									this.plugin.getELogger().warn("Error : Loading group ("
 											+ "type='" + type.get() + "';"
 											+ "group='" + subject.getIdentifier() + "';"
 											+ "inheritance='" + inheritance +"')");
@@ -203,14 +203,14 @@ public class EGroupCollection extends ESubjectCollection {
 				    			this.groups_default.put(type.get(), subject);
 				    			
 				    			this.plugin.getManagerEvent().post(PermSystemEvent.Action.DEFAULT_GROUP_CHANGED);
-				    			this.plugin.getLogger().debug("Group default : (world=" + type.get() + ";subject=" + subject.getIdentifier() + ")");
+				    			this.plugin.getELogger().debug("Group default : (world=" + type.get() + ";subject=" + subject.getIdentifier() + ")");
 				    		}
 						}
 					}
 				}
 			}
 		}
-		this.plugin.getLogger().debug("Loading world '" + world_name + "' in " +  chronometer.getMilliseconds().toString() + " ms");
+		this.plugin.getELogger().debug("Loading world '" + world_name + "' in " +  chronometer.getMilliseconds().toString() + " ms");
 	}
 	
 	/**
@@ -234,7 +234,7 @@ public class EGroupCollection extends ESubjectCollection {
 							}
 
 							this.plugin.getManagerEvent().post(subject, Action.GROUP_REMOVED);
-							this.plugin.getLogger().debug("UnLoad world (Subject='" + subject.getIdentifier() + "';World='" + world.get() + "')");
+							this.plugin.getELogger().debug("UnLoad world (Subject='" + subject.getIdentifier() + "';World='" + world.get() + "')");
 						}
 					}
 				}

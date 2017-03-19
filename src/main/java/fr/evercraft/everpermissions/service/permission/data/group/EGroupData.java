@@ -73,11 +73,11 @@ public class EGroupData extends EOptionSubjectData {
     				// Supprime une permission
     				if (value.equals(Tristate.UNDEFINED)) {
     					permissions.removeChild(permission);
-    					this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject.getIdentifier() + "';permission='" + permission + "';type='" + world.get() + "')");
+    					this.plugin.getELogger().debug("Removed from configs file : (identifier='" + subject.getIdentifier() + "';permission='" + permission + "';type='" + world.get() + "')");
     				// Ajoute une permission
     				} else {
     					permissions.getNode(permission).setValue(value.asBoolean());
-    					this.plugin.getLogger().debug("Added to the configs file : (identifier='" + subject.getIdentifier() + "';permission='" + permission + "';type='" + world.get() + "')");
+    					this.plugin.getELogger().debug("Added to the configs file : (identifier='" + subject.getIdentifier() + "';permission='" + permission + "';type='" + world.get() + "')");
     				}
     				this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSION_CHANGED);
     				this.plugin.getManagerData().saveGroup(world.get());
@@ -100,7 +100,7 @@ public class EGroupData extends EOptionSubjectData {
     			// Si le fichier de configuration existe
     			if (conf.isPresent()) {
     				conf.get().getNode().getNode(subject.getIdentifier()).removeChild("permissions");
-    				this.plugin.getLogger().debug("Removed the permissions configuration file : (identifier='" + subject.getIdentifier() + "';type='" + world.get() + "')");
+    				this.plugin.getELogger().debug("Removed the permissions configuration file : (identifier='" + subject.getIdentifier() + "';type='" + world.get() + "')");
     				
     				this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSION_CHANGED);
     				this.plugin.getManagerData().saveGroup(world.get());
@@ -119,7 +119,7 @@ public class EGroupData extends EOptionSubjectData {
     		for (Entry<String, EPConfGroups> world : this.plugin.getManagerData().getConfGroups().entrySet()) {
     			world.getValue().getNode().getNode(subject.getIdentifier()).removeChild("permissions");
     		}
-    		this.plugin.getLogger().debug("Removed the permissions configuration file : (identifier='" + subject.getIdentifier() + "')");
+    		this.plugin.getELogger().debug("Removed the permissions configuration file : (identifier='" + subject.getIdentifier() + "')");
     		
 			this.plugin.getManagerEvent().post(this.subject, Action.GROUP_PERMISSION_CHANGED);
 			this.plugin.getManagerData().saveGroups();
@@ -150,7 +150,7 @@ public class EGroupData extends EOptionSubjectData {
 						subgroups.add(parent.getIdentifier());
 						
 						node.getNode("inheritances").setValue(subgroups);
-        				this.plugin.getLogger().debug("Added to the configs file : (identifier='" + subject.getIdentifier() + "';inheritance='" + parent.getIdentifier() + "';type='" + world.get() + "')");
+        				this.plugin.getELogger().debug("Added to the configs file : (identifier='" + subject.getIdentifier() + "';inheritance='" + parent.getIdentifier() + "';type='" + world.get() + "')");
         				
         				this.plugin.getManagerEvent().post(this.subject, Action.GROUP_INHERITANCE_CHANGED);
         				this.plugin.getManagerData().saveGroup(world.get());
@@ -183,7 +183,7 @@ public class EGroupData extends EOptionSubjectData {
 						} else {
 							node.getNode("inheritances").setValue(subgroups);
 						}
-						this.plugin.getLogger().debug("Removed from configs file : (identifier='" + subject.getIdentifier() + "';inheritance='" + parent.getIdentifier() + "';type='" + world.get() + "')");
+						this.plugin.getELogger().debug("Removed from configs file : (identifier='" + subject.getIdentifier() + "';inheritance='" + parent.getIdentifier() + "';type='" + world.get() + "')");
 						
 						this.plugin.getManagerEvent().post(this.subject, Action.GROUP_INHERITANCE_CHANGED);
 						this.plugin.getManagerData().saveGroup(world.get());
@@ -207,7 +207,7 @@ public class EGroupData extends EOptionSubjectData {
     			// Si le fichier de configuration existe
     			if (users.isPresent()) {
     				users.get().getNode().getNode(subject.getIdentifier()).removeChild("inheritances");
-    				this.plugin.getLogger().debug("Removed the inheritances configuration file : (identifier='" + subject.getIdentifier() + "';type='" + world.get() + "')");
+    				this.plugin.getELogger().debug("Removed the inheritances configuration file : (identifier='" + subject.getIdentifier() + "';type='" + world.get() + "')");
     				
     				this.plugin.getManagerEvent().post(this.subject, Action.GROUP_INHERITANCE_CHANGED);
     				this.plugin.getManagerData().saveGroup(world.get());
@@ -226,7 +226,7 @@ public class EGroupData extends EOptionSubjectData {
     		for (Entry<String, EPConfGroups> world : this.plugin.getManagerData().getConfGroups().entrySet()) {
     			world.getValue().getNode().getNode(subject.getIdentifier()).removeChild("inheritances");
     		}
-        	this.plugin.getLogger().debug("Removed the inheritances configuration file : (identifier='" + subject.getIdentifier() + "')");
+        	this.plugin.getELogger().debug("Removed the inheritances configuration file : (identifier='" + subject.getIdentifier() + "')");
 			this.plugin.getManagerEvent().post(this.subject, Action.GROUP_INHERITANCE_CHANGED);
 			this.plugin.getManagerData().saveGroups();
 			return true;
@@ -251,10 +251,10 @@ public class EGroupData extends EOptionSubjectData {
     				ConfigurationNode options = conf.get().getNode().getNode(subject.getIdentifier(), "options");
     				if (value == null) {
     					options.removeChild(option);
-    					this.plugin.getLogger().warn("Removed from configs file : (identifier='" + subject.getIdentifier() + "';option='" + option + "';type='" + world.get() + "')");
+    					this.plugin.getELogger().warn("Removed from configs file : (identifier='" + subject.getIdentifier() + "';option='" + option + "';type='" + world.get() + "')");
     				} else {
     					options.getNode(option).setValue(value);
-    					this.plugin.getLogger().warn("Added to the configs file : (identifier='" + subject.getIdentifier() + "';option='" + option + "';name='" + value + "';type='" + world.get() + "')");
+    					this.plugin.getELogger().warn("Added to the configs file : (identifier='" + subject.getIdentifier() + "';option='" + option + "';name='" + value + "';type='" + world.get() + "')");
     				}
     				this.plugin.getManagerEvent().post(this.subject, Action.GROUP_OPTION_CHANGED);
     				this.plugin.getManagerData().saveGroup(world.get());
@@ -277,7 +277,7 @@ public class EGroupData extends EOptionSubjectData {
     			// Si le fichier de configuration existe
     			if (conf.isPresent()) {
     				conf.get().getNode().getNode(subject.getIdentifier()).removeChild("options");
-    				this.plugin.getLogger().warn("Removed the options configuration file : (identifier='" + subject.getIdentifier() + "';type='" + world.get() + "')");
+    				this.plugin.getELogger().warn("Removed the options configuration file : (identifier='" + subject.getIdentifier() + "';type='" + world.get() + "')");
     			}
     			this.plugin.getManagerEvent().post(this.subject, Action.GROUP_OPTION_CHANGED);
     			this.plugin.getManagerData().saveGroup(world.get());
@@ -295,7 +295,7 @@ public class EGroupData extends EOptionSubjectData {
     		for (Entry<String, EPConfGroups> group : this.plugin.getManagerData().getConfGroups().entrySet()) {
     			group.getValue().get(subject.getIdentifier()).removeChild("options");
     		}
-    		this.plugin.getLogger().warn("Removed the options configuration file : (identifier='" + subject.getIdentifier() + "')");
+    		this.plugin.getELogger().warn("Removed the options configuration file : (identifier='" + subject.getIdentifier() + "')");
     		this.plugin.getManagerEvent().post(this.subject, Action.GROUP_OPTION_CHANGED);
     		this.plugin.getManagerData().saveGroups();
     		return true;

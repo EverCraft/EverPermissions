@@ -43,7 +43,7 @@ public class EPManagerEvent {
 	}
 	
 	public boolean post(final PermSystemEvent.Action action) {
-		this.plugin.getLogger().debug("Event PermSystemEvent : (Action='" + action.name() +"')");
+		this.plugin.getELogger().debug("Event PermSystemEvent : (Action='" + action.name() +"')");
 		
 		if (action.equals(PermSystemEvent.Action.RELOADED)) {
 			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermSystemEventReloaded(this.getCause()));
@@ -64,7 +64,7 @@ public class EPManagerEvent {
 	}
 	
 	public boolean post(final Subject subject, Optional<EPlayer> player, final PermUserEvent.Action action) {
-		this.plugin.getLogger().debug("Event PermUserEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
+		this.plugin.getELogger().debug("Event PermUserEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
 		
 		if (action.equals(PermUserEvent.Action.USER_ADDED)) {
 			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermUserEventAdd(subject, player, this.getCause()));
@@ -83,7 +83,7 @@ public class EPManagerEvent {
 	}
 	
 	public boolean post(final Subject subject, final PermGroupEvent.Action action) {
-		this.plugin.getLogger().debug("Event PermGroupEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
+		this.plugin.getELogger().debug("Event PermGroupEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
 		
 		if (action.equals(PermGroupEvent.Action.GROUP_ADDED)) {
 			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermGroupEventAdd(subject, this.getCause()));
@@ -100,7 +100,7 @@ public class EPManagerEvent {
 	}
 	
 	public boolean post(final Subject subject, final PermOtherEvent.Action action) {
-		this.plugin.getLogger().debug("Event PermOtherEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
+		this.plugin.getELogger().debug("Event PermOtherEvent : (Subject='" + subject.getIdentifier() + "';Action='" + action.name() +"')");
 		
 		if (action.equals(PermOtherEvent.Action.OTHER_ADDED)) {
 			return this.plugin.getGame().getEventManager().post(ESpongeEventFactory.createPermOtherEventAdd(subject, this.getCause()));

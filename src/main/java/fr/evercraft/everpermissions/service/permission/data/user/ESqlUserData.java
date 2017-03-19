@@ -63,14 +63,14 @@ public class ESqlUserData implements IUserData {
 			ResultSet list = preparedStatement.executeQuery();
 			while (list.next()) {
 				subject.setPermissionExecute(EContextCalculator.getContextWorld(list.getString("world")),list.getString("permission"), Tristate.fromBoolean(list.getBoolean("boolean")));
-				this.plugin.getLogger().debug("Loading : ("
+				this.plugin.getELogger().debug("Loading : ("
 						+ "identifier='" + subject.getIdentifier() + "';"
 						+ "permission='" + list.getString("permission") + "';"
 						+ "value='" + list.getBoolean("boolean") + "';"
 						+ "type='" + list.getString("world") + "')");
 			}
 		} catch (SQLException e) {
-			this.plugin.getLogger().warn("Permissions error when loading : " + e.getMessage());
+			this.plugin.getELogger().warn("Permissions error when loading : " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
@@ -88,14 +88,14 @@ public class ESqlUserData implements IUserData {
 			ResultSet list = preparedStatement.executeQuery();
 			while (list.next()) {
 				subject.setOptionExecute(EContextCalculator.getContextWorld(list.getString("world")), list.getString("option"), list.getString("value"));
-				this.plugin.getLogger().debug("Loading : ("
+				this.plugin.getELogger().debug("Loading : ("
 						+ "identifier=" + subject.getIdentifier() + ";"
 						+ "option=" + list.getString("option") + ";"
 						+ "value=" + list.getString("value") + ";"
 						+ "type=" + list.getString("world") + ")");
 			}
 		} catch (SQLException e) {
-			this.plugin.getLogger().warn("Options error when loading : " + e.getMessage());
+			this.plugin.getELogger().warn("Options error when loading : " + e.getMessage());
 		} finally {
 			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
@@ -117,14 +117,14 @@ public class ESqlUserData implements IUserData {
 					// Chargement des sous-groupes
 					if (!list.getBoolean("subgroup") && subject.getParents(contexts).isEmpty()) {
 						subject.addParentExecute(contexts, group);
-						this.plugin.getLogger().debug("Loading : ("
+						this.plugin.getELogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "group=" + list.getString("group") + ";"
 	    						+ "type=" + list.getString("world") + ")");
 					// Chargement du groupe
 					} else {
 						subject.addSubParentExecute(contexts, group);
-						this.plugin.getLogger().debug("Loading : ("
+						this.plugin.getELogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "subgroup=" + list.getString("group") + ";"
 	    						+ "type=" + list.getString("world") + ")");
@@ -132,7 +132,7 @@ public class ESqlUserData implements IUserData {
 				}
 			}
 		} catch (SQLException e) {
-			this.plugin.getLogger().warn("Groups error when loading : " + e.getMessage());
+			this.plugin.getELogger().warn("Groups error when loading : " + e.getMessage());
 		} finally {
 			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
@@ -163,7 +163,7 @@ public class ESqlUserData implements IUserData {
 				preparedStatement.setString(2, world);
 				preparedStatement.setString(3, permission);
 				
-				this.plugin.getLogger().debug("Remove from database : (identifier='" + subject + "';permission='" + permission + "';type='" + world + "')");
+				this.plugin.getELogger().debug("Remove from database : (identifier='" + subject + "';permission='" + permission + "';type='" + world + "')");
 			// Ajoute une permission
         	} else if (insert) {
         		String query = 	  "INSERT INTO `" + this.plugin.getManagerData().getDataBases().getTableUsersPermissions() + "` "
@@ -174,7 +174,7 @@ public class ESqlUserData implements IUserData {
 				preparedStatement.setString(3, permission);
 				preparedStatement.setBoolean(4, value.asBoolean());
 				
-				this.plugin.getLogger().debug("Adding to the database : (identifier='" + subject + "';permission='" + permission + "';value='" + value.asBoolean() + "';type='" + world + "')");
+				this.plugin.getELogger().debug("Adding to the database : (identifier='" + subject + "';permission='" + permission + "';value='" + value.asBoolean() + "';type='" + world + "')");
 			// Mise à jour une permission
         	} else {
         		String query = 	  "UPDATE `" + this.plugin.getManagerData().getDataBases().getTableUsersPermissions() + "` "
@@ -186,11 +186,11 @@ public class ESqlUserData implements IUserData {
 				preparedStatement.setString(3, world);
 				preparedStatement.setString(4, permission);
 				
-				this.plugin.getLogger().debug("Updating the database : (identifier='" + subject + "';permission='" + permission + "';value='" + value.asBoolean() + "';type='" + world + "')");
+				this.plugin.getELogger().debug("Updating the database : (identifier='" + subject + "';permission='" + permission + "';value='" + value.asBoolean() + "';type='" + world + "')");
         	}
         	preparedStatement.execute();
         } catch (SQLException e) {
-        	this.plugin.getLogger().warn("Error during a change of permission : " + e.getMessage());
+        	this.plugin.getELogger().warn("Error during a change of permission : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -219,9 +219,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setString(1, subject);
 			preparedStatement.setString(2, world);
 			preparedStatement.execute();
-			this.plugin.getLogger().debug("Removes the database permissions : (identifier='" + subject + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Removes the database permissions : (identifier='" + subject + "';type='" + world + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error permissions deletions : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error permissions deletions : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -249,9 +249,9 @@ public class ESqlUserData implements IUserData {
     		preparedStatement = connection.prepareStatement(query);
 			preparedStatement.setString(1, subject);
 			preparedStatement.execute();
-			this.plugin.getLogger().debug("Removes the database permissions : (identifier='" + subject + "')");
+			this.plugin.getELogger().debug("Removes the database permissions : (identifier='" + subject + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error permissions deletions : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error permissions deletions : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -286,7 +286,7 @@ public class ESqlUserData implements IUserData {
 				preparedStatement.setString(2, world);
 				preparedStatement.setString(3, option);
 				
-				this.plugin.getLogger().debug("Remove from database : (identifier='" + subject + "';option='" + option + "';world='" + world + "')");
+				this.plugin.getELogger().debug("Remove from database : (identifier='" + subject + "';option='" + option + "';world='" + world + "')");
         	} else if (insert) {
         		String query = 	  "INSERT INTO `" + this.plugin.getManagerData().getDataBases().getTableUsersOptions() + "` "
 			    				+ "VALUES (?, ?, ?, ?);";
@@ -296,7 +296,7 @@ public class ESqlUserData implements IUserData {
 				preparedStatement.setString(3, option);
 				preparedStatement.setString(4, value);
 				
-				this.plugin.getLogger().debug("Adding to the database : (identifier='" + subject + "';option='" + option + "';value='" + value + "';world='" + world + "')");
+				this.plugin.getELogger().debug("Adding to the database : (identifier='" + subject + "';option='" + option + "';value='" + value + "';world='" + world + "')");
         	} else {
         		String query = 	  "UPDATE `" + this.plugin.getManagerData().getDataBases().getTableUsersOptions() + "` "
         						+ "SET `value` = ? "
@@ -307,11 +307,11 @@ public class ESqlUserData implements IUserData {
 				preparedStatement.setString(3, world);
 				preparedStatement.setString(4, option);
 				
-				this.plugin.getLogger().debug("Updating the database : (identifier='" + subject + "';option='" + option + "';value='" + value + "';world='" + world + "')");
+				this.plugin.getELogger().debug("Updating the database : (identifier='" + subject + "';option='" + option + "';value='" + value + "';world='" + world + "')");
         	}
         	preparedStatement.execute();
         } catch (SQLException e) {
-        	this.plugin.getLogger().warn("Error during a change of option : " + e.getMessage());
+        	this.plugin.getELogger().warn("Error during a change of option : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -341,9 +341,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setString(2, world);
 			preparedStatement.execute();
 			
-			this.plugin.getLogger().debug("Removes the database options : (identifier='" + subject + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Removes the database options : (identifier='" + subject + "';type='" + world + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error options deletions : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error options deletions : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -372,9 +372,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setString(1, subject);
 			preparedStatement.execute();
 			
-			this.plugin.getLogger().debug("Removes the database options : (identifier='" + subject + "')");
+			this.plugin.getELogger().debug("Removes the database options : (identifier='" + subject + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error options deletions : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error options deletions : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -409,9 +409,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setBoolean(4, false);
 			preparedStatement.execute();
 			
-			this.plugin.getLogger().debug("Adding to the database : (identifier='" + subject + "';group='" + parent + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Adding to the database : (identifier='" + subject + "';group='" + parent + "';type='" + world + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error during a change of group : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error during a change of group : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -443,9 +443,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setBoolean(4, false);
 			preparedStatement.execute();
 					
-			this.plugin.getLogger().debug("Remove from database : (identifier='" + subject + "';group='" + parent + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Remove from database : (identifier='" + subject + "';group='" + parent + "';type='" + world + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error during a change of group : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error during a change of group : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -476,9 +476,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setBoolean(3, false);
 			preparedStatement.execute();
 			
-			this.plugin.getLogger().debug("Removes the database groups : (identifier='" + subject + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Removes the database groups : (identifier='" + subject + "';type='" + world + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error groups deletions : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error groups deletions : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -508,9 +508,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setBoolean(2, false);
 			preparedStatement.execute();
 			
-			this.plugin.getLogger().debug("Removes the database groups : (identifier='" + subject + "')");
+			this.plugin.getELogger().debug("Removes the database groups : (identifier='" + subject + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error groups deletions : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error groups deletions : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -545,9 +545,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setBoolean(4, true);
 			preparedStatement.execute();
 			
-			this.plugin.getLogger().debug("Adding to the database : (identifier='" + subject + "';subgroup='" + parent + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Adding to the database : (identifier='" + subject + "';subgroup='" + parent + "';type='" + world + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error during a change of subgroup : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error during a change of subgroup : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -579,9 +579,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setBoolean(4, true);
 			preparedStatement.execute();			
 			
-			this.plugin.getLogger().debug("Remove from database : (identifier='" + subject + "';subgroup='" + parent + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Remove from database : (identifier='" + subject + "';subgroup='" + parent + "';type='" + world + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error during a change of subgroup : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error during a change of subgroup : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -612,9 +612,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setBoolean(3, true);
 			preparedStatement.execute();
 			
-			this.plugin.getLogger().debug("Removes the database subgroups : (identifier='" + subject + "';type='" + world + "')");
+			this.plugin.getELogger().debug("Removes the database subgroups : (identifier='" + subject + "';type='" + world + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error subgroups deletions : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error subgroups deletions : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {
@@ -644,9 +644,9 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setBoolean(2, true);
 			preparedStatement.execute();
 			
-			this.plugin.getLogger().debug("Removes the database subgroups : (identifier='" + subject + "')");
+			this.plugin.getELogger().debug("Removes the database subgroups : (identifier='" + subject + "')");
     	} catch (SQLException e) {
-    		this.plugin.getLogger().warn("Error subgroups deletions : " + e.getMessage());
+    		this.plugin.getELogger().warn("Error subgroups deletions : " + e.getMessage());
 		} catch (ServerDisableException e) {
 			e.execute();
 		} finally {

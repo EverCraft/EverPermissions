@@ -52,7 +52,7 @@ public class EUserCollection extends ESubjectCollection {
 					    	 */
 							@Override
 							public void onRemoval(RemovalNotification<String, EUserSubject> notification) {
-								EUserCollection.this.plugin.getLogger().debug("Unloading the player cache : " + notification.getValue().getIdentifier());
+								EUserCollection.this.plugin.getELogger().debug("Unloading the player cache : " + notification.getValue().getIdentifier());
 								EUserCollection.this.plugin.getManagerEvent().post(notification.getValue(), Action.USER_REMOVED);
 							}
 					    	
@@ -66,7 +66,7 @@ public class EUserCollection extends ESubjectCollection {
 					        	Chronometer chronometer = new Chronometer();
 					        	
 					            EUserSubject subject = new EUserSubject(EUserCollection.this.plugin, identifier, EUserCollection.this);
-					            EUserCollection.this.plugin.getLogger().debug("Loading user '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
+					            EUserCollection.this.plugin.getELogger().debug("Loading user '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
 					            
 					            EUserCollection.this.plugin.getManagerEvent().post(subject, Action.USER_ADDED);
 					            return subject;
@@ -82,7 +82,7 @@ public class EUserCollection extends ESubjectCollection {
 	    	}
 	    	return this.subjects.get(identifier);
 		} catch (ExecutionException e) {
-			this.plugin.getLogger().warn("Error : Loading user (identifier='" + identifier + "';message='" + e.getMessage() + "')");
+			this.plugin.getELogger().warn("Error : Loading user (identifier='" + identifier + "';message='" + e.getMessage() + "')");
 			return null;
 		}
 	}
@@ -123,13 +123,13 @@ public class EUserCollection extends ESubjectCollection {
 		// Si le joueur est dans le cache
 		if (player != null) {
 			this.subjects.putIfAbsent(identifier, player);
-			this.plugin.getLogger().debug("Loading player cache : " + identifier);
+			this.plugin.getELogger().debug("Loading player cache : " + identifier);
 		// Si le joueur n'est pas dans le cache
 		} else {
 			Chronometer chronometer = new Chronometer();
 			player = new EUserSubject(this.plugin, identifier, this);
 			this.subjects.putIfAbsent(identifier, player);
-			this.plugin.getLogger().debug("Loading player '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
+			this.plugin.getELogger().debug("Loading player '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
 		}
 		this.plugin.getManagerEvent().post(player, Action.USER_ADDED);
 	}
@@ -144,7 +144,7 @@ public class EUserCollection extends ESubjectCollection {
 		if (player != null) {
 			this.cache.put(identifier, player);
 			this.plugin.getManagerEvent().post(player, Action.USER_REMOVED);
-			this.plugin.getLogger().debug("Unloading the player : " + identifier);
+			this.plugin.getELogger().debug("Unloading the player : " + identifier);
 		}
 	}
 }

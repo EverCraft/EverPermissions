@@ -43,7 +43,7 @@ public class ETemplateCollection extends ESubjectCollection {
 			EOtherSubject subject = new EOtherSubject(this.plugin, identifier, ETemplateCollection.this);
 			this.subjects.put(identifier, subject);
 			
-			this.plugin.getLogger().debug("Loading template '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
+			this.plugin.getELogger().debug("Loading template '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
 			return subject;
     	}
     	return this.subjects.get(identifier);

@@ -77,7 +77,7 @@ public class EUserData extends EOptionSubjectData {
 	    				Optional<EGroupSubject> subject = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
 	    				if (subject.isPresent()) {
 	    					this.addParentExecute(contexts, subject.get());
-	    					this.plugin.getLogger().debug("Loading : ("
+	    					this.plugin.getELogger().debug("Loading : ("
 	        						+ "identifier=" + this.getIdentifier() + ";"
 	        						+ "default_group=" + subject.get().getIdentifier() + ";"
 	        						+ "type=" + type_user.get() + ")");

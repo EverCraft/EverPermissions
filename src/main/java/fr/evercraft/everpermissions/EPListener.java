@@ -58,7 +58,7 @@ public class EPListener {
     @Listener
     public void onLoadWorldEvent(final LoadWorldEvent event) {
     	if (!event.isCancelled()) {
-    		this.plugin.getLogger().debug("Load world : " + event.getTargetWorld().getName());
+    		this.plugin.getELogger().debug("Load world : " + event.getTargetWorld().getName());
     		this.plugin.getService().getGroupSubjects().registerWorld(event.getTargetWorld().getName());
     		this.plugin.getManagerData().registerUser(event.getTargetWorld().getName());
     		
@@ -72,7 +72,7 @@ public class EPListener {
     @Listener
     public void onUnloadWorldEvent(final UnloadWorldEvent event) {
     	if (!event.isCancelled()) {
-    		this.plugin.getLogger().debug("Unload world : " + event.getTargetWorld().getName());
+    		this.plugin.getELogger().debug("Unload world : " + event.getTargetWorld().getName());
     		this.plugin.getService().getGroupSubjects().removeWorld(event.getTargetWorld().getName());
     		this.plugin.getManagerData().removeUser(event.getTargetWorld().getName());
     		

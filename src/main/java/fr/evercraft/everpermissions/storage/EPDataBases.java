@@ -102,7 +102,7 @@ public class EPDataBases extends EDataBase<EverPermissions> {
 			
 			resultat = true;
     	} catch (SQLException e) {
-			this.plugin.getLogger().warn("Error while deleting the database : " + e.getMessage());
+			this.plugin.getELogger().warn("Error while deleting the database : " + e.getMessage());
 		} finally {
 			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
