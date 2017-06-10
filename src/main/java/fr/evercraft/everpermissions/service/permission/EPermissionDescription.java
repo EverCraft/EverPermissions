@@ -19,7 +19,6 @@ package fr.evercraft.everpermissions.service.permission;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 import fr.evercraft.everpermissions.service.EPermissionService;
@@ -88,14 +87,11 @@ public class EPermissionDescription implements PermissionDescription {
     }
     
     @Override
-    public String toString() {
-        return Objects.toStringHelper(this)
-                .add("owner", this.plugin)
-                .add("id", this.id)
-                .toString();
-    }
+	public String toString() {
+		return "EPermissionDescription [id=" + id + ", description=" + description + "]";
+	}
 
-    public static class Builder implements PermissionDescription.Builder {
+	public static class Builder implements PermissionDescription.Builder {
         private final PluginContainer plugin;
         private final EPermissionService service;
         
