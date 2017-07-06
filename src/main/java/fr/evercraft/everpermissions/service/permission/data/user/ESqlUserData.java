@@ -71,7 +71,6 @@ public class ESqlUserData implements IUserData {
 			}
 		} catch (SQLException e) {
 			this.plugin.getELogger().warn("Permissions error when loading : " + e.getMessage());
-			e.printStackTrace();
 		} finally {
 			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
