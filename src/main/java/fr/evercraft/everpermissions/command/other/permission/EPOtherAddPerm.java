@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -72,14 +73,12 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		// Résultat de la commande :
-		boolean resultat = false;
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		if (args.size() == 3) {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le joueur existe
 			if (optSubject.isPresent()){
-				resultat = this.command(source, optSubject.get(), args.get(1), args.get(2));
+				return this.command(source, optSubject.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
@@ -90,17 +89,17 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 		} else {
 			source.sendMessage(this.help(source));
 		}
-		return resultat;
+		return CompletableFuture.completedFuture(false);
 	}
 	
-	private boolean command(final CommandSource staff, final Subject subject, final String permission, final String value_name) {
+	private CompletableFuture<Boolean> command(final CommandSource staff, final Subject subject, final String permission, final String value_name) {
 		Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
 		// La value n'est pas un boolean
 		if (!value.isPresent()) {
 			EPMessages.ERROR_BOOLEAN.sender()
 				.replace("<boolean>", value_name)
 				.sendTo(staff);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		// La permission n'a pas été ajouté
@@ -118,7 +117,7 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 					.replace("<permission>", permission)
 					.sendTo(staff);
 			}
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		// Permission : True
@@ -134,6 +133,6 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 				.replace("<permission>", permission)
 				.sendTo(staff);
 		}
-		return true;
+		return CompletableFuture.completedFuture(true);
 	}
 }

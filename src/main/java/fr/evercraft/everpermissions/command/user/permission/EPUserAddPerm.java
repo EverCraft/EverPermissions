@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -77,9 +78,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		// Résultat de la commande :
-		boolean resultat = false;
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Si on ne connait pas le joueur
 		if (args.size() == 3) {
 			Optional<EUser> optUser = this.plugin.getEServer().getEUser(args.get(0));
@@ -87,10 +86,10 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 			if (optUser.isPresent()){
 				// Si la source est un joueur
 				if (source instanceof EPlayer) {
-					resultat = this.command(source, optUser.get(), args.get(1), args.get(2), ((EPlayer) source).getWorld().getName());
+					return this.command(source, optUser.get(), args.get(1), args.get(2), ((EPlayer) source).getWorld().getName());
 				// La source n'est pas un joueur
 				} else {
-					resultat = this.command(source, optUser.get(), args.get(1), args.get(2), this.plugin.getGame().getServer().getDefaultWorldName());
+					return this.command(source, optUser.get(), args.get(1), args.get(2), this.plugin.getGame().getServer().getDefaultWorldName());
 				}
 			// Le joueur est introuvable
 			} else {
@@ -103,7 +102,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 			Optional<EUser> optPlayer = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optPlayer.isPresent()){
-				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2), args.get(3));
+				return this.command(source, optPlayer.get(), args.get(1), args.get(2), args.get(3));
 			// Le joueur est introuvable
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
@@ -114,10 +113,10 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 		} else {
 			source.sendMessage(this.help(source));
 		}
-		return resultat;
+		return CompletableFuture.completedFuture(false);
 	}
 	
-	private boolean command(final CommandSource staff, final EUser user, final String permission, final String value_name, final String world_name) {
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final String permission, final String value_name, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		// Monde existant
 		if (!type_user.isPresent()) {
@@ -125,7 +124,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 				.prefix(EPMessages.PREFIX)
 				.replace("<world>", world_name)
 				.sendTo(staff);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
@@ -134,7 +133,7 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 			EPMessages.ERROR_BOOLEAN.sender()
 				.replace("<boolean>", value_name)
 				.sendTo(staff);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
@@ -233,6 +232,6 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 						.replace("<type>", type_user.get()));
 			}
 		}
-		return true;
+		return CompletableFuture.completedFuture(true);
 	}
 }

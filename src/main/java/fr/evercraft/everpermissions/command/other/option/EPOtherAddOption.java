@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -68,14 +69,12 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		// Résultat de la commande :
-		boolean resultat = false;
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		if (args.size() == 3) {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le subject existe
 			if (optSubject.isPresent()){
-				resultat = this.command(source, optSubject.get(), args.get(1), args.get(2));
+				return this.command(source, optSubject.get(), args.get(1), args.get(2));
 			// Le subject est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
@@ -86,16 +85,16 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 		} else {
 			source.sendMessage(this.help(source));
 		}
-		return resultat;
+		return CompletableFuture.completedFuture(false);
 	}
 	
-	private boolean command(final CommandSource staff, final EOtherSubject subject, final String option, String value) {
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EOtherSubject subject, final String option, String value) {
 		// L'option n'a pas été ajouté
 		if (!subject.getSubjectData().setOption(EContextCalculator.EMPTY, option, value)) {
 			EAMessages.COMMAND_ERROR.sender()
 				.prefix(EPMessages.PREFIX)
 				.sendTo(staff);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		EPMessages.OTHER_ADD_OPTION_PLAYER.sender()
@@ -103,6 +102,6 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 			.replace("<option>", option)
 			.replace("<value>", Text.of(value))
 			.sendTo(staff);
-		return true;
+		return CompletableFuture.completedFuture(true);
 	}
 }

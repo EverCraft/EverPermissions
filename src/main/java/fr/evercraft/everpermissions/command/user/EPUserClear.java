@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -63,15 +64,13 @@ public class EPUserClear extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		// Résultat de la commande :
-		boolean resultat = false;
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Si on ne connait pas le monde
 		if (args.size() == 1) {
 			Optional<EUser> optUser = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optUser.isPresent()){
-				resultat = this.command(source, optUser.get());
+				return this.command(source, optUser.get());
 			// Le joueur est introuvable
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
@@ -82,17 +81,17 @@ public class EPUserClear extends ECommand<EverPermissions> {
 		} else {
 			source.sendMessage(this.help(source));
 		}
-		return resultat;
+		return CompletableFuture.completedFuture(false);
 	}
 	
-	private boolean command(final CommandSource staff, final EUser user) {
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user) {
 		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
 		// User inexistant
 		if (subject == null) {
 			EAMessages.PLAYER_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
 				.sendTo(staff);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		subject.getSubjectData().clearParents();
@@ -121,6 +120,6 @@ public class EPUserClear extends ECommand<EverPermissions> {
 					.replace("<staff>", staff.getName())
 					.replace("<player>", user.getName()));
 		}
-		return true;
+		return CompletableFuture.completedFuture(true);
 	}
 }

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -67,14 +68,12 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		// Résultat de la commande :
-		boolean resultat = false;
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		if (args.size() == 1) {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le joueur existe
 			if (optSubject.isPresent()){
-				resultat = command(source, optSubject.get());
+				return this.command(source, optSubject.get());
 			// Le joueur est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
@@ -85,10 +84,10 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 		} else {
 			source.sendMessage(this.help(source));
 		}
-		return resultat;
+		return CompletableFuture.completedFuture(false);
 	}
 	
-	private boolean command(final CommandSource staff, final Subject subject) {
+	private CompletableFuture<Boolean> command(final CommandSource staff, final Subject subject) {
 		List<Text> list = new ArrayList<Text>();
 		
 		// La liste des permissions
@@ -127,6 +126,6 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 				EPMessages.OTHER_LIST_PERMISSION_TITLE.getFormat()
 					.toText("<subject>", subject.getIdentifier()), 
 				list, staff);
-		return true;
+		return CompletableFuture.completedFuture(true);
 	}
 }

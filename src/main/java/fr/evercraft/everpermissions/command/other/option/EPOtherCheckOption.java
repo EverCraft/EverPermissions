@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -66,14 +67,12 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		// Résultat de la commande :
-		boolean resultat = false;
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		if (args.size() == 2) {
 			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le subject existe
 			if (optSubject.isPresent()){
-				resultat = this.command(source, optSubject.get(), args.get(1));
+				return this.command(source, optSubject.get(), args.get(1));
 			// Le subject est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
@@ -84,10 +83,10 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 		} else {
 			source.sendMessage(this.help(source));
 		}
-		return resultat;
+		return CompletableFuture.completedFuture(false);
 	}
 	
-	private boolean command(final CommandSource staff, final EOtherSubject subject, final String type) {
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EOtherSubject subject, final String type) {
 		String name = subject.getSubjectData().getOptions(EContextCalculator.EMPTY).get(type);
 		// Il n'y a pas de valeur
 		if (name == null) {
@@ -95,7 +94,7 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 				.replace("<subject>", subject.getIdentifier())
 				.replace("<option>", type)
 				.sendTo(staff);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		EPMessages.OTHER_CHECK_OPTION_DEFINED.sender()
@@ -103,6 +102,6 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 			.replace("<option>", type)
 			.replace("<value>", Text.of(name))
 			.sendTo(staff);
-		return true;
+		return CompletableFuture.completedFuture(true);
 	}
 }

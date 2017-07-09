@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -75,29 +76,27 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		// Résultat de la commande :
-		boolean resultat = false;
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Si on ne connait pas le monde
 		if (args.size() == 2) {
 			// Si la source est un joueur
 			if (source instanceof EPlayer) {
-				resultat = this.command(source, args.get(0), args.get(1), ((EPlayer) source).getWorld().getName());
+				return this.command(source, args.get(0), args.get(1), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
-				resultat = this.command(source, args.get(0), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
+				return this.command(source, args.get(0), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connais le monde
 		} else if (args.size() == 3) {
-			resultat = this.command(source, args.get(0), args.get(1), args.get(2));
+			return this.command(source, args.get(0), args.get(1), args.get(2));
 		// Nombre d'argument incorrect
 		} else {
 			source.sendMessage(this.help(source));
 		}
-		return resultat;
+		return CompletableFuture.completedFuture(false);
 	}
 	
-	private boolean command(final CommandSource player, final String group_name, final String inheritance_name, final String world_name) {
+	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String inheritance_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
@@ -105,7 +104,7 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 				.prefix(EPMessages.PREFIX)
 				.replace("<world>", world_name)
 				.sendTo(player);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
@@ -115,7 +114,7 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
 				.sendTo(player);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		Subject inheritance = this.plugin.getService().getGroupSubjects().get(inheritance_name);
@@ -125,7 +124,7 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 				.replace("<group>", inheritance_name)
 				.replace("<type>", type_group.get())
 				.sendTo(player);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
@@ -136,7 +135,7 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 				.replace("<group>", group.getIdentifier())
 				.replace("<type>", type_group.get())
 				.sendTo(player);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		EPMessages.GROUP_DEL_INHERITANCE_STAFF.sender()
@@ -144,6 +143,6 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 				.replace("<group>", group.getIdentifier())
 				.replace("<type>", type_group.get())
 				.sendTo(player);
-		return true;
+		return CompletableFuture.completedFuture(true);
 	}
 }

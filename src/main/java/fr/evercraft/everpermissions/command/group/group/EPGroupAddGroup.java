@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -65,29 +66,27 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		// Résultat de la commande :
-		boolean resultat = false;
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Si on ne connait pas le monde
 		if (args.size() == 1) {
 			// Si la source est un joueur
 			if (source instanceof EPlayer) {
-				resultat = this.command(source, args.get(0), ((EPlayer) source).getWorld().getName());
+				return this.command(source, args.get(0), ((EPlayer) source).getWorld().getName());
 			// La source n'est pas un joueur
 			} else {
-				resultat = this.command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
+				return this.command(source, args.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
 			}
 		// On connais le monde
 		} else if (args.size() == 2) {
-			resultat = this.command(source, args.get(0), args.get(1));
+			return this.command(source, args.get(0), args.get(1));
 		// Nombre d'argument incorrect
 		} else {
 			source.sendMessage(this.help(source));
 		}
-		return resultat;
+		return CompletableFuture.completedFuture(false);
 	}
 	
-	private boolean command(final CommandSource player, final String group_name, final String world_name) {
+	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String world_name) {
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
@@ -95,7 +94,7 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 				.prefix(EPMessages.PREFIX)
 				.replace("<world>", world_name)
 				.sendTo(player);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
@@ -105,7 +104,7 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
 				.sendTo(player);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		// Le groupe n'a pas été ajouté
@@ -113,13 +112,13 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 			EAMessages.COMMAND_ERROR.sender()
 				.prefix(EPMessages.PREFIX)
 				.sendTo(player);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		EPMessages.GROUP_ADD_GROUP_STAFF.sender()
 			.replace("<group>", group_name)
 			.replace("<type>", type_group.get())
 			.sendTo(player);
-		return true;
+		return CompletableFuture.completedFuture(true);
 	}
 }

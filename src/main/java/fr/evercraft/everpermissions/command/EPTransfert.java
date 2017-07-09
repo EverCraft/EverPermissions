@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -81,10 +82,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		// Résultat de la commande :
-		boolean resultat = false;
-		
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		if (args.size() == 1) {
 			//Si la base de donnée est activé
 			if (this.plugin.getManagerData().isSQL()) {
@@ -112,11 +110,11 @@ public class EPTransfert extends ECommand<EverPermissions> {
 				// Transféré vers une base de donnée SQL
 				if (args.get(0).equalsIgnoreCase("sql")) {
 					this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> commandSQL(source)).submit(this.plugin);
-					resultat = true;
+					return CompletableFuture.completedFuture(true);
 				// Transféré vers un fichier de config
 				} else if (args.get(0).equalsIgnoreCase("conf")) {
 					this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> commandConf(source)).submit(this.plugin);
-					resultat = true;
+					return CompletableFuture.completedFuture(true);
 				// Erreur : sql ou conf
 				} else {
 					source.sendMessage(this.help(source));
@@ -128,7 +126,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 		} else {
 			source.sendMessage(this.help(source));
 		}
-		return resultat;
+		return CompletableFuture.completedFuture(false);
 	}
 
 	public Text getButtonConfirmationSQL(){
@@ -150,7 +148,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	 * @param player Le joueur
 	 * @return True si cela a correctement fonctionné
 	 */
-	private boolean commandSQL(final CommandSource player) {
+	private CompletableFuture<Boolean> commandSQL(final CommandSource player) {
 		boolean resultat = false;
 		
 		Connection connection = null;
@@ -270,7 +268,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			EPMessages.TRANSFERT_ERROR.sendTo(player);
 		}
 		
-		return resultat;
+		return CompletableFuture.completedFuture(resultat);
 	}
 
 	private void commandConf(final CommandSource source) {

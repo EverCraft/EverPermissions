@@ -19,6 +19,7 @@ package fr.evercraft.everpermissions.command.disable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -53,8 +54,8 @@ public class EPOp extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		source.sendMessage(EPMessages.PREFIX.getText().concat(EPMessages.COMMAND_OP.getText()));
-		return false;
+		return CompletableFuture.completedFuture(false);
 	}
 }

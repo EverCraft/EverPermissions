@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -75,9 +76,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 		return Arrays.asList();
 	}
 	
-	public boolean execute(final CommandSource source, final List<String> args) throws CommandException {
-		// Résultat de la commande :
-		boolean resultat = false;
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Si on ne connait pas le monde
 		if (args.size() == 2) {
 			Optional<EUser> optUser = this.plugin.getEServer().getEUser(args.get(0));
@@ -85,10 +84,10 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 			if (optUser.isPresent()){
 				// Si la source est un joueur
 				if (source instanceof EPlayer) {
-					resultat = this.command(source, optUser.get(), args.get(1), ((EPlayer) source).getWorld().getName());
+					return this.command(source, optUser.get(), args.get(1), ((EPlayer) source).getWorld().getName());
 				// La source n'est pas un joueur
 				} else {
-					resultat = this.command(source, optUser.get(), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
+					return this.command(source, optUser.get(), args.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
 				}
 			// Le joueur est introuvable
 			} else {
@@ -101,7 +100,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 			Optional<EUser> optPlayer = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optPlayer.isPresent()){
-				resultat = this.command(source, optPlayer.get(), args.get(1), args.get(2));
+				return this.command(source, optPlayer.get(), args.get(1), args.get(2));
 			// Le joueur est introuvable
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
@@ -112,10 +111,10 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 		} else {
 			source.sendMessage(this.help(source));
 		}
-		return resultat;
+		return CompletableFuture.completedFuture(false);
 	}
 	
-	private boolean command(final CommandSource staff, final EUser user, final String group_name, final String world_name) {
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final String group_name, final String world_name) {
 		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
 		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
 		// Monde existant
@@ -124,7 +123,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 				.prefix(EPMessages.PREFIX)
 				.replace("<world>", world_name)
 				.sendTo(staff);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
@@ -134,7 +133,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
 				.sendTo(staff);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
@@ -143,7 +142,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 			EAMessages.PLAYER_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
 				.sendTo(staff);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
@@ -164,7 +163,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 					.replace("<type>", type_user.get())
 					.sendTo(staff);
 			}
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		// Le groupe est supérieur au groupe actuelle du joueur
@@ -184,7 +183,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 					.replace("<type>", type_user.get())
 					.sendTo(staff);
 			}
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		// Le groupe n'a pas été changé
@@ -192,7 +191,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 			EAMessages.COMMAND_ERROR.sender()
 				.prefix(EPMessages.PREFIX)
 				.sendTo(staff);
-			return false;
+			return CompletableFuture.completedFuture(false);
 		}
 		
 		if (staff.getIdentifier().equals(user.getIdentifier())) {
@@ -228,6 +227,6 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 					.replace("<group>", user.getIdentifier())
 					.replace("<type>", type_user.get()));
 		}
-		return true;
+		return CompletableFuture.completedFuture(true);
 	}
 }
