@@ -230,7 +230,7 @@ public class EGroupCollection extends ESubjectCollection {
 							this.groups_default.remove(world.get(), subject);
 							
 							if (subject.getWorlds().isEmpty()) {
-								this.subject.remove(subject);
+								this.subject.remove((String) group.getKey());
 							}
 
 							this.plugin.getManagerEvent().post(subject, Action.GROUP_REMOVED);
