@@ -91,6 +91,7 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
+					.replace("<player>", args.get(0))
 					.sendTo(source);
 			}
 		// On connait le joueur
@@ -103,6 +104,7 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
+					.replace("<player>", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -128,6 +130,7 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 		if (subject == null) {
 			EAMessages.PLAYER_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
+				.replace("<player>", user.getName())
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}

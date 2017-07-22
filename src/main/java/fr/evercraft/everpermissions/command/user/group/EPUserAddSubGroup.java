@@ -92,6 +92,7 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
+					.replace("<player>", args.get(0))
 					.sendTo(source);
 			}
 		// On connais le monde
@@ -103,6 +104,7 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 			// Le joueur est introuvable
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
+				.replace("<player>", args.get(0))
 					.prefix(EPMessages.PREFIX)
 					.sendTo(source);
 			}
@@ -140,6 +142,7 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 		if (subject == null) {
 			EAMessages.PLAYER_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
+				.replace("<player>", user.getIdentifier())
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}

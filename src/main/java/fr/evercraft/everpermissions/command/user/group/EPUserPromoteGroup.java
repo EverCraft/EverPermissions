@@ -93,6 +93,7 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
+					.replace("<player>", args.get(0))
 					.sendTo(source);
 			}
 		// On connait le monde
@@ -105,6 +106,7 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
+					.replace("<player>", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -141,6 +143,7 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 		if (subject == null) {
 			EAMessages.PLAYER_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
+				.replace("<player>", user.getIdentifier())
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
