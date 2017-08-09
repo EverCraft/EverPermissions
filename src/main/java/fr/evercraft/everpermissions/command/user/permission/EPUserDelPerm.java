@@ -125,7 +125,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		Set<Context> contexts = EContextCalculator.of(world_name);
 		
 		if (!user.getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED)) {
 			if (staff.getIdentifier().equals(user.getIdentifier())) {

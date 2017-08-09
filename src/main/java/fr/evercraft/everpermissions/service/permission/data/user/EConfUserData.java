@@ -48,7 +48,7 @@ public class EConfUserData implements IUserData {
     		ConfigurationNode user = world.getValue().get(subject.getIdentifier());
     		// Si le fichier de configuration existe
     		if (user.getValue() != null) {
-    			Set<Context> contexts = EContextCalculator.getContextWorld(world.getKey());
+    			Set<Context> contexts = EContextCalculator.of(world.getKey());
     			// Chargement des permissions
     			for (Entry<Object, ? extends ConfigurationNode> permission : user.getNode("permissions").getChildrenMap().entrySet()) {
 	    			if (permission.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {

@@ -128,7 +128,7 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		
 		// La permission n'a pas été ajouté
 		if (!group.getSubjectData().setPermission(contexts, permission, Tristate.fromBoolean(value.get()))) {

@@ -33,23 +33,15 @@ public class EPListener {
 	 */
 	@Listener
     public void onClientConnectionEvent(final ClientConnectionEvent.Auth event) {
-		this.plugin.getService().getUserSubjects().get(event.getProfile().getUniqueId().toString());
+		this.plugin.getService().getUserSubjects().loadSubject(event.getProfile().getUniqueId().toString());
     }
 	
-	/**
-	 * Ajoute le joueur à la liste
-	 */
-	@Listener
-    public void onClientConnectionEvent(final ClientConnectionEvent.Join event) {
-		this.plugin.getService().getUserSubjects().registerPlayer(event.getTargetEntity().getIdentifier());
-    }
-    
 	/**
 	 * Supprime le joueur de la liste
 	 */
     @Listener
     public void onClientConnectionEvent(final ClientConnectionEvent.Disconnect event) {
-        this.plugin.getService().getUserSubjects().removePlayer(event.getTargetEntity().getIdentifier());
+        this.plugin.getService().getUserSubjects().suggestUnload(event.getTargetEntity().getIdentifier());
     }
 	
     /**

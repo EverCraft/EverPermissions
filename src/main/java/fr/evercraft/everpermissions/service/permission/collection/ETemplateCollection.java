@@ -16,51 +16,78 @@
  */
 package fr.evercraft.everpermissions.service.permission.collection;
 
-import fr.evercraft.everapi.util.Chronometer;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
+import org.spongepowered.api.util.Tristate;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
-public class ETemplateCollection extends ESubjectCollection {
-    private final Map<String, EOtherSubject> subjects;
+public class ETemplateCollection extends ESubjectCollection<EOtherSubject> {
 
     public ETemplateCollection(final EverPermissions plugin) {
     	super(plugin, PermissionService.SUBJECTS_ROLE_TEMPLATE);
-    	
-    	this.subjects = new ConcurrentHashMap<String, EOtherSubject>();
     }
     
     @Override
-    public EOtherSubject get(final String identifier) {
-		if (!this.subjects.containsKey(identifier)) {			
-			Chronometer chronometer = new Chronometer();
-			
-			EOtherSubject subject = new EOtherSubject(this.plugin, identifier, ETemplateCollection.this);
-			this.subjects.put(identifier, subject);
-			
-			this.plugin.getELogger().debug("Loading template '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
-			return subject;
-    	}
-    	return this.subjects.get(identifier);
-    }
-    
+	protected EOtherSubject add(String identifier) {
+		return new EOtherSubject(this.plugin, identifier, this);
+	}
+
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-    public Iterable<Subject> getAllSubjects() {
-        return (Iterable) this.subjects.values();
-    }
-    
-    @Override
-    public boolean hasRegistered(String identifier) {
-    	return subjects.containsKey(identifier);
-    }
-    
-    @Override
-	public void reload() {
+	public CompletableFuture<Boolean> hasSubject(String identifier) {
+		return CompletableFuture.completedFuture(this.subjects.containsKey(identifier.toLowerCase()));
+	}
+
+	@Override
+	public CompletableFuture<Map<String, Subject>> loadSubjects(Set<String> identifiers) {
+		ImmutableMap.Builder<String, Subject> builder = ImmutableMap.builder();
+		for (String identifier : identifiers) {
+			EOtherSubject subject = this.subjects.get(identifier.toLowerCase());
+			if (subject != null) {
+				builder.put(subject.getIdentifier().toLowerCase(), subject);
+			}
+		}
+		return CompletableFuture.completedFuture(builder.build());
+	}
+
+	@Override
+	public CompletableFuture<Set<String>> getAllIdentifiers() {
+		return CompletableFuture.completedFuture(this.subjects.values().stream()
+			 .map(subject -> subject.getIdentifier())
+			 .collect(Collectors.toSet()));
+	}
+
+	@Override
+	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(String permission) {
+		ImmutableMap.Builder<SubjectReference, Boolean> builder = ImmutableMap.builder();
+		for (Subject subject : this.subjects.values()) {
+			Tristate value = subject.getPermissionValue(subject.getActiveContexts(), permission);
+			if (!value.equals(Tristate.UNDEFINED)) {
+				builder.put(subject.asSubjectReference(), value.asBoolean());
+			}
+		}
+		return CompletableFuture.completedFuture(builder.build());
+	}
+
+	@Override
+	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(Set<Context> contexts, String permission) {
+		ImmutableMap.Builder<SubjectReference, Boolean> builder = ImmutableMap.builder();
+		for (Subject subject : this.subjects.values()) {
+			Tristate value = subject.getPermissionValue(contexts, permission);
+			if (!value.equals(Tristate.UNDEFINED)) {
+				builder.put(subject.asSubjectReference(), value.asBoolean());
+			}
+		}
+		return CompletableFuture.completedFuture(builder.build());
 	}
 }

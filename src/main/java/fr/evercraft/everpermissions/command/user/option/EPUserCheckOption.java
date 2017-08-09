@@ -135,7 +135,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		Set<Context> contexts = EContextCalculator.of(world_name);
 
 		Optional<String> name = subject.getOption(contexts, type);
 		// Il y a une valeur

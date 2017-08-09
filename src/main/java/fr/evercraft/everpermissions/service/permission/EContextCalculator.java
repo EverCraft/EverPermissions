@@ -77,17 +77,13 @@ public class EContextCalculator implements ContextCalculator<Subject> {
      * @param contexts Le context avec le monde
      * @return Le context avec le type du groupe
      */
-    public Set<Context> getContextGroup(final Set<Context> contexts) {
-		Set<Context> accumulator = new HashSet<Context>();
+    public String getGroup(final Set<Context> contexts) {
 		for (Context context : contexts) {
 			if (context.getType().equals(Context.WORLD_KEY)) {
-				Optional<String> world = this.plugin.getManagerData().getTypeGroup(context.getName());
-				if (world.isPresent()) {
-					accumulator.add(new Context(Context.WORLD_KEY, world.get()));
-				}
+				return this.plugin.getManagerData().getTypeGroup(context.getName()).orElse("");
 			}
 		}
-		return accumulator;
+		return "";
     }
 
     /**
@@ -95,17 +91,13 @@ public class EContextCalculator implements ContextCalculator<Subject> {
      * @param contexts Le context avec le monde
      * @return Le context avec le type du joueur
      */
-    public Set<Context> getContextUser(final Set<Context> contexts) {
-		Set<Context> accumulator = new HashSet<Context>();
+    public String getUser(final Set<Context> contexts) {
 		for (Context context : contexts) {
 			if (context.getType().equals(Context.WORLD_KEY)) {
-				Optional<String> world = this.plugin.getManagerData().getTypeUser(context.getName());
-				if (world.isPresent()) {
-					accumulator.add(new Context(Context.WORLD_KEY, world.get()));
-				}
+				return this.plugin.getManagerData().getTypeUser(context.getName()).orElse("");
 			}
 		}
-		return accumulator;
+		return "";
     }
 	 
     /**
@@ -113,7 +105,7 @@ public class EContextCalculator implements ContextCalculator<Subject> {
      * @param world Le monde
      * @return Le context
      */
-	public static Set<Context> getContextWorld(final String world) {
+	public static Set<Context> of(final String world) {
 	    Set<Context> contexts = new HashSet<Context>();
 		contexts.add(new Context(Context.WORLD_KEY, world));
 		return Collections.unmodifiableSet(contexts);

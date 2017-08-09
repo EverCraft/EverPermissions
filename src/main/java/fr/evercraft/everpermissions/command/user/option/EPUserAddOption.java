@@ -137,7 +137,7 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		Set<Context> contexts = EContextCalculator.of(world_name);
 		
 		// La permission n'a pas été ajouté
 		if (!subject.getSubjectData().setOption(contexts, type, name)) {

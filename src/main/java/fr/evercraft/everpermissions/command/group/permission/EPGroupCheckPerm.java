@@ -114,7 +114,7 @@ public class EPGroupCheckPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		Tristate value = group.getPermissionValue(contexts, permission);
 		
 		// Permission : True

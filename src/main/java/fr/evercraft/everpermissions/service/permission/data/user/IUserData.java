@@ -16,53 +16,56 @@
  */
 package fr.evercraft.everpermissions.service.permission.data.user;
 
+import java.util.concurrent.CompletableFuture;
+
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 public interface IUserData {
     
-    public void load(EUserData subject);
+    public CompletableFuture<Boolean> load(EUserData subject);
     
     /*
      * Permissions
      */
 
-    public boolean setPermission(final String subject, final String world, final String  permission, final Tristate value, final boolean insert);
+    public CompletableFuture<Boolean> setPermission(final String subject, final String world, final String  permission, final Tristate value, final boolean insert);
 
-    public boolean clearPermissions(final String subject, final String world);
+    public CompletableFuture<Boolean> clearPermissions(final String subject, final String world);
     
-    public boolean clearPermissions(final String subject);
+    public CompletableFuture<Boolean> clearPermissions(final String subject);
     
     /*
      * Options
      */
     
-    public boolean setOption(final String subject, final String world, final String type, final String name, final boolean insert);
+    public CompletableFuture<Boolean> setOption(final String subject, final String world, final String type, final String name, final boolean insert);
 
-    public boolean clearOptions(final String subject, final String world);
+    public CompletableFuture<Boolean> clearOptions(final String subject, final String world);
 
-    public boolean clearOptions(final String subject);
+    public CompletableFuture<Boolean> clearOptions(final String subject);
 
     /*
      * Groups
      */
     
-    public boolean addParent(final String subject, final String world, final String parent);
+    public CompletableFuture<Boolean> addParent(final String subject, final String world, final SubjectReference parent, final boolean insert);
 
-    public boolean removeParent(final String subject, final String world, final String parent);
+    public CompletableFuture<Boolean> removeParent(final String subject, final String world, final SubjectReference parent);
 
-    public boolean clearParents(final String subject, final String world);
+    public CompletableFuture<Boolean> clearParents(final String subject, final String world);
 
-    public boolean clearParents(final String subject);
+    public CompletableFuture<Boolean> clearParents(final String subject);
     
     /*
      * SubGroups
      */
     
-    public boolean addSubParent(final String subject, final String world, final String parent);
+    public CompletableFuture<Boolean> addSubParent(final String subject, final String world, final SubjectReference parent);
 
-    public boolean removeSubParent(final String subject, final String world, final String parent);
+    public CompletableFuture<Boolean> removeSubParent(final String subject, final String world, final SubjectReference parent);
     
-    public boolean clearSubParents(final String subject, final String world);
+    public CompletableFuture<Boolean> clearSubParents(final String subject, final String world);
 
-    public boolean clearSubParents(final String subject);
+    public CompletableFuture<Boolean> clearSubParents(final String subject);
 }

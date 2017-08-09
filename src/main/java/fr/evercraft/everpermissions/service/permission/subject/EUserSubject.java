@@ -24,16 +24,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.MemorySubjectData;
-import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 import com.google.common.base.Preconditions;
 
+import fr.evercraft.everapi.event.PermUserEvent.Action;
+import fr.evercraft.everapi.util.Chronometer;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 import fr.evercraft.everpermissions.service.permission.data.user.ETransientUserData;
@@ -43,22 +46,30 @@ public class EUserSubject extends ESubject {
 	private final EUserData data;
 	private final ETransientUserData transientData;
 	
-    public EUserSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection collection) {
+    public EUserSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<ESubject> collection) {
     	super(plugin, identifier, collection);
 
     	this.data = new EUserData(this.plugin, this);
         this.transientData = new ETransientUserData(this.plugin, this);
     }
     
+    public CompletableFuture<Void> load() {
+    	Chronometer chronometer = new Chronometer();
+    	
+        this.plugin.getELogger().debug("Loading user '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
+        this.plugin.getManagerEvent().post(this, Action.USER_ADDED);
+		return null;
+	}
+    
     /*
      * Accesseurs
      */
     
-    public Optional<Subject> getSubject() {
+    public Optional<SubjectReference> getSubject() {
         return this.getSubject(this.getActiveContexts());
     }
     
-    public Optional<Subject> getSubject(final Set<Context> contexts) {
+    public Optional<SubjectReference> getSubject(final Set<Context> contexts) {
         return this.data.getParent(contexts);
     }
     
@@ -93,7 +104,7 @@ public class EUserSubject extends ESubject {
      */
 	
     public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {    	
-		Set<Context> contexts_user = this.plugin.getService().getContextCalculator().getContextUser(contexts);
+		Set<Context> contexts_user = this.plugin.getService().getContextCalculator().getUser(contexts);
 		// TempoData : Permissions
 		Tristate value = this.getTransientSubjectData().getNodeTree(contexts_user).get(permission);
 		if (!value.equals(Tristate.UNDEFINED)) {
@@ -102,10 +113,10 @@ public class EUserSubject extends ESubject {
 		}
     	
 		// TempoData : Groups
-    	Set<Context> contexts_group = this.plugin.getService().getContextCalculator().getContextGroup(contexts);
-    	Iterator<Subject> subjects = this.getTransientSubjectData().getParents(contexts_user).iterator();
+    	Set<Context> contexts_group = this.plugin.getService().getContextCalculator().getGroup(contexts);
+    	Iterator<SubjectReference> subjects = this.getTransientSubjectData().getParents(contexts_user).iterator();
     	while(subjects.hasNext()) {
-    		value = subjects.next().getPermissionValue(contexts_group, permission);
+    		value = subjects.next().resolve().join().getPermissionValue(contexts_group, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
     			this.plugin.getELogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
@@ -122,7 +133,7 @@ public class EUserSubject extends ESubject {
     	// SubjectData : SubGroup
     	subjects = this.getSubjectData().getSubParentsContexts(contexts_user).iterator();
     	while(subjects.hasNext()) {
-    		value = subjects.next().getPermissionValue(contexts_group, permission);
+    		value = subjects.next().resolve().join().getPermissionValue(contexts_group, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
     			this.plugin.getELogger().debug("SubjectData 'SubGroup' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
@@ -132,7 +143,7 @@ public class EUserSubject extends ESubject {
     	// SubjectData : Groups
     	subjects = this.getSubjectData().getParentsContexts(contexts_user).iterator();
     	while(subjects.hasNext()) {
-    		value = subjects.next().getPermissionValue(contexts_group, permission);
+    		value = subjects.next().resolve().join().getPermissionValue(contexts_group, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
     			this.plugin.getELogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
@@ -148,7 +159,7 @@ public class EUserSubject extends ESubject {
     
     @Override
     public Optional<String> getOption(final Set<Context> contexts, final String option) {
-    	Set<Context> contexts_user = this.plugin.getService().getContextCalculator().getContextUser(contexts);
+    	Set<Context> contexts_user = this.plugin.getService().getContextCalculator().getUser(contexts);
 		// TempoData : Permissions
 		String value = this.getTransientSubjectData().getOptions(contexts_user).get(option);
 		if (value != null) {
@@ -156,8 +167,8 @@ public class EUserSubject extends ESubject {
 		}
     	
 		// TempoData : Groups
-		Set<Context> contexts_group = this.plugin.getService().getContextCalculator().getContextGroup(contexts);
-    	Iterator<Subject> subjects = this.getTransientSubjectData().getParents(contexts_user).iterator();
+		Set<Context> contexts_group = this.plugin.getService().getContextCalculator().getGroup(contexts);
+    	Iterator<SubjectReference> subjects = this.getTransientSubjectData().getParents(contexts_user).iterator();
     	Optional<String> optValue;
     	while(subjects.hasNext()) {
     		optValue = ((ESubject) subjects.next()).getOption(contexts_group, option);
@@ -196,9 +207,9 @@ public class EUserSubject extends ESubject {
      */
     
     @Override
-    public List<Subject> getParents(final Set<Context> contexts) {
+    public List<SubjectReference> getParents(final Set<Context> contexts) {
     	Preconditions.checkNotNull(contexts, "contexts");
-    	List<Subject> list = new ArrayList<Subject>();
+    	List<SubjectReference> list = new ArrayList<SubjectReference>();
     	list.addAll(this.getSubjectData().getParents(contexts));
     	list.addAll(this.getSubjectData().getSubParents(contexts));
     	list.addAll(this.getTransientSubjectData().getParents(contexts));

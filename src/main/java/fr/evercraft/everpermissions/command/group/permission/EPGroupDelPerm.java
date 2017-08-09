@@ -115,7 +115,7 @@ public class EPGroupDelPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		
 		// La permission n'a pas été supprimé
 		if (!group.getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED)) {

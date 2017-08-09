@@ -20,15 +20,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
+
 import fr.evercraft.everapi.exception.ServerDisableException;
+import fr.evercraft.everapi.services.worldguard.region.ProtectedRegion;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
+import fr.evercraft.everworldguard.protection.EProtectionService;
+import fr.evercraft.everworldguard.protection.regions.EProtectedGlobalRegion;
+import fr.evercraft.everworldguard.protection.regions.EProtectedRegion;
 
 public class ESqlUserData implements IUserData {
 	private final EverPermissions plugin;
@@ -37,22 +48,61 @@ public class ESqlUserData implements IUserData {
         this.plugin = plugin;
     }
     
-    public void load(final EUserData subject) {
-    	Connection connection = null;
-    	try {
-    		connection = this.plugin.getManagerData().getDataBases().getConnection();
-    		
-	    	this.loadPermissions(connection, subject);
-			this.loadOptions(connection, subject);
-			this.loadGroups(connection, subject);
-		} catch (ServerDisableException e) {
-			e.execute();
-		} finally {
-			try {if (connection != null) connection.close();} catch (SQLException e) {}
-	    }
+    public CompletableFuture<Boolean> execute(final Function<Connection, Boolean> fun) {
+    	return CompletableFuture.supplyAsync(() -> {
+			Connection connection = null;
+			try {
+	    		return fun.apply(this.plugin.getManagerData().getDataBases().getConnection());
+			} catch (ServerDisableException e) {
+				e.execute();
+			} finally {
+				try {if (connection != null) connection.close();} catch (SQLException e) {}
+		    }
+			return false;
+		}, this.plugin.getThreadAsync());
     }
     
-    public void loadPermissions(final Connection connection, final EUserData subject) {
+    public CompletableFuture<Boolean> load(final EUserData subject) {
+    	return CompletableFuture.supplyAsync(() -> {
+			Connection connection = null;
+			try {
+				connection = this.plugin.getManagerData().getDataBases().getConnection();
+				
+				this.loadPermissions(connection, subject);
+				this.loadOptions(connection, subject);
+				this.loadGroups(connection, subject);
+			} catch (ServerDisableException e) {
+				e.execute();
+			} catch (SQLException e) {
+			} finally {
+				try {if (connection != null) connection.close();} catch (SQLException e) {}
+		    }
+			return false;
+		}, this.plugin.getThreadAsync());
+    }
+    
+    public CompletableFuture<Boolean> load(final List<EUserData> subjects) {
+    	return CompletableFuture.supplyAsync(() -> {
+			Connection connection = null;
+			try {
+				connection = this.plugin.getManagerData().getDataBases().getConnection();
+				
+				for (EUserData subject : subjects) {
+					this.loadPermissions(connection, subject);
+					this.loadOptions(connection, subject);
+					this.loadGroups(connection, subject);
+				}
+			} catch (ServerDisableException e) {
+				e.execute();
+			} catch (SQLException e) {
+			} finally {
+				try {if (connection != null) connection.close();} catch (SQLException e) {}
+		    }
+			return false;
+		}, this.plugin.getThreadAsync());
+    }
+    
+    public void loadPermissions(final Connection connection, final EUserData subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT *" 
 						+ "FROM `" + this.plugin.getManagerData().getDataBases().getTableUsersPermissions() + "` "
@@ -62,7 +112,7 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setString(1, subject.getIdentifier());
 			ResultSet list = preparedStatement.executeQuery();
 			while (list.next()) {
-				subject.setPermissionExecute(EContextCalculator.getContextWorld(list.getString("world")),list.getString("permission"), Tristate.fromBoolean(list.getBoolean("boolean")));
+				subject.setPermissionExecute(list.getString("world"), list.getString("permission"), Tristate.fromBoolean(list.getBoolean("boolean")));
 				this.plugin.getELogger().debug("Loading : ("
 						+ "identifier='" + subject.getIdentifier() + "';"
 						+ "permission='" + list.getString("permission") + "';"
@@ -71,12 +121,13 @@ public class ESqlUserData implements IUserData {
 			}
 		} catch (SQLException e) {
 			this.plugin.getELogger().warn("Permissions error when loading : " + e.getMessage());
+			throw e;
 		} finally {
 			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
 	}
 
-	public void loadOptions(final Connection connection, final EUserData subject) {
+	public void loadOptions(final Connection connection, final EUserData subject) throws SQLException {
 		PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT *" 
 						+ "FROM `" + this.plugin.getManagerData().getDataBases().getTableUsersOptions() + "` "
@@ -86,7 +137,7 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setString(1, subject.getIdentifier());
 			ResultSet list = preparedStatement.executeQuery();
 			while (list.next()) {
-				subject.setOptionExecute(EContextCalculator.getContextWorld(list.getString("world")), list.getString("option"), list.getString("value"));
+				subject.setOptionExecute(list.getString("world"), list.getString("option"), list.getString("value"));
 				this.plugin.getELogger().debug("Loading : ("
 						+ "identifier=" + subject.getIdentifier() + ";"
 						+ "option=" + list.getString("option") + ";"
@@ -95,12 +146,13 @@ public class ESqlUserData implements IUserData {
 			}
 		} catch (SQLException e) {
 			this.plugin.getELogger().warn("Options error when loading : " + e.getMessage());
+			throw e;
 		} finally {
 			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
 	}
 
-	public void loadGroups(final Connection connection, final EUserData subject) {
+	public void loadGroups(final Connection connection, final EUserData subject) throws SQLException {
 		PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT *" 
 						+ "FROM `" + this.plugin.getManagerData().getDataBases().getTableUsersGroups() + "` "
@@ -110,19 +162,18 @@ public class ESqlUserData implements IUserData {
 			preparedStatement.setString(1, subject.getIdentifier());
 			ResultSet list = preparedStatement.executeQuery();
 			while(list.next()) {
-				Subject group = this.plugin.getService().getGroupSubjects().get(list.getString("group"));
+				Subject group = this.plugin.getService().getGroupSubjects().loadSubject(list.getString("group")).join();
 				if (group != null) {
-					Set<Context> contexts = EContextCalculator.getContextWorld(list.getString("world"));
 					// Chargement des sous-groupes
-					if (!list.getBoolean("subgroup") && subject.getParents(contexts).isEmpty()) {
-						subject.addParentExecute(contexts, group);
+					if (!list.getBoolean("subgroup") && subject.getParents(list.getString("world")).isEmpty()) {
+						subject.addParentExecute(list.getString("world"), group.asSubjectReference());
 						this.plugin.getELogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "group=" + list.getString("group") + ";"
 	    						+ "type=" + list.getString("world") + ")");
 					// Chargement du groupe
 					} else {
-						subject.addSubParentExecute(contexts, group);
+						subject.addSubParentExecute(list.getString("world"), group.asSubjectReference());
 						this.plugin.getELogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "subgroup=" + list.getString("group") + ";"
@@ -132,6 +183,7 @@ public class ESqlUserData implements IUserData {
 			}
 		} catch (SQLException e) {
 			this.plugin.getELogger().warn("Groups error when loading : " + e.getMessage());
+			throw e;
 		} finally {
 			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
@@ -141,7 +193,7 @@ public class ESqlUserData implements IUserData {
      * Permissions
      */
 	
-	public boolean setPermission(final String subject, final String world, final String permission, Tristate value, final boolean insert) {
+	public CompletableFuture<Boolean> setPermission(final String subject, final String world, final String permission, Tristate value, final boolean insert) {
 		this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> setPermissionAsync(subject, world, permission, value, insert))
 			.name("Permission : setPermission").submit(this.plugin);
 		return true;

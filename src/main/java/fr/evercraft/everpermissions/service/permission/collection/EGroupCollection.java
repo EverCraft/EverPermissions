@@ -29,45 +29,35 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 import com.google.common.reflect.TypeToken;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class EGroupCollection extends ESubjectCollection {
+public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 	private final ConcurrentMap<String, EGroupSubject> groups_default;
-    private final ConcurrentMap<String, EGroupSubject> subject;
 
     public EGroupCollection(final EverPermissions plugin) {
     	super(plugin, PermissionService.SUBJECTS_GROUP);
     	this.groups_default = new ConcurrentHashMap<String, EGroupSubject>();
-    	this.subject = new ConcurrentHashMap<String, EGroupSubject>();
-    }
-    
-    @Override
-    public EGroupSubject get(final String identifier) {
-    	return this.subject.get(identifier.toLowerCase());
-    }
-    
-	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-    public Iterable<Subject> getAllSubjects() {
-        return (Iterable) this.subject.values();
-    }
-    
-    @Override
-    public boolean hasRegistered(final String identifier) {
-    	return subject.containsKey(identifier.toLowerCase());
     }
     
     public void reload() {}
+    
+    @Override
+	protected EGroupSubject add(String identifier) {
+		return new EGroupSubject(this.plugin, identifier, this);
+	}
     
     /*
      * Groupe
@@ -134,7 +124,7 @@ public class EGroupCollection extends ESubjectCollection {
 		if (conf.isPresent()) {
 			Optional<String> type = this.plugin.getManagerData().getTypeGroup(world_name);
 			if (type.isPresent()) {
-				Set<Context> contexts = EContextCalculator.getContextWorld(type.get());
+				Set<Context> contexts = EContextCalculator.of(type.get());
 				// Chargement des permissions et des options
 				for (Entry<Object, ? extends ConfigurationNode> group : conf.get().getNode().getChildrenMap().entrySet()) {
 					if (group.getKey() instanceof String) {
@@ -322,5 +312,36 @@ public class EGroupCollection extends ESubjectCollection {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public CompletableFuture<Boolean> hasSubject(String identifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Map<String, Subject>> loadSubjects(Set<String> identifiers) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Set<String>> getAllIdentifiers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(String permission) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(Set<Context> contexts,
+			String permission) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -36,6 +36,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -47,7 +48,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 import fr.evercraft.everpermissions.storage.EPConfUsers;
 import fr.evercraft.everpermissions.storage.EPManagerStorage;
 
@@ -216,7 +216,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			    	    			// Chargement les sous-groupes
 			    	    			try {
 			    						for (String subgroup : conf.getValue().getNode("subgroups").getList(TypeToken.of(String.class))) {
-			    							EGroupSubject subject = this.plugin.getService().getGroupSubjects().get(subgroup);
+			    							Subject subject = this.plugin.getService().getGroupSubjects().loadSubject(subgroup).join();
 			    							if (subject != null) {
 			    								preparedGroups.setString(1, user);
 			    								preparedGroups.setString(2, world);
@@ -230,7 +230,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			    	    			// Chargement du groupe
 			    	    			String group = conf.getValue().getNode("group").getString(null);
 			    	    			if (group != null) {
-			    	    				EGroupSubject subject = this.plugin.getService().getGroupSubjects().get(group);
+			    	    				Subject subject = this.plugin.getService().getGroupSubjects().loadSubject(group).join();
 		    							if (subject != null) {
 		    								preparedGroups.setString(1, user);
 		    								preparedGroups.setString(2, world);
@@ -335,7 +335,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 				while (list.next()) {
 					// Si c'est un sous-groupe
 					if (list.getBoolean("subgroup")) {
-						EGroupSubject subject = this.plugin.getService().getGroupSubjects().get(list.getString("group"));
+						Subject subject = this.plugin.getService().getGroupSubjects().loadSubject(list.getString("group")).join();
 						if (subject != null) {
 							List<String> subgroups;
 							try {
@@ -346,7 +346,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 						}
 					// Si c'est un groupe
 					} else {
-						EGroupSubject subject = this.plugin.getService().getGroupSubjects().get(list.getString("group"));
+						Subject subject = this.plugin.getService().getGroupSubjects().loadSubject(list.getString("group")).join();
 						if (subject != null) {
 							config.getNode().getNode(list.getString("uuid")).getNode("group").setValue(subject.getIdentifier());
 						}

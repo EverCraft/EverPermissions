@@ -63,40 +63,7 @@ public class EGroupSubject extends ESubject {
 	/*
      * Permissions
      */
-	
-	@Override
-    public Tristate getPermissionValue(final Set<Context> type_contexts, final String permission) {
-    	// TempoData : Permissions
-    	Tristate value = this.getTransientSubjectData().getNodeTree(type_contexts).get(permission);
-		if (!value.equals(Tristate.UNDEFINED)) {
-			return value;
-		}
-    	
-		// TempoData : Groupes
-    	Iterator<Subject> subjects = this.getTransientSubjectData().getParents(type_contexts).iterator();
-    	while(subjects.hasNext()) {
-    		value = subjects.next().getPermissionValue(type_contexts, permission);
-    		if (!value.equals(Tristate.UNDEFINED)) {
-    			return value;
-    		}
-    	}
-    	
-    	// MemoryData : Permissions
-		value = this.getSubjectData().getNodeTree(type_contexts).getTristate(permission);
-		if (!value.equals(Tristate.UNDEFINED)) {
-			return value;
-		}
-    	
-		// MemoryData : Groupes
-    	subjects = this.getSubjectData().getParents(type_contexts).iterator();
-    	while(subjects.hasNext()) {
-    		Tristate tristate = subjects.next().getPermissionValue(type_contexts, permission);
-    		if (!tristate.equals(Tristate.UNDEFINED)) {
-    			return tristate;
-    		}
-    	}
-        return Tristate.UNDEFINED;
-    }
+
 	
 	/*
 	 * World
@@ -115,7 +82,7 @@ public class EGroupSubject extends ESubject {
 	}
 	
 	public void clear(final String type) {
-		Set<Context> contexts = EContextCalculator.getContextWorld(type);
+		Set<Context> contexts = EContextCalculator.of(type);
 		
 		this.getSubjectData().clearParentsExecute(contexts);
 		this.getSubjectData().clearOptionsExecute(contexts);

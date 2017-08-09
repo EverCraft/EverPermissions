@@ -133,7 +133,7 @@ public class EPGroupAddInheritance extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		// L'inheritance n'a pas été ajouté
 		if (!group.getSubjectData().addParent(contexts, inheritance)) {
 			EPMessages.GROUP_ADD_INHERITANCE_ERROR_HAVE.sender()

@@ -135,7 +135,7 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		Set<Context> contexts = EContextCalculator.of(world_name);
 		Optional<Subject> group = subject.getSubjectData().getParent(contexts);
 		
 		// Le groupe n'a pas été supprimé

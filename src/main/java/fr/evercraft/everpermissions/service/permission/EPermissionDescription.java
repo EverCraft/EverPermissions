@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 
 import fr.evercraft.everpermissions.service.EPermissionService;
 
@@ -29,66 +30,74 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import javax.annotation.Nullable;
 
 public class EPermissionDescription implements PermissionDescription {
     private final EPermissionService service;
-    private final String id;
+    private final String permission;
     private final Text description;
     private final PluginContainer plugin;
 
-    public EPermissionDescription(EPermissionService service, PluginContainer plugin, String id, Text description) {
+    public EPermissionDescription(EPermissionService service, PluginContainer plugin, String permission, Text description) {
     	this.service = checkNotNull(service, "service");
-        this.id = checkNotNull(id, "id");
+        this.permission = checkNotNull(permission, "permission");
         this.description = checkNotNull(description, "description");
         this.plugin = checkNotNull(plugin, "owner");
     }
 
     @Override
     public String getId() {
-        return this.id;
+        return this.permission;
     }
 
     @Override
-    public Text getDescription() {
-        return this.description;
+    public Optional<Text> getDescription() {
+        return Optional.ofNullable(this.description);
     }
 
     @Override
     public Map<Subject, Boolean> getAssignedSubjects(String type) {
-        return this.service.getSubjects(type).getAllWithPermission(getId());
-    }
-
-    @Override
-    public PluginContainer getOwner() {
-        return this.plugin;
+    	Optional<SubjectCollection> collection = this.service.getCollection(type);
+    	if (!collection.isPresent()) return ImmutableMap.of();
+    	
+        return collection.get().getLoadedWithPermission(this.permission);
     }
     
     @Override
-    public int hashCode() {
-        return this.id.hashCode();
+	public CompletableFuture<Map<SubjectReference, Boolean>> findAssignedSubjects(String type) {
+		return this.service.loadCollection(type)
+			.thenComposeAsync(collection -> {
+				return collection.getAllWithPermission(this.permission);
+			});
+	}
+
+    @Override
+    public Optional<PluginContainer> getOwner() {
+        return Optional.ofNullable(this.plugin);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
+        if (this == obj) return true;
+        if (!(obj instanceof EPermissionDescription)) return false;
+        
         EPermissionDescription other = (EPermissionDescription) obj;
-        return this.id.equals(other.id) && this.plugin.equals(other.plugin) && this.description.equals(other.description);
+        return this.permission.equals(other.permission) && this.plugin == other.plugin && this.description == other.description;
     }
     
     @Override
 	public String toString() {
-		return "EPermissionDescription [id=" + id + ", description=" + description + "]";
+		return "EPermissionDescription [permission=" + permission + ", description=" + description + "]";
 	}
 
 	public static class Builder implements PermissionDescription.Builder {
@@ -112,7 +121,7 @@ public class EPermissionDescription implements PermissionDescription {
         }
 
         @Override
-        public Builder description(Text description) {
+        public Builder description(@Nullable Text description) {
             this.description = checkNotNull(description, "description");
             return this;
         }
@@ -127,14 +136,13 @@ public class EPermissionDescription implements PermissionDescription {
         @Override
         public EPermissionDescription register() throws IllegalStateException {
             checkState(this.id != null, "No id set");
-            checkState(this.description != null, "No description set");
             EPermissionDescription description = new EPermissionDescription(this.service, this.plugin, this.id, this.description);
             this.service.registerDescription(description);
 
             // Set role-templates
-            SubjectCollection subjects = this.service.getSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE);
+            SubjectCollection subjects = this.service.loadCollection(PermissionService.SUBJECTS_ROLE_TEMPLATE).join();
             for (Entry<String, Tristate> assignment : this.roleAssignments.entrySet()) {
-                Subject subject = subjects.get(assignment.getKey());
+                Subject subject = subjects.loadSubject(assignment.getKey()).join();
                 subject.getTransientSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, this.id, assignment.getValue());
             }
             return description;

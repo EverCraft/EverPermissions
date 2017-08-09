@@ -135,7 +135,7 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		Set<Context> contexts = EContextCalculator.of(world_name);
 		
 		// L'option n'a pas été supprimé
 		if (!subject.getSubjectData().setOption(contexts, type, null)) {

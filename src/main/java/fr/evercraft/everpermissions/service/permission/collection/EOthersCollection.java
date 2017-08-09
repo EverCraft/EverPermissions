@@ -16,70 +16,58 @@
  */
 package fr.evercraft.everpermissions.service.permission.collection;
 
-import fr.evercraft.everapi.event.PermOtherEvent.Action;
-import fr.evercraft.everapi.util.Chronometer;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.EPermissionService;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
-public class EOthersCollection extends ESubjectCollection {
-	private final ConcurrentMap<String, EOtherSubject> subjects;
+public class EOthersCollection extends ESubjectCollection<EOtherSubject> {
 	
     public EOthersCollection(final EverPermissions plugin, final String identifier) {
     	super(plugin, identifier);
-    	this.subjects = new ConcurrentHashMap<String, EOtherSubject>();
     }
-    
-    @Override
-    public EOtherSubject get(String identifier) {
-    	identifier = getIdentifier(identifier);
-    	
-		if (!this.subjects.containsKey(identifier)) {
-			Chronometer chronometer = new Chronometer();
-			
-			EOtherSubject subject = new EOtherSubject(this.plugin, identifier, EOthersCollection.this);
-			this.subjects.put(identifier, subject);
-			
-			this.plugin.getELogger().debug("Loading other '" + identifier + "' in " +  chronometer.getMilliseconds().toString() + " ms");
-			this.plugin.getManagerEvent().post(subject, Action.OTHER_ADDED);
-			
-			return subject;
-    	}
-    	return this.subjects.get(identifier);
-    }
-    
-    @Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-    public Iterable<Subject> getAllSubjects() {
-        return (Iterable) this.subjects.values();
-    }
-    
-    @Override
-    public boolean hasRegistered(String identifier) {
-    	return this.subjects.containsKey(getIdentifier(identifier));
-    }
-	
+
 	@Override
-	public void reload() {
-		for (EOtherSubject subject : this.subjects.values()) {
-			subject.reload();
-		}
+	public CompletableFuture<Boolean> hasSubject(String identifier) {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
-	/**
-	 * Change le nom des commandblocks
-	 * @param identifier Le nom du subject
-	 * @return Le nom
-	 */
-	public String getIdentifier(String identifier) {
-		if (identifier.equals("@")){
-    		identifier = EPermissionService.IDENTIFIER_COMMAND_BLOCK;
-    	}
-		return identifier;
+
+	@Override
+	public CompletableFuture<Map<String, Subject>> loadSubjects(Set<String> identifiers) {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+	@Override
+	public CompletableFuture<Set<String>> getAllIdentifiers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(String permission) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(Set<Context> contexts,
+			String permission) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected EOtherSubject add(String identifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+    
 }

@@ -30,9 +30,9 @@ import org.spongepowered.api.util.Tristate;
 
 import fr.evercraft.everapi.event.PermOtherEvent.Action;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.data.EOptionSubjectData;
+import fr.evercraft.everpermissions.service.permission.data.ESubjectData;
 
-public class EOtherData extends EOptionSubjectData {
+public class EOtherData extends ESubjectData {
     public EOtherData(final EverPermissions plugin, final Subject subject) {
     	super(plugin, subject);
     	

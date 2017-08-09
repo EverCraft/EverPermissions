@@ -127,7 +127,7 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		// L'inheritance n'a pas été supprimé
 		if (!group.getSubjectData().removeParent(contexts, inheritance)) {
 			EPMessages.GROUP_DEL_INHERITANCE_ERROR.sender()

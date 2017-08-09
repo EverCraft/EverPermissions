@@ -36,11 +36,11 @@ import com.google.common.reflect.TypeToken;
 import fr.evercraft.everapi.event.PermGroupEvent.Action;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.data.EOptionSubjectData;
+import fr.evercraft.everpermissions.service.permission.data.ESubjectData;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 import fr.evercraft.everpermissions.storage.EPConfGroups;
 
-public class EGroupData extends EOptionSubjectData {
+public class EGroupData extends ESubjectData {
 
     public EGroupData(final EverPermissions plugin, final EGroupSubject subject) {
         super(plugin, subject);

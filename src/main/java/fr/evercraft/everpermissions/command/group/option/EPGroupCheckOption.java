@@ -115,7 +115,7 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 		}
 
 
-		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		String name = group.getSubjectData().getOptions(contexts).get(option);
 		// Si il y a une valeur
 		if (name == null) {

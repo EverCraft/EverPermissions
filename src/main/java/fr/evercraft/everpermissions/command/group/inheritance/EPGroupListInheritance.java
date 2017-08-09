@@ -28,6 +28,7 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -112,11 +113,11 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		List<Text> list = new ArrayList<Text>();
 
 		// La liste des inheritances
-		List<Subject> groups = group.getSubjectData().getParents(contexts);
+		List<SubjectReference> groups = group.getSubjectData().getParents(contexts);
 		if (groups.isEmpty()) {
 			list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_EMPTY.getText());
 		} else {

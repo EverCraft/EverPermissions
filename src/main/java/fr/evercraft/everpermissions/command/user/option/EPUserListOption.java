@@ -134,7 +134,7 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		Set<Context> contexts = EContextCalculator.of(world_name);
 		List<Text> list = new ArrayList<Text>();
 		
 		// La liste des options

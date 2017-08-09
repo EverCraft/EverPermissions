@@ -147,7 +147,7 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		Set<Context> contexts = EContextCalculator.of(world_name);
 		
 		// Le sous-groupe n'a pas été ajouté
 		if (!subject.getSubjectData().addSubParent(contexts, group)) {

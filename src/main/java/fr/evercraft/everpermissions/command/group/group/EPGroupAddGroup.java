@@ -97,7 +97,7 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		EGroupSubject group = this.plugin.getService().getGroupSubjects().loadSubject(group_name).join();
 		// Groupe existant
 		if (group != null && group.hasWorld(type_group.get())) {
 			EPMessages.GROUP_ADD_GROUP_ERROR.sender()

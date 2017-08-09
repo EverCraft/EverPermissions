@@ -16,7 +16,7 @@
  */
 package fr.evercraft.everpermissions.service;
 
-import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import fr.evercraft.everapi.exception.PluginDisableException;
@@ -25,13 +25,14 @@ import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.EPermissionDescription;
-import fr.evercraft.everpermissions.service.permission.collection.EDefaultsCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EOthersCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EGroupCollection;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 import fr.evercraft.everpermissions.service.permission.collection.ETemplateCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EUserCollection;
 import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
+import fr.evercraft.everpermissions.service.permission.subject.ESubject;
+import fr.evercraft.everpermissions.service.permission.subject.ESubjectReference;
 import fr.evercraft.everpermissions.service.permission.subject.ETempateSubject;
 
 import org.spongepowered.api.command.CommandSource;
@@ -40,20 +41,26 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.service.context.ContextCalculator;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.Predicate;
 
 public class EPermissionService implements PermissionService {
 	public static final String IDENTIFIER_COMMAND_BLOCK = "CommandBlock";
-	public static final String SUBJECTS_DEFAULTS = "default";
+	public static final String SUBJECT_DEFAULT = "Default";
 	
 	private final EverPermissions plugin;
 
@@ -63,20 +70,20 @@ public class EPermissionService implements PermissionService {
     private final EGroupCollection groupCollection;
     private final EOthersCollection commandBlockCollection;
 	private final EOthersCollection systemCollection;
-	private final EDefaultsCollection defaultsCollection;
+	private final EOthersCollection defaultsCollection;
     
     private final EContextCalculator contextCalculator;
     
     private final CopyOnWriteArraySet<ContextCalculator<Subject>> contextCalculators;
-    private final ConcurrentMap<String, ESubjectCollection> subjectCollections; 
+    private final ConcurrentMap<String, ESubjectCollection<?>> subjectCollections; 
     private final ConcurrentMap<String, EPermissionDescription> descriptions;
 
     public EPermissionService(final EverPermissions plugin) throws PluginDisableException {
     	this.plugin = plugin;
     	
     	// Default
-    	this.defaultsCollection = new EDefaultsCollection(this.plugin);
-    	this.defaults = new ETempateSubject(this.plugin, SUBJECTS_DEFAULTS, this.defaultsCollection, this);
+    	this.defaultsCollection = new EOthersCollection(this.plugin, PermissionService.SUBJECTS_DEFAULT);
+    	this.defaults = new EOtherSubject(this.plugin, SUBJECT_DEFAULT, this.defaultsCollection);
     	
     	this.descriptions = new ConcurrentHashMap<String, EPermissionDescription>();
     	
@@ -91,12 +98,13 @@ public class EPermissionService implements PermissionService {
     	this.systemCollection = new EOthersCollection(this.plugin, PermissionService.SUBJECTS_SYSTEM);
     	this.commandBlockCollection = new EOthersCollection(this.plugin, PermissionService.SUBJECTS_COMMAND_BLOCK);
     	
-    	this.subjectCollections = new ConcurrentHashMap<String, ESubjectCollection>();
-    	this.subjectCollections.put(PermissionService.SUBJECTS_USER, this.userCollection);
-    	this.subjectCollections.put(PermissionService.SUBJECTS_GROUP, this.groupCollection);
-    	this.subjectCollections.put(PermissionService.SUBJECTS_SYSTEM, this.systemCollection);
-    	this.subjectCollections.put(PermissionService.SUBJECTS_COMMAND_BLOCK, this.commandBlockCollection);
-    	this.subjectCollections.put(PermissionService.SUBJECTS_ROLE_TEMPLATE, new ETemplateCollection(this.plugin));
+    	this.subjectCollections = new ConcurrentHashMap<String, ESubjectCollection<?>>();
+    	this.subjectCollections.put(PermissionService.SUBJECTS_USER.toLowerCase(), this.userCollection);
+    	this.subjectCollections.put(PermissionService.SUBJECTS_GROUP.toLowerCase(), this.groupCollection);
+    	this.subjectCollections.put(PermissionService.SUBJECTS_SYSTEM.toLowerCase(), this.systemCollection);
+    	this.subjectCollections.put(PermissionService.SUBJECTS_COMMAND_BLOCK.toLowerCase(), this.commandBlockCollection);
+    	this.subjectCollections.put(PermissionService.SUBJECTS_DEFAULT.toLowerCase(), this.defaultsCollection);
+    	this.subjectCollections.put(PermissionService.SUBJECTS_ROLE_TEMPLATE.toLowerCase(), new ETemplateCollection(this.plugin));
     }
     
     /**
@@ -161,19 +169,35 @@ public class EPermissionService implements PermissionService {
 	}
     
     @Override
-    public ESubjectCollection getSubjects(final String identifier) {
-    	Preconditions.checkNotNull(identifier, "identifier");
-    	if (!this.subjectCollections.containsKey(identifier)) {
-    		 this.subjectCollections.putIfAbsent(identifier, new EOthersCollection(this.plugin, identifier));
-    	}
-    	return this.subjectCollections.get(identifier);
-    }
+	public CompletableFuture<SubjectCollection> loadCollection(String identifier) {
+		ESubjectCollection collection = this.subjectCollections.get(identifier.toLowerCase());
+		if (collection != null) return CompletableFuture.completedFuture(collection);
+		
+		collection = new EOthersCollection(this.plugin, identifier);
+		this.subjectCollections.put(identifier.toLowerCase(), collection);
+		return collection.load();
+	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-    public ConcurrentMap<String, SubjectCollection> getKnownSubjects() {
-        return (ConcurrentMap) this.subjectCollections;
-    }
+	public Optional<SubjectCollection> getCollection(String identifier) {
+		return Optional.ofNullable(this.subjectCollections.get(identifier.toLowerCase()));
+	}
+
+	@Override
+	public CompletableFuture<Boolean> hasCollection(String identifier) {
+		if (this.subjectCollections.containsKey(identifier.toLowerCase())) return CompletableFuture.completedFuture(true);
+		
+		return CompletableFuture.supplyAsync(() -> {
+			File[] files = this.plugin.getPath().resolve("others").toFile().listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File directory, String fileName) {
+			        return fileName.endsWith(".conf") && fileName.equalsIgnoreCase(identifier + ".conf");
+				}
+			});
+		
+			return files.length != 0;
+		});
+	}
 	
 	/*
 	 * Context
@@ -191,12 +215,12 @@ public class EPermissionService implements PermissionService {
      */
     
     @Override
-    public Optional<PermissionDescription.Builder> newDescriptionBuilder(final Object instance) {
+    public PermissionDescription.Builder newDescriptionBuilder(final Object instance) {
         Optional<PluginContainer> container = this.plugin.getGame().getPluginManager().fromInstance(instance);
-        if (container.isPresent()) {
-        	return Optional.of(new EPermissionDescription.Builder(this, container.get()));
+        if (!container.isPresent()) {
+        	throw new IllegalArgumentException("Couldn't find a plugin container for " + instance.getClass().getSimpleName());
         }
-        return Optional.empty();
+        return new EPermissionDescription.Builder(this, container.get());
     }
 
     @Override
@@ -225,5 +249,43 @@ public class EPermissionService implements PermissionService {
 	public void broadcastMessage(CommandSource staff, UUID uuid, EMessageSender message) {
 		message.sendAll(this.plugin.getEServer().getOnlineEPlayers(), other -> 
 			!other.equals(staff) && !uuid.equals(other.getUniqueId()) &&  other.hasPermission(EPPermissions.BROADCAST.get()));
+	}
+
+	@Override
+	public Predicate<String> getIdentifierValidityPredicate() {
+		return value -> true;
+	}
+
+	@Override
+	public Map<String, SubjectCollection> getLoadedCollections() {
+		return ImmutableMap.copyOf(this.subjectCollections);
+	}
+
+	@Override
+	public CompletableFuture<Set<String>> getAllIdentifiers() {
+		return CompletableFuture.supplyAsync(() -> {
+			ImmutableSet.Builder<String> identifiers = ImmutableSet.builder();
+			for (ESubjectCollection collection : this.subjectCollections.values()) {
+				identifiers.add(collection.getIdentifier());
+			}
+
+			File[] files = this.plugin.getPath().resolve("others").toFile().listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File directory, String fileName) {
+			        return fileName.endsWith(".conf");
+				}
+			});
+		
+			for (File file : files) {
+				identifiers.add(file.getName().replace("(.conf)$", ""));
+			}
+			
+			return identifiers.build();
+		});
+	}
+
+	@Override
+	public SubjectReference newSubjectReference(String collectionIdentifier, String subjectIdentifier) {
+		return new ESubjectReference(this, collectionIdentifier, subjectIdentifier);
 	}
 }

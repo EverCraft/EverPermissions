@@ -114,7 +114,7 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		List<Text> list = new ArrayList<Text>();
 		
 		// La liste des permissions

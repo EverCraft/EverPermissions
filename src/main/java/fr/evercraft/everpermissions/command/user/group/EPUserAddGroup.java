@@ -136,7 +136,7 @@ public class EPUserAddGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		Set<Context> contexts = EContextCalculator.of(world_name);
 		
 		// Le groupe n'a pas été ajouté
 		if (!user.getSubjectData().addParent(contexts, group)) {

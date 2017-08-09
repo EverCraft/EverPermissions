@@ -113,7 +113,7 @@ public class EPGroupDelOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 
-		Set<Context> contexts = EContextCalculator.getContextWorld(type_group.get());
+		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		// L'option n'a pas été supprimé
 		if (group.getSubjectData().setOption(contexts, option, null)) {
 			EPMessages.GROUP_DEL_OPTION_ERROR.sender()

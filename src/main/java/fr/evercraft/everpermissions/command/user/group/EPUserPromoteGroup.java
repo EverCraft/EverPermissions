@@ -148,7 +148,7 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.getContextWorld(world_name);
+		Set<Context> contexts = EContextCalculator.of(world_name);
 		Optional<Subject> parent = subject.getSubjectData().getParent(contexts);
 		
 		// Le groupe du joueur est égale au nouveau groupe
@@ -170,7 +170,7 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 		}
 		
 		// Le groupe est supérieur au groupe actuelle du joueur
-		if (parent.isPresent() && parent.get().isChildOf(EContextCalculator.getContextWorld(type_group.get()), group)) {
+		if (parent.isPresent() && parent.get().isChildOf(EContextCalculator.of(type_group.get()), group)) {
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_PROMOTE_ERROR_DEMOTE_EQUALS.sender()
 					.replace("<player>", user.getName())

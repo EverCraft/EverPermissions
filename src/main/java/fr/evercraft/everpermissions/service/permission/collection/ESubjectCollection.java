@@ -17,62 +17,124 @@
 package fr.evercraft.everpermissions.service.permission.collection;
 
 import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.permission.subject.ESubject;
+import fr.evercraft.everpermissions.service.permission.subject.ESubjectReference;
 
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.util.Tristate;
 
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
+import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Predicate;
 
 /**
  * Subject collection
  */
-public abstract class ESubjectCollection implements SubjectCollection {
+public abstract class ESubjectCollection<T extends ESubject> implements SubjectCollection {
 	protected final EverPermissions plugin;
-    private final String identifier;
+	
+	private final String identifier;
+	protected final ConcurrentMap<String, T> subjects;
 
-    public ESubjectCollection(final EverPermissions plugin, final String identifier) {
-    	this.plugin = plugin;
-        this.identifier = identifier;
-    }
-    
-    @Override
-    public String getIdentifier() {
-        return this.identifier;
-    }
-    
-    @Override
-    public Subject getDefaults() {
-        return this.plugin.getService().getDefaults();
-    }
-    
-    @Override
-    public Map<Subject, Boolean> getAllWithPermission(final String permission) {
-    	final Map<Subject, Boolean> map = new HashMap<Subject, Boolean>();
-        for (Subject subject : getAllSubjects()) {
-            Tristate value = subject.getPermissionValue(subject.getActiveContexts(), permission);
-            if (value != Tristate.UNDEFINED) {
-            	map.put(subject, value.asBoolean());
-            }
-        }
-        return Collections.unmodifiableMap(map);
-    }
+	public ESubjectCollection(final EverPermissions plugin, final String identifier) {
+		this.plugin = plugin;
+		this.identifier = identifier;
+		
+		this.subjects = new ConcurrentHashMap<String, T>();
+	}
+	
+	/**
+	 * Rechargement : Vide le cache et recharge tous les joueurs
+	 */
+	public void reload() {
+		for (T subject : this.subjects.values()) {
+			subject.reload();
+		}
+	}
+	
+	public CompletableFuture<Void> load() {
+		return CompletableFuture.runAsync(() -> {});
+	}
+	
+	protected abstract T add(String identifier);
+	
+	@Override
+	public CompletableFuture<Subject> loadSubject(String identifier) {
+		ESubject cache = this.subjects.get(identifier);
+		if (cache != null) return CompletableFuture.completedFuture(cache);
+		
+		final T subject = this.add(identifier);
+		this.subjects.put(subject.getIdentifier().toLowerCase(), subject);
+		
+		return subject.load().thenApply(e -> subject);
+	}
+	
+	@Override
+	public void suggestUnload(String identifier) {
+		this.subjects.remove(identifier);
+	}
 
-    @Override
-    public Map<Subject, Boolean> getAllWithPermission(final Set<Context> contexts, final String permission) {
-    	final Map<Subject, Boolean> ret = new HashMap<Subject, Boolean>();
-        for (Subject subject : getAllSubjects()) {
-            Tristate value = subject.getPermissionValue(contexts, permission);
-            if (value != Tristate.UNDEFINED) {
-                ret.put(subject, value.asBoolean());
-            }
-        }
-        return Collections.unmodifiableMap(ret);
-    }
-    
-    public abstract void reload();
+	@Override
+	public Optional<Subject> getSubject(String identifier) {
+		return Optional.ofNullable(this.subjects.get(identifier));
+	}
+	
+	@Override
+	public Collection<Subject> getLoadedSubjects() {
+		return ImmutableSet.copyOf(this.subjects.values());
+	}
+	
+	public Predicate<String> getIdentifierValidityPredicate() {
+		return subject -> true;
+	}
+	
+	@Override
+	public String getIdentifier() {
+		return this.identifier;
+	}
+	
+	@Override
+	public Subject getDefaults() {
+		return this.plugin.getService().getDefaults();
+	}
+	
+	@Override
+	public SubjectReference newSubjectReference(String subjectIdentifier) {
+		return new ESubjectReference(this.plugin.getService(), this.getIdentifier(), subjectIdentifier);
+	}
+	
+	@Override
+	public Map<Subject, Boolean> getLoadedWithPermission(String permission) {
+		ImmutableMap.Builder<Subject, Boolean> builder = ImmutableMap.builder();
+		for (Subject subject : this.subjects.values()) {
+			Tristate value = subject.getPermissionValue(subject.getActiveContexts(), permission);
+			if (!value.equals(Tristate.UNDEFINED)) {
+				builder.put(subject, value.asBoolean());
+			}
+		}
+		return builder.build();
+	}
+
+	@Override
+	public Map<Subject, Boolean> getLoadedWithPermission(Set<Context> contexts, String permission) {
+		ImmutableMap.Builder<Subject, Boolean> builder = ImmutableMap.builder();
+		for (Subject subject : this.subjects.values()) {
+			Tristate value = subject.getPermissionValue(contexts, permission);
+			if (!value.equals(Tristate.UNDEFINED)) {
+				builder.put(subject, value.asBoolean());
+			}
+		}
+		return builder.build();
+	}
 }
