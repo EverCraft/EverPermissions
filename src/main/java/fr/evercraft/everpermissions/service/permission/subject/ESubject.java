@@ -20,42 +20,47 @@ import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectReference;
-import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.service.context.Context;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public abstract class ESubject implements Subject {
 	protected final EverPermissions plugin;
 	
-	private final ESubjectCollection<ESubject> collection;
-	
+	private final ESubjectCollection<?> collection;
 	protected final String identifier;
+	protected String name;
+	
+	// MultiThreading
+	private final ReadWriteLock lock;
+	protected final Lock write_lock;
+	protected final Lock read_lock;
 
-	public ESubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<ESubject> collection) {
+	public ESubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<?> collection) {
 		this.plugin = plugin;
 		
 		this.identifier = identifier;
 		this.collection = collection;
+		
+		// MultiThreading
+		this.lock = new ReentrantReadWriteLock();
+		this.write_lock = this.lock.writeLock();
+		this.read_lock = this.lock.readLock();
 	}
 
 	public abstract void reload();
-	public abstract CompletableFuture<Void> load();
-	
-	public abstract MemorySubjectData getSubjectData();
-	public abstract MemorySubjectData getTransientSubjectData();
 	
 	/*
 	 * Accesseurs
@@ -71,6 +76,10 @@ public abstract class ESubject implements Subject {
 		return this.collection;
 	}
 	
+	public String getCollectionIdentifier() {
+		return this.collection.getIdentifier();
+	}
+	
 	@Override
 	public Optional<CommandSource> getCommandSource() {
 		return Optional.empty();
@@ -78,97 +87,7 @@ public abstract class ESubject implements Subject {
 	
 	@Override
 	public Set<Context> getActiveContexts() {
-		return new HashSet<Context>();
-	}
-	
-	/*
-	 * Options
-	 */
-	
-	@Override
-	public Optional<String> getOption(final Set<Context> contexts, final String option) {
-		// TempoData : Permissions
-		String value = this.getTransientSubjectData().getOptions(contexts).get(option);
-		if (value != null) {
-			return Optional.of(value);
-		}
-		
-		// TempoData : Groups
-		Iterator<SubjectReference> subjects = this.getTransientSubjectData().getParents(contexts).iterator();
-		Optional<String> optValue;
-		while(subjects.hasNext()) {
-			optValue = subjects.next().resolve().join().getOption(contexts, option);
-			if (optValue.isPresent()) {
-				return optValue;
-			}
-		}
-		
-		// SubjectData : Permissions
-		value = this.getSubjectData().getOptions(contexts).get(option);
-		if (value != null) {
-			return Optional.of(value);
-		}
-		
-		// SubjectData : Groups
-		subjects = this.getSubjectData().getParents(contexts).iterator();
-		while(subjects.hasNext()) {
-			optValue = subjects.next().resolve().join().getOption(contexts, option);
-			if (optValue.isPresent()) {
-				return optValue;
-			}
-		}
-		return Optional.empty();
-	}
-	
-	/*
-	 * Permissions
-	 */
-	
-	@Override
-    public Tristate getPermissionValue(final Set<Context> type_contexts, final String permission) {
-    	// TempoData : Permissions
-    	Tristate value = this.getTransientSubjectData().getNodeTree(type_contexts).get(permission);
-		if (!value.equals(Tristate.UNDEFINED)) {
-			return value;
-		}
-    	
-		// TempoData : Groupes
-    	Iterator<SubjectReference> subjects = this.getTransientSubjectData().getParents(type_contexts).iterator();
-    	while(subjects.hasNext()) {
-    		value = subjects.next().resolve().join().getPermissionValue(type_contexts, permission);
-    		if (!value.equals(Tristate.UNDEFINED)) {
-    			return value;
-    		}
-    	}
-    	
-    	// MemoryData : Permissions
-		value = this.getSubjectData().getNodeTree(type_contexts).getTristate(permission);
-		if (!value.equals(Tristate.UNDEFINED)) {
-			return value;
-		}
-    	
-		// MemoryData : Groupes
-    	subjects = this.getSubjectData().getParents(type_contexts).iterator();
-    	while(subjects.hasNext()) {
-    		value = subjects.next().resolve().join().getPermissionValue(type_contexts, permission);
-    		if (!value.equals(Tristate.UNDEFINED)) {
-    			return value;
-    		}
-    	}
-        return Tristate.UNDEFINED;
-    }
-	
-	/*
-	 * Groupes
-	 */
-	
-	@Override
-	public List<SubjectReference> getParents(final Set<Context> contexts) {
-		Preconditions.checkNotNull(contexts, "contexts");
-		List<SubjectReference> list = new ArrayList<SubjectReference>();
-		list.addAll(this.getTransientSubjectData().getParents(contexts));
-		list.addAll(this.getSubjectData().getParents(contexts));
-		return list;
+		return ImmutableSet.of();
 	}
 	
 	@Override
@@ -195,10 +114,10 @@ public abstract class ESubject implements Subject {
 		if (this == other) {
 			return true;
 		}
-		if (other == null || !(other instanceof ESubject)) {
+		if (other == null || !(other instanceof Subject)) {
 			return false;
 		}
-		return this.getIdentifier().equals(((ESubject) other).getIdentifier());
+		return this.getIdentifier().equals(((Subject) other).getIdentifier());
 	}
 	
 	@Override
@@ -210,9 +129,34 @@ public abstract class ESubject implements Subject {
 	public SubjectReference asSubjectReference() {
 		return new ESubjectReference(this.plugin.getService(), this.getContainingCollection().getIdentifier(), this.getIdentifier());
 	}
+	
+	public Optional<String> getFriendlyIdentifier() {
+		this.read_lock.lock();
+		try {
+			return Optional.ofNullable(this.name);
+		} finally {
+			this.read_lock.unlock();
+		}
+	}
 
-	@Override
-	public boolean isSubjectDataPersisted() {
-		return true;
+	public CompletableFuture<Boolean> setFriendlyIdentifier(String name) {
+		return CompletableFuture.supplyAsync(() -> {
+			if (this.name == null && name == null) return false;
+			if (this.name != null && name != null && this.name.equals(name)) return false;
+			
+			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).setFriendlyIdentifier(this, name)) return false;
+			
+			this.setFriendlyIdentifierExecute(name);
+			return true;
+		}, this.plugin.getThreadAsync());
+	}
+	
+	public void setFriendlyIdentifierExecute(String name) {
+		this.write_lock.lock();
+		try {
+			this.name = name;
+		} finally {
+			this.write_lock.unlock();
+		}
 	}
 }

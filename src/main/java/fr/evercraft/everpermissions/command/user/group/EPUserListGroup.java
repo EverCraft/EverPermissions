@@ -136,7 +136,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		
 		List<Text> list = new ArrayList<Text>();
 		Set<Context> contexts = EContextCalculator.of(world_name);
-		Optional<Subject> group = subject.getSubjectData().getParent(contexts);
+		Optional<Subject> group = subject.getSubjectData().getGroup(contexts);
 		
 		// Le groupe
 		if (group.isPresent()) {

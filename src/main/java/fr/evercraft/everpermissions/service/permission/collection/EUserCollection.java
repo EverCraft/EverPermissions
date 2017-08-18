@@ -16,30 +16,28 @@
  */
 package fr.evercraft.everpermissions.service.permission.collection;
 
-import fr.evercraft.everapi.event.PermUserEvent.Action;
-import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
-
-import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectReference;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.SubjectReference;
+
+import com.google.common.base.Preconditions;
+
+import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+
 public class EUserCollection extends ESubjectCollection<EUserSubject> {
 
-	public EUserCollection(final EverPermissions plugin) {
-		super(plugin, PermissionService.SUBJECTS_USER);
+	public EUserCollection(final EverPermissions plugin, String collectionIdentifier) {
+		super(plugin, collectionIdentifier);
 	}
 	
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected EUserSubject add(String identifier) {
-		return new EUserSubject(this.plugin, identifier, (ESubjectCollection) this);
+		return new EUserSubject(this.plugin, identifier, this);
 	}
 	
 	@Override
@@ -50,38 +48,15 @@ public class EUserCollection extends ESubjectCollection<EUserSubject> {
 		
 		EUserSubject player = this.subjects.remove(identifier);
 		if (player != null) {
-			this.plugin.getManagerEvent().post(player, Action.USER_REMOVED);
 			this.plugin.getELogger().debug("Unloading the player : " + identifier);
 		}
 	}
 	
 	@Override
-	public CompletableFuture<Boolean> hasSubject(String identifier) {
-		// TODO Requete DataBase
-		return null;
-	}
-	
-	@Override
-	public CompletableFuture<Set<String>> getAllIdentifiers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Map<String, Subject>> loadSubjects(Set<String> identifiers) {
-		// TODO Requete DataBase
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(String permission) {
-		// TODO Requete DataBase
-		return null;
-	}
-
-	@Override
 	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(Set<Context> contexts, String permission) {
-		// TODO Requete DataBase
-		return null;
+		Preconditions.checkNotNull(contexts, "contexts");
+		Preconditions.checkNotNull(permission, "permission");
+		
+		return this.getAllWithPermission(this.plugin.getService().getContextCalculator().getUser(contexts), permission);
 	}
 }

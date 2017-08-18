@@ -52,7 +52,7 @@ public class EPListener {
     	if (!event.isCancelled()) {
     		this.plugin.getELogger().debug("Load world : " + event.getTargetWorld().getName());
     		this.plugin.getService().getGroupSubjects().registerWorld(event.getTargetWorld().getName());
-    		this.plugin.getManagerData().registerUser(event.getTargetWorld().getName());
+    		this.plugin.getManagerData().register(event.getTargetWorld().getName());
     		
     		this.plugin.getService().getUserSubjects().reload();
     	}

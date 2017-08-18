@@ -21,6 +21,7 @@ import fr.evercraft.everapi.event.PermGroupEvent.Action;
 import fr.evercraft.everapi.util.Chronometer;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
+import fr.evercraft.everpermissions.service.permission.storage.ICollectionStorage;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 import fr.evercraft.everpermissions.storage.EPConfGroups;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -69,25 +70,21 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
      * @param type Le type de groupe
      * @return False si le type de groupe n'existe pas
      */
-    public boolean register(final String identifier, final String type) {
-		Optional<EPConfGroups> groups =  this.plugin.getManagerData().getConfGroup(type);
-		if (groups.isPresent()) {
-	    	groups.get().addDefault(identifier + ".default", false);
-	    	groups.get().addDefault(identifier + ".inheritances", Arrays.asList());
+    public boolean register(final String identifier, final String worldType) {
+    	ICollectionStorage storage = this.plugin.getManagerData().register(PermissionService.SUBJECTS_GROUP, worldType);
 	    	
-	    	// Création du groupe si il n'existe pas
-	    	EGroupSubject group =  this.get(identifier);
-	    	if (group == null) {
-	    		group = new EGroupSubject(this.plugin, identifier, this);
-	    		this.subject.putIfAbsent(identifier.toLowerCase(), group);
-	    	}
-	    	group.registerWorld(type);
-	    	
-	    	this.plugin.getManagerData().saveGroup(type);
-	    	this.plugin.getManagerEvent().post(group, Action.GROUP_ADDED);
-	    	return true;
-		}
-    	return false;
+    	// Création du groupe si il n'existe pas
+    	EGroupSubject group =  this.subjects.get(identifier);
+    	if (group != null) {
+    		group.registerWorld(worldType);
+    		return true;
+    		
+    	}
+    	
+		group = new EGroupSubject(this.plugin, identifier, this);
+		group.registerWorld(worldType);
+		this.subjects.put(identifier.toLowerCase(), group);
+		return storage.load(group);
     }
     
     /**
@@ -96,8 +93,10 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
      * @param type Le type de groupe
      * @return False si le type de groupe n'existe pas
      */
-    public boolean remove(final String identifier, final String type) {
-    	Optional<EPConfGroups> groups =  this.plugin.getManagerData().getConfGroup(type);
+    public boolean remove(final String identifier, final String worldType) {
+    	ICollectionStorage collectionStorage = this.plugin.getManagerData().get(worldType);
+    	if (collectionStorage == null) return false;    	
+    	
     	if (groups.isPresent()) {
 	    	groups.get().getNode().removeChild(identifier);
 	    	EGroupSubject group = this.get(identifier);
@@ -106,7 +105,6 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 	    		this.groups_default.remove(type, group);
 	    		
 	    		this.plugin.getManagerData().saveGroup(type);
-	    		this.plugin.getManagerEvent().post(group, Action.GROUP_REMOVED);
 	    		return true;
 	    	}
     	}
@@ -192,7 +190,6 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 							if (group.getValue().getNode("default").getBoolean(false)) {
 				    			this.groups_default.put(type.get(), subject);
 				    			
-				    			this.plugin.getManagerEvent().post(PermSystemEvent.Action.DEFAULT_GROUP_CHANGED);
 				    			this.plugin.getELogger().debug("Group default : (world=" + type.get() + ";subject=" + subject.getIdentifier() + ")");
 				    		}
 						}
@@ -284,7 +281,6 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 				this.groups_default.putIfAbsent(type, group);
 				
 				this.plugin.getManagerData().saveGroup(type);
-				this.plugin.getManagerEvent().post(PermSystemEvent.Action.DEFAULT_GROUP_CHANGED);
 				return true;
 			}
 		}
@@ -307,41 +303,9 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 				this.groups_default.remove(type, group);
 				
 				this.plugin.getManagerData().saveGroup(type);
-				this.plugin.getManagerEvent().post(PermSystemEvent.Action.DEFAULT_GROUP_CHANGED);
 				return true;
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public CompletableFuture<Boolean> hasSubject(String identifier) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Map<String, Subject>> loadSubjects(Set<String> identifiers) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Set<String>> getAllIdentifiers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(String permission) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(Set<Context> contexts,
-			String permission) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

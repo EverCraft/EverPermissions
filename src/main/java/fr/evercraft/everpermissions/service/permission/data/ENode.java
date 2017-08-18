@@ -18,15 +18,15 @@ package fr.evercraft.everpermissions.service.permission.data;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.spongepowered.api.util.Tristate;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 
 public class ENode extends HashMap<String, ENode> {
 	private static final long serialVersionUID = -3369286570178770580L;
-	private static final Pattern SPLIT_REGEX = Pattern.compile("\\.");
+	private static final Splitter NODE_SPLITTER = Splitter.on('.');
 	
 	private Tristate value;
 	
@@ -76,7 +76,7 @@ public class ENode extends HashMap<String, ENode> {
      * @return La valeur de la permission
      */
     public Tristate getTristate(final String permission) {
-        String[] parts = SPLIT_REGEX.split(permission.toLowerCase());
+        Iterable<String> parts = NODE_SPLITTER.split(permission.toLowerCase());
         ENode currentNode = this;
         Tristate lastUndefinedVal = Tristate.UNDEFINED;
         for (String str : parts) {
@@ -142,7 +142,7 @@ public class ENode extends HashMap<String, ENode> {
     public static ENode of(final Map<String, Boolean> values, final Tristate defaultValue) {
     	ENode newTree = new ENode(defaultValue);
         for (Map.Entry<String, Boolean> value : values.entrySet()) {
-            String[] parts = SPLIT_REGEX.split(value.getKey().toLowerCase());
+            Iterable<String> parts = NODE_SPLITTER.split(value.getKey().toLowerCase());
             ENode currentNode = newTree;
             for (String part : parts) {
                 if (currentNode.containsKey(part)) {
@@ -165,7 +165,7 @@ public class ENode extends HashMap<String, ENode> {
      * @return Le nouveau node
      */
     public ENode withValue(final String node, final Tristate value) {
-        String[] parts = SPLIT_REGEX.split(node.toLowerCase());
+        Iterable<String> parts = NODE_SPLITTER.split(node.toLowerCase());
         ENode newRoot = this.copy();
         ENode currentPtr = newRoot;
 

@@ -25,8 +25,8 @@ import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.EPlugin;
 import fr.evercraft.everpermissions.command.EPManagerCommands;
-import fr.evercraft.everpermissions.event.EPManagerEvent;
 import fr.evercraft.everpermissions.service.EPermissionService;
+import fr.evercraft.everpermissions.storage.EPDataBases;
 import fr.evercraft.everpermissions.storage.EPManagerStorage;
 
 @Plugin(id = "everpermissions", 
@@ -44,19 +44,20 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 	private EPConfig config;
 	private EPMessage messages;
 	
-	private EPManagerEvent managerEvent;
 	private EPManagerStorage managerData;
 	private EPManagerCommands managerCommands;
 	
 	private EPermissionService service;
+	private EPDataBases database;
 
 	@Override
 	protected void onPreEnable() throws PluginDisableException, ServerDisableException {
 		this.config = new EPConfig(this);
 		this.messages = new EPMessage(this);
 		
-		this.managerData = new EPManagerStorage(this);		
-		this.managerEvent = new EPManagerEvent(this);
+		this.database = new EPDataBases(this);
+		
+		this.managerData = new EPManagerStorage(this);
 		
 		this.service = new EPermissionService(this);
 		this.getGame().getServiceManager().setProvider(this, PermissionService.class, this.service);
@@ -92,6 +93,10 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 	public EPMessage getMessages() {
 		return this.messages;
 	}
+	
+	public EPDataBases getDataBases() {
+		return this.database;
+	}
 
 	public EPermissionService getService() {
 		return this.service;
@@ -99,10 +104,6 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 	
 	public EPManagerStorage getManagerData() {
 		return this.managerData;
-	}
-	
-	public EPManagerEvent getManagerEvent() {
-		return this.managerEvent;
 	}
 
 	public EPManagerCommands getManagerCommands() {

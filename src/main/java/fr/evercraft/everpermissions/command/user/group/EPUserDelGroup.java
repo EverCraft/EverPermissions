@@ -136,7 +136,7 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 		}
 		
 		Set<Context> contexts = EContextCalculator.of(world_name);
-		Optional<Subject> group = subject.getSubjectData().getParent(contexts);
+		Optional<Subject> group = subject.getSubjectData().getGroup(contexts);
 		
 		// Le groupe n'a pas été supprimé
 		if (!group.isPresent() || !subject.getSubjectData().removeParent(contexts)) {

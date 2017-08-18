@@ -22,14 +22,17 @@ import fr.evercraft.everpermissions.service.permission.subject.ESubjectReference
 
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.util.Tristate;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -63,21 +66,46 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		}
 	}
 	
-	public CompletableFuture<Void> load() {
-		return CompletableFuture.runAsync(() -> {});
+	public CompletableFuture<Boolean> load() {
+		return CompletableFuture.completedFuture(true);
 	}
 	
 	protected abstract T add(String identifier);
 	
 	@Override
 	public CompletableFuture<Subject> loadSubject(String identifier) {
-		ESubject cache = this.subjects.get(identifier);
+		T cache = this.subjects.get(identifier);
 		if (cache != null) return CompletableFuture.completedFuture(cache);
 		
 		final T subject = this.add(identifier);
 		this.subjects.put(subject.getIdentifier().toLowerCase(), subject);
 		
-		return subject.load().thenApply(e -> subject);
+		return CompletableFuture.supplyAsync(() -> {
+			this.plugin.getManagerData().get(this.getIdentifier()).load(subject);
+			return subject;
+		}, this.plugin.getThreadAsync());
+	}
+	
+	@Override
+	public CompletableFuture<Map<String, Subject>> loadSubjects(Set<String> identifiers) {
+		ImmutableMap.Builder<String, Subject> subjects = ImmutableMap.builder();
+		Set<ESubject> newSubjects = new HashSet<ESubject>();
+		for (String identifier : identifiers) {
+			T subject = this.subjects.get(identifier);
+			if (subject == null) {
+				subject = this.add(identifier);
+				newSubjects.add(subject);
+			}
+			this.subjects.put(subject.getIdentifier().toLowerCase(), subject);
+			subjects.put(subject.getIdentifier().toLowerCase(), subject);
+		}
+		
+		if (newSubjects.isEmpty()) return CompletableFuture.completedFuture(subjects.build());
+		
+		return CompletableFuture.supplyAsync(() -> {
+			this.plugin.getManagerData().get(this.getIdentifier()).load(newSubjects);
+			return subjects.build();
+		}, this.plugin.getThreadAsync());
 	}
 	
 	@Override
@@ -111,11 +139,15 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	
 	@Override
 	public SubjectReference newSubjectReference(String subjectIdentifier) {
+		Preconditions.checkNotNull(subjectIdentifier, "subjectIdentifier");
+		
 		return new ESubjectReference(this.plugin.getService(), this.getIdentifier(), subjectIdentifier);
 	}
 	
 	@Override
 	public Map<Subject, Boolean> getLoadedWithPermission(String permission) {
+		Preconditions.checkNotNull(permission, "permission");
+		
 		ImmutableMap.Builder<Subject, Boolean> builder = ImmutableMap.builder();
 		for (Subject subject : this.subjects.values()) {
 			Tristate value = subject.getPermissionValue(subject.getActiveContexts(), permission);
@@ -128,6 +160,9 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 
 	@Override
 	public Map<Subject, Boolean> getLoadedWithPermission(Set<Context> contexts, String permission) {
+		Preconditions.checkNotNull(contexts, "contexts");
+		Preconditions.checkNotNull(permission, "permission");
+		
 		ImmutableMap.Builder<Subject, Boolean> builder = ImmutableMap.builder();
 		for (Subject subject : this.subjects.values()) {
 			Tristate value = subject.getPermissionValue(contexts, permission);
@@ -136,5 +171,37 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 			}
 		}
 		return builder.build();
+	}
+	
+	@Override
+	public CompletableFuture<Boolean> hasSubject(String identifier) {
+		Preconditions.checkNotNull(identifier, "identifier");
+		
+		return CompletableFuture.supplyAsync(() -> {
+			return this.plugin.getManagerData().get(this.getIdentifier()).hasSubject(identifier);
+		}, this.plugin.getThreadAsync());
+	}
+	
+	@Override
+	public CompletableFuture<Set<String>> getAllIdentifiers() {
+		return CompletableFuture.supplyAsync(() -> {
+			return this.plugin.getManagerData().get(this.getIdentifier()).getAllIdentifiers();
+		}, this.plugin.getThreadAsync());
+	}
+
+	@Override
+	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(String permission) {
+		Preconditions.checkNotNull(permission, "permission");
+		
+		return this.getAllWithPermission(SubjectData.GLOBAL_CONTEXT, permission);
+	}
+	
+	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(String typeWorld, String permission) {
+		Preconditions.checkNotNull(typeWorld, "typeWorld");
+		Preconditions.checkNotNull(permission, "permission");
+		
+		return CompletableFuture.supplyAsync(() -> {
+			return this.plugin.getManagerData().get(this.getIdentifier()).getAllWithPermission(typeWorld, permission);
+		}, this.plugin.getThreadAsync());
 	}
 }

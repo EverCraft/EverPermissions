@@ -25,7 +25,9 @@ import java.util.Set;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.world.Locatable;
 
 import com.google.common.collect.ImmutableSet;
@@ -78,12 +80,7 @@ public class EContextCalculator implements ContextCalculator<Subject> {
      * @return Le context avec le type du groupe
      */
     public String getGroup(final Set<Context> contexts) {
-		for (Context context : contexts) {
-			if (context.getType().equals(Context.WORLD_KEY)) {
-				return this.plugin.getManagerData().getTypeGroup(context.getName()).orElse("");
-			}
-		}
-		return "";
+    	return this.get(PermissionService.SUBJECTS_GROUP, contexts);
     }
 
     /**
@@ -92,9 +89,14 @@ public class EContextCalculator implements ContextCalculator<Subject> {
      * @return Le context avec le type du joueur
      */
     public String getUser(final Set<Context> contexts) {
+		return this.get(PermissionService.SUBJECTS_USER, contexts);
+    }
+    
+    public String get(final String collection, final Set<Context> contexts) {
 		for (Context context : contexts) {
 			if (context.getType().equals(Context.WORLD_KEY)) {
-				return this.plugin.getManagerData().getTypeUser(context.getName()).orElse("");
+				return this.plugin.getManagerData().getTypeWorld(collection, context.getName()).orElseGet(() -> 
+					this.plugin.getManagerData().getTypeWorld(collection, EContextCalculator.getWorld(SubjectData.GLOBAL_CONTEXT).orElse("")).orElse(""));
 			}
 		}
 		return "";

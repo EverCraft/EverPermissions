@@ -149,7 +149,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 		}
 		
 		Set<Context> contexts = EContextCalculator.of(world_name);
-		Optional<Subject> parent = subject.getSubjectData().getParent(contexts);
+		Optional<Subject> parent = subject.getSubjectData().getGroup(contexts);
 		
 		// Le groupe du joueur est égale au nouveau groupe
 		if (parent.isPresent() && parent.get().equals(group)) {

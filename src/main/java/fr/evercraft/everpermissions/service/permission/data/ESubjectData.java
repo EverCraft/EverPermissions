@@ -16,8 +16,6 @@
  */
 package fr.evercraft.everpermissions.service.permission.data;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +28,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
@@ -40,33 +38,37 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import fr.evercraft.everapi.event.ESpongeEventFactory;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
+import fr.evercraft.everpermissions.service.permission.subject.ESubject;
 
 public abstract class ESubjectData implements SubjectData {
 	
 	protected final EverPermissions plugin;
-	protected final Subject subject;
+	protected final ESubject subject;
+	protected final boolean transientData;
 	
 	protected final ConcurrentMap<String, Map<String, String>> options;
 	protected final ConcurrentMap<String, ENode> permissions;
-	protected final ConcurrentMap<String, List<SubjectReference>> groups;
+	protected final ConcurrentMap<String, List<SubjectReference>> parents;
 	
 	// MultiThreading
 	private final ReadWriteLock lock;
 	protected final Lock write_lock;
 	protected final Lock read_lock;
 
-	public ESubjectData(final EverPermissions plugin, final Subject subject) {
+	public ESubjectData(final EverPermissions plugin, final ESubject subject, boolean transientData) {
 		Preconditions.checkNotNull(plugin, "plugin");
 		Preconditions.checkNotNull(subject, "subject");
 		
 		this.plugin = plugin;
 		this.subject = subject;
+		this.transientData = transientData;
 		
 		this.options = new ConcurrentHashMap<String, Map<String, String>>();
 		this.permissions = new ConcurrentHashMap<String, ENode>();
-		this.groups = new ConcurrentHashMap<String, List<SubjectReference>>();
+		this.parents = new ConcurrentHashMap<String, List<SubjectReference>>();
 		
 		// MultiThreading
 		this.lock = new ReentrantReadWriteLock();
@@ -78,6 +80,18 @@ public abstract class ESubjectData implements SubjectData {
 		return this.subject.getIdentifier();
 	}
 	
+	public ESubject getSubject() {
+		return this.subject;
+	}
+	
+	public String getCollectionIdentifier() {
+		return this.subject.getCollectionIdentifier();
+	}
+	
+	public boolean isTransient() {
+		return this.transientData;
+	}
+	
 	public abstract CompletableFuture<Boolean> load();
 
 	public CompletableFuture<Boolean> reload() {
@@ -85,7 +99,7 @@ public abstract class ESubjectData implements SubjectData {
 		try {
 			this.permissions.clear();
 			this.options.clear();
-			this.groups.clear();
+			this.parents.clear();
 			
 			return CompletableFuture.completedFuture(true);
 		} finally {
@@ -93,14 +107,13 @@ public abstract class ESubjectData implements SubjectData {
 		}
 	}
 	
+	public void onUpdate() {
+		ESpongeEventFactory.createSubjectDataUpdate(this, Cause.source(this.plugin).build());
+	}
+	
 	/*
 	 * Permissions
 	 */
-	
-	public abstract CompletableFuture<Boolean> setPermission(Set<Context> contexts, String permission, Tristate value);
-	public abstract CompletableFuture<Boolean> clearPermissions(Set<Context> contexts);
-	public abstract CompletableFuture<Boolean> clearPermissions();
-
 	
 	public ENode getNodeTree(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
@@ -124,14 +137,37 @@ public abstract class ESubjectData implements SubjectData {
 		return ret.build();
 	}
 	
-	@Override
-	public Map<String, Boolean> getPermissions(final Set<Context> contexts) {
-		Preconditions.checkNotNull(contexts, "contexts");
+	public Map<String, Boolean> getPermissions(final String typeWorld) {
+		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
-		String world = EContextCalculator.getWorld(contexts).orElse("");
-		ENode perms = this.permissions.get(world);
-		if (perms == null) return ImmutableMap.of();
-		return perms.asMap();
+		this.read_lock.lock();
+		try {
+			ENode perms = this.permissions.get(typeWorld);
+			if (perms == null) return ImmutableMap.of();
+			return perms.asMap();
+		} finally {
+			this.read_lock.unlock();
+		}
+	}
+	
+	public CompletableFuture<Boolean> setPermission(final String typeWorld, final String permission, final Tristate value) {
+		Preconditions.checkNotNull(typeWorld, "typeWorld");
+		Preconditions.checkNotNull(permission, "permission");
+		Preconditions.checkNotNull(value, "value");
+		
+		return CompletableFuture.supplyAsync(() -> {
+			Boolean oldValue = this.getNodeTree(typeWorld).asMap().get(permission);
+			boolean insert = oldValue == null;
+			
+			if (insert && value.equals(Tristate.UNDEFINED)) return false;
+			if (!insert && !value.equals(Tristate.UNDEFINED) && oldValue.booleanValue() == value.asBoolean()) return false;
+			
+			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).setPermission(this, typeWorld, permission, value, insert)) return false;
+			
+			this.setPermissionExecute(typeWorld, permission, value);
+			this.onUpdate();
+			return true;
+		}, this.plugin.getThreadAsync());
 	}
 
 	public void setPermissionExecute(final String typeWorld, final String permission, final Tristate value) {
@@ -154,6 +190,25 @@ public abstract class ESubjectData implements SubjectData {
 		}
 	}
 	
+	public CompletableFuture<Boolean> clearPermissions(final String typeWorld) {
+		Preconditions.checkNotNull(typeWorld, "typeWorld");
+		
+		return CompletableFuture.supplyAsync(() -> {
+			this.read_lock.lock();
+			try {
+				if (this.permissions.containsKey(typeWorld)) return false;
+			} finally {
+				this.read_lock.unlock();
+			}
+			
+			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearPermissions(this, typeWorld)) return false;
+			
+			this.clearPermissionsExecute(typeWorld);
+			this.onUpdate();
+			return true;
+		}, this.plugin.getThreadAsync());
+	}
+	
 	public void clearPermissionsExecute(final String typeWorld) {
 		this.write_lock.lock();
 		try {
@@ -161,6 +216,24 @@ public abstract class ESubjectData implements SubjectData {
 		} finally {
 			this.write_lock.unlock();
 		}
+	}
+	
+	@Override
+	public CompletableFuture<Boolean> clearPermissions() {
+		return CompletableFuture.supplyAsync(() -> {
+			this.read_lock.lock();
+			try {
+				if (this.permissions.isEmpty()) return false;
+			} finally {
+				this.read_lock.unlock();
+			}
+			
+			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearPermissions(this)) return false;
+			
+			this.clearPermissionsExecute();
+			this.onUpdate();
+			return true;
+		}, this.plugin.getThreadAsync());
 	}
 
 	public void clearPermissionsExecute() {
@@ -175,60 +248,71 @@ public abstract class ESubjectData implements SubjectData {
 	/*
 	 * Groups
 	 */
-	public abstract CompletableFuture<Boolean> removeParent(Set<Context> contexts, SubjectReference parent);
-	public abstract CompletableFuture<Boolean> clearParents(Set<Context> contexts);
-	public abstract CompletableFuture<Boolean> clearParents();
 	
 	public Map<Set<Context>, List<SubjectReference>> getAllParents() {
-		ImmutableMap.Builder<Set<Context>, List<SubjectReference>> builder = ImmutableMap.builder();
-		for (Entry<String, List<SubjectReference>> groups : this.groups.entrySet()) {
-			builder.put(EContextCalculator.of(groups.getKey()), groups.getValue());
+		this.read_lock.lock();
+		try {
+			ImmutableMap.Builder<Set<Context>, List<SubjectReference>> builder = ImmutableMap.builder();
+			for (Entry<String, List<SubjectReference>> groups : this.parents.entrySet()) {
+				builder.put(EContextCalculator.of(groups.getKey()), groups.getValue());
+			}
+			return builder.build();
+		} finally {
+			this.read_lock.unlock();
 		}
-		return builder.build();
 	}
-
-	public List<SubjectReference> getParents(final Set<Context> contexts) {
-		Preconditions.checkNotNull(contexts, "contexts");
+	
+	public List<SubjectReference> getParents(final String typeWorld) {
+		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
-		String world = EContextCalculator.getWorld(contexts).orElse("");
+		this.read_lock.lock();
+		try {
+			List<SubjectReference> group = this.parents.get(typeWorld);
+			if (group == null) return ImmutableList.of();
+			return group;
+		} finally {
+			this.read_lock.unlock();
+		}
+	}
+	
+	public CompletableFuture<Boolean> addParent(final String typeWorld, final SubjectReference parent) {
+		Preconditions.checkNotNull(typeWorld, "typeWorld");
+		Preconditions.checkNotNull(parent, "parent");
 		
-		List<SubjectReference> ret = this.groups.get(world);
-		if (ret == null) return Collections.emptyList();
-		return ret;
+		return CompletableFuture.supplyAsync(() -> {
+			this.read_lock.lock();
+			try {
+				List<SubjectReference> parents = this.parents.get(typeWorld);
+				if (parents != null && parents.contains(parent)) return false;
+			} finally {
+				this.read_lock.unlock();
+			}
+			
+			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).addParent(this, typeWorld, parent)) return false;
+			
+			this.addParentExecute(typeWorld, parent);
+			this.onUpdate();
+			return true;
+		}, this.plugin.getThreadAsync());
 	}
 	
 	public void addParentExecute(final String typeWorld, final SubjectReference parent) {
-		List<SubjectReference> parents = this.groups.get(typeWorld);
-		if (parents == null) {
-			this.groups.put(typeWorld, ImmutableList.of(parent));
-		} else if (!parents.contains(parent)) {
-			this.groups.replace(typeWorld, ImmutableList.<SubjectReference>builder().addAll(parents).add(parent).build());
+		this.write_lock.lock();
+		try {
+			List<SubjectReference> parents = this.parents.get(typeWorld);
+			if (parents == null) {
+				this.parents.put(typeWorld, ImmutableList.of(parent));
+			} else if (!parents.contains(parent)) {
+				this.parents.replace(typeWorld, ImmutableList.<SubjectReference>builder().addAll(parents).add(parent).build());
+			}
+		} finally {
+			this.write_lock.unlock();
 		}
-	}
-	
-	public void removeParentExecute(final String typeWorld, final SubjectReference parent) {
-		List<SubjectReference> parents = new ArrayList<SubjectReference>(this.groups.get(typeWorld));
-		if (parents != null && parents.contains(parent)) {
-			parents.remove(parent);
-			this.groups.replace(typeWorld, ImmutableList.copyOf(parents));
-		}
-	}	
-	
-	public void clearParentsExecute(final String typeWorld) {
-		this.groups.remove(typeWorld);
-	}
-	
-	public void clearParentsExecute() {
-		this.groups.clear();
 	}
 
 	/*
 	 * Options
 	 */
-	
-	public abstract CompletableFuture<Boolean> setOption(Set<Context> contexts, String type, String name);
-	public abstract CompletableFuture<Boolean> clearOptions(Set<Context> contexts);
-	public abstract CompletableFuture<Boolean> clearOptions();
 	
 	@Override
 	public Map<Set<Context>, Map<String, String>> getAllOptions() {
@@ -238,20 +322,34 @@ public abstract class ESubjectData implements SubjectData {
 		 }
 		 return builder.build();
 	}
-
-	@Override
-	public Map<String, String> getOptions(final Set<Context> contexts) {
-		Preconditions.checkNotNull(contexts, "contexts");
-		
-		return this.getOptions(EContextCalculator.getWorld(contexts).orElse(""));
-	}
 	
 	public Map<String, String> getOptions(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
-		Map<String, String> ret = this.options.get(typeWorld);
-		if (ret == null) return ImmutableMap.of();
-		return ImmutableMap.copyOf(ret);
+		this.read_lock.lock();
+		try {
+			Map<String, String> ret = this.options.get(typeWorld);
+			if (ret == null) return ImmutableMap.of();
+			return ImmutableMap.copyOf(ret);
+		} finally {
+			this.read_lock.unlock();
+		}
+	}
+	
+	public CompletableFuture<Boolean> setOption(final String typeWorld, final String key, final String value) {
+		return CompletableFuture.supplyAsync(() -> {
+			String oldValue = this.getOptions(typeWorld).get(key);
+			boolean insert = oldValue == null;
+			
+			if (insert && value == null) return false;
+			if (!insert && value != null && oldValue.equals(value)) return false;
+			
+			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).setOption(this, typeWorld, key, value, insert)) return false;
+			
+			this.setOptionExecute(typeWorld, key, oldValue);
+			this.onUpdate();
+			return true;
+		}, this.plugin.getThreadAsync());
 	}
 
 	public void setOptionExecute(final String typeWorld, final String key, final String value) {
@@ -275,6 +373,24 @@ public abstract class ESubjectData implements SubjectData {
 		}
 	}
 	
+	public CompletableFuture<Boolean> clearOptions(final String typeWorld) {
+		return CompletableFuture.supplyAsync(() -> {
+			this.read_lock.lock();
+			try {
+				if (!this.options.containsKey(typeWorld)) return false;
+				
+			} finally {
+				this.read_lock.unlock();
+			}
+			
+			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearOptions(this, typeWorld)) return false;
+			
+			this.clearOptionsExecute(typeWorld);
+			this.onUpdate();
+			return true;
+		}, this.plugin.getThreadAsync());
+	}
+	
 	public void clearOptionsExecute(final String typeWorld) {
 		this.write_lock.lock();
 		try {
@@ -282,6 +398,25 @@ public abstract class ESubjectData implements SubjectData {
 		} finally {
 			this.write_lock.unlock();
 		}
+	}
+	
+	@Override
+	public CompletableFuture<Boolean> clearOptions() {
+		return CompletableFuture.supplyAsync(() -> {
+			this.read_lock.lock();
+			try {
+				if (this.options.isEmpty()) return false;
+				
+			} finally {
+				this.read_lock.unlock();
+			}
+			
+			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearOptions(this)) return false;
+			
+			this.clearOptionsExecute();
+			this.onUpdate();
+			return true;
+		}, this.plugin.getThreadAsync());
 	}
 	
 	public void clearOptionsExecute() {

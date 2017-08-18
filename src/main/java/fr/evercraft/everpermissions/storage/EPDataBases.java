@@ -26,54 +26,66 @@ import fr.evercraft.everapi.plugin.EDataBase;
 import fr.evercraft.everpermissions.EverPermissions;
 
 public class EPDataBases extends EDataBase<EverPermissions> {
-	private String table_users_permissions;
-	private String table_users_groups;
-	private String table_users_options;
+	private static final String TABLE_USERS_PROFILS = "users_profils";
+	private static final String TABLE_USERS_PERMISSIONS = "users_perms";
+	private static final String TABLE_USERS_GROUPS = "users_groups";
+	private static final String TABLE_USERS_OPTIONS = "users_options";
 
 	public EPDataBases(EverPermissions plugin) throws PluginDisableException {
 		super(plugin);
 	}
 
 	public boolean init() throws ServerDisableException {
-		this.table_users_permissions = "users_perms";
+		String profils ="CREATE TABLE IF NOT EXISTS <table> (" +
+							"`uuid` varchar(36) NOT NULL," +
+							"`collection` varchar(36)," +
+							"`name` varchar(36)," +
+							"PRIMARY KEY (`uuid`, `collection`, `name`));";
+		initTable(this.getTableUsersProfiles(), profils);
+		
 		String permissions ="CREATE TABLE IF NOT EXISTS <table> (" +
 							"`uuid` varchar(36) NOT NULL," +
+							"`collection` varchar(36)," +
 							"`world` varchar(36)," +
-							"`permission` varchar(50) NOT NULL," +
+							"`permission` varchar(100) NOT NULL," +
 							"`boolean` BOOLEAN NOT NULL," +
-							"PRIMARY KEY (`uuid`, `world`, `permission`));";
+							"PRIMARY KEY (`uuid`, `collection`, `world`, `permission`));";
 		initTable(this.getTableUsersPermissions(), permissions);
 		
-		this.table_users_groups = "users_groups";
 		String groups =		"CREATE TABLE IF NOT EXISTS <table> (" +
 							"`uuid` varchar(36) NOT NULL," +
+							"`collection` varchar(36)," +
 							"`world` varchar(36)," +
-							"`group` varchar(50) NOT NULL," +
-							"`subgroup` BOOLEAN NOT NULL," +
-							"PRIMARY KEY (`uuid`, `world`, `group`, `subgroup`));";
+							"`group` varchar(36) NOT NULL," +
+							"`priority` INT NOT NULL AUTO_INCREMENT," +
+							"PRIMARY KEY (`uuid`, `collection`, `world`, `group`, `priority`));";
 		initTable(this.getTableUsersGroups(), groups);
 		
-		this.table_users_options = "users_options";
 		String spawns = 	"CREATE TABLE IF NOT EXISTS <table> (" +
 							"`uuid` varchar(36) NOT NULL," +
+							"`collection` varchar(36)," +
 							"`world` varchar(36) NOT NULL," +
 							"`option` varchar(50) NOT NULL," +
 							"`value` varchar(100) NOT NULL," +
-							"PRIMARY KEY (`uuid`, `world`, `option`));";
+							"PRIMARY KEY (`uuid`, `collection`, `world`, `option`));";
 		initTable(this.getTableUsersOptions(), spawns);		
 		return true;
 	}
+	
+	public String getTableUsersProfiles() {
+		return this.getPrefix() + TABLE_USERS_PROFILS;
+	}
 
 	public String getTableUsersPermissions() {
-		return this.getPrefix() + this.table_users_permissions;
+		return this.getPrefix() + TABLE_USERS_PERMISSIONS;
 	}
 
 	public String getTableUsersGroups() {
-		return this.getPrefix() + this.table_users_groups;
+		return this.getPrefix() + TABLE_USERS_GROUPS;
 	}
 
 	public String getTableUsersOptions() {
-		return this.getPrefix() + this.table_users_options;
+		return this.getPrefix() + TABLE_USERS_OPTIONS;
 	}
 	
 	/**
@@ -85,6 +97,11 @@ public class EPDataBases extends EDataBase<EverPermissions> {
 		boolean resultat = false;
 		PreparedStatement preparedStatement = null;
 		try {
+			// Profils
+    		preparedStatement = connection.prepareStatement("TRUNCATE  `" + this.getTableUsersProfiles() + "` ;");
+			preparedStatement.execute();
+			preparedStatement.close();
+			
 			// Permissions
     		preparedStatement = connection.prepareStatement("TRUNCATE  `" + this.getTableUsersPermissions() + "` ;");
 			preparedStatement.execute();

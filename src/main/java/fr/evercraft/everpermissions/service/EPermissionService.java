@@ -25,15 +25,12 @@ import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.EPermissionDescription;
-import fr.evercraft.everpermissions.service.permission.collection.EOthersCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EGroupCollection;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 import fr.evercraft.everpermissions.service.permission.collection.ETemplateCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EUserCollection;
-import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
-import fr.evercraft.everpermissions.service.permission.subject.ESubject;
 import fr.evercraft.everpermissions.service.permission.subject.ESubjectReference;
-import fr.evercraft.everpermissions.service.permission.subject.ETempateSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -68,9 +65,9 @@ public class EPermissionService implements PermissionService {
 
     private final EUserCollection userCollection;
     private final EGroupCollection groupCollection;
-    private final EOthersCollection commandBlockCollection;
-	private final EOthersCollection systemCollection;
-	private final EOthersCollection defaultsCollection;
+    private final EUserCollection commandBlockCollection;
+	private final EUserCollection systemCollection;
+	private final EUserCollection defaultsCollection;
     
     private final EContextCalculator contextCalculator;
     
@@ -82,8 +79,8 @@ public class EPermissionService implements PermissionService {
     	this.plugin = plugin;
     	
     	// Default
-    	this.defaultsCollection = new EOthersCollection(this.plugin, PermissionService.SUBJECTS_DEFAULT);
-    	this.defaults = new EOtherSubject(this.plugin, SUBJECT_DEFAULT, this.defaultsCollection);
+    	this.defaultsCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_DEFAULT);
+    	this.defaults = new EUserSubject(this.plugin, SUBJECT_DEFAULT, this.defaultsCollection);
     	
     	this.descriptions = new ConcurrentHashMap<String, EPermissionDescription>();
     	
@@ -94,9 +91,9 @@ public class EPermissionService implements PermissionService {
     	
     	// Collection
     	this.groupCollection = new EGroupCollection(this.plugin);
-    	this.userCollection = new EUserCollection(this.plugin);
-    	this.systemCollection = new EOthersCollection(this.plugin, PermissionService.SUBJECTS_SYSTEM);
-    	this.commandBlockCollection = new EOthersCollection(this.plugin, PermissionService.SUBJECTS_COMMAND_BLOCK);
+    	this.userCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_USER);
+    	this.systemCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_SYSTEM);
+    	this.commandBlockCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_COMMAND_BLOCK);
     	
     	this.subjectCollections = new ConcurrentHashMap<String, ESubjectCollection<?>>();
     	this.subjectCollections.put(PermissionService.SUBJECTS_USER.toLowerCase(), this.userCollection);
@@ -111,7 +108,7 @@ public class EPermissionService implements PermissionService {
      * Rechargement de toutes les collections
      */
     public void reload() {    	
-    	for (ESubjectCollection collection : this.subjectCollections.values()) {
+    	for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
     		collection.reload();
     	}
     }
@@ -130,20 +127,20 @@ public class EPermissionService implements PermissionService {
     	return this.groupCollection;
     }
 
-    public EOthersCollection getCommandBlockSubjects() {
+    public EUserCollection getCommandBlockSubjects() {
     	return this.commandBlockCollection;
     }
     
-    public EOthersCollection getSytemSubjects() {
+    public EUserCollection getSytemSubjects() {
     	return this.systemCollection;
     }
     
     public Set<String> getSuggestsOthers() {
     	TreeSet<String> suggests = new TreeSet<String>();
-    	for (Subject subject : this.plugin.getService().getSytemSubjects().getAllSubjects()) {
+    	for (Subject subject : this.plugin.getService().getSytemSubjects().getLoadedSubjects()) {
 			suggests.add(subject.getIdentifier());
 		}
-		for (Subject subject : this.plugin.getService().getCommandBlockSubjects().getAllSubjects()) {
+		for (Subject subject : this.plugin.getService().getCommandBlockSubjects().getLoadedSubjects()) {
 			suggests.add(subject.getIdentifier());
 		}
 		return suggests;
@@ -159,23 +156,27 @@ public class EPermissionService implements PermissionService {
      * @param identifier L'identifiant du EOtherSubject
      * @return Un EOtherSubject
      */
-    public Optional<EOtherSubject> getOtherSubject(final String identifier) {
-		if (this.plugin.getService().getSytemSubjects().hasRegistered(identifier)) {
-			return Optional.ofNullable(this.plugin.getService().getSytemSubjects().get(identifier));
-		} else if (this.plugin.getService().getCommandBlockSubjects().hasRegistered(identifier)) {
-			return Optional.ofNullable(this.plugin.getService().getCommandBlockSubjects().get(identifier));
+    public Optional<Subject> getOtherSubject(final String identifier) {
+    	Optional<Subject> subject = this.plugin.getService().getSytemSubjects().getSubject(identifier);
+		if (subject.isPresent()) {
+			return subject;
+		}
+		
+		subject = this.plugin.getService().getCommandBlockSubjects().getSubject(identifier);
+		if (subject.isPresent()) {
+			return subject;
 		}
 		return Optional.empty();
 	}
     
     @Override
 	public CompletableFuture<SubjectCollection> loadCollection(String identifier) {
-		ESubjectCollection collection = this.subjectCollections.get(identifier.toLowerCase());
+		ESubjectCollection<?> collection = this.subjectCollections.get(identifier.toLowerCase());
 		if (collection != null) return CompletableFuture.completedFuture(collection);
 		
-		collection = new EOthersCollection(this.plugin, identifier);
-		this.subjectCollections.put(identifier.toLowerCase(), collection);
-		return collection.load();
+		final ESubjectCollection<?> newCollection = new EUserCollection(this.plugin, identifier);
+		this.subjectCollections.put(identifier.toLowerCase(), newCollection);
+		return newCollection.load().thenApply(result -> newCollection);
 	}
 
 	@Override
@@ -265,7 +266,7 @@ public class EPermissionService implements PermissionService {
 	public CompletableFuture<Set<String>> getAllIdentifiers() {
 		return CompletableFuture.supplyAsync(() -> {
 			ImmutableSet.Builder<String> identifiers = ImmutableSet.builder();
-			for (ESubjectCollection collection : this.subjectCollections.values()) {
+			for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
 				identifiers.add(collection.getIdentifier());
 			}
 

@@ -60,34 +60,19 @@ public class EPConfig extends EConfig<EverPermissions> {
 								"	DIM-1=nether",
 								"The worlds 'world' and 'DIM1' will have the same users but not 'DIM-1'");
 	}
-	
-	/**
-	 * Donne le fichier de configuration des groupes du monde
-	 * @param world Le monde
-	 * @return Le nom du fichier de configuration
-	 */
-	public String getGroups(final String world) {
-		String name = this.get("groups." + world).getString(null);
-		if (name == null) {
-			name = EPConfig.DEFAULT;
-			this.get("groups." + world).setValue(name);
-			this.save(true);
-		}		
-		return name;
-	}
-	
-	/**
-	 * Donne le fichier de configuration des joueurs du monde
-	 * @param world Le monde
-	 * @return Le nom du fichier de configuration
-	 */
-	public String getUsers(final String world) {
-		String name = this.get("users." + world).getString(null);
+
+	public String get(String collection, String world) {
+		String name = this.get(collection + "." + world).getString(null);
 		if (name == null) {
 			name = EPConfig.DEFAULT;
 			this.get("users." + world).setValue(name);
 			this.save(true);
 		}		
 		return name;
+	}
+
+	public String register(String collection, String world) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
