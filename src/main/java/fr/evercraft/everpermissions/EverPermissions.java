@@ -26,8 +26,6 @@ import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.EPlugin;
 import fr.evercraft.everpermissions.command.EPManagerCommands;
 import fr.evercraft.everpermissions.service.EPermissionService;
-import fr.evercraft.everpermissions.storage.EPDataBases;
-import fr.evercraft.everpermissions.storage.EPManagerStorage;
 
 @Plugin(id = "everpermissions", 
 		name = "EverPermissions", 
@@ -37,14 +35,12 @@ import fr.evercraft.everpermissions.storage.EPManagerStorage;
 		authors = {"rexbut"},
 		dependencies = {
 		    @Dependency(id = "everapi", version = EverAPI.VERSION),
-		    @Dependency(id = "everchat", version = EverAPI.VERSION, optional = true),
 		    @Dependency(id = "spongeapi", version = EverAPI.SPONGEAPI_VERSION)
 		})
 public class EverPermissions extends EPlugin<EverPermissions> {
 	private EPConfig config;
 	private EPMessage messages;
 	
-	private EPManagerStorage managerData;
 	private EPManagerCommands managerCommands;
 	
 	private EPermissionService service;
@@ -56,8 +52,6 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 		this.messages = new EPMessage(this);
 		
 		this.database = new EPDataBases(this);
-		
-		this.managerData = new EPManagerStorage(this);
 		
 		this.service = new EPermissionService(this);
 		this.getGame().getServiceManager().setProvider(this, PermissionService.class, this.service);
@@ -74,7 +68,6 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 	protected void onReload() throws PluginDisableException {
 		this.reloadConfigurations();
 		
-		this.managerData.reload();
 		this.service.reload();
 	}
 	
@@ -100,10 +93,6 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 
 	public EPermissionService getService() {
 		return this.service;
-	}
-	
-	public EPManagerStorage getManagerData() {
-		return this.managerData;
 	}
 
 	public EPManagerCommands getManagerCommands() {

@@ -183,6 +183,10 @@ public class EPermissionService implements PermissionService {
 	public Optional<SubjectCollection> getCollection(String identifier) {
 		return Optional.ofNullable(this.subjectCollections.get(identifier.toLowerCase()));
 	}
+	
+	public Optional<ESubjectCollection<?>> get(String identifier) {
+		return Optional.ofNullable(this.subjectCollections.get(identifier.toLowerCase()));
+	}
 
 	@Override
 	public CompletableFuture<Boolean> hasCollection(String identifier) {
@@ -254,7 +258,7 @@ public class EPermissionService implements PermissionService {
 
 	@Override
 	public Predicate<String> getIdentifierValidityPredicate() {
-		return value -> true;
+		return value -> value.length() <= 36;
 	}
 
 	@Override
@@ -264,25 +268,7 @@ public class EPermissionService implements PermissionService {
 
 	@Override
 	public CompletableFuture<Set<String>> getAllIdentifiers() {
-		return CompletableFuture.supplyAsync(() -> {
-			ImmutableSet.Builder<String> identifiers = ImmutableSet.builder();
-			for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
-				identifiers.add(collection.getIdentifier());
-			}
-
-			File[] files = this.plugin.getPath().resolve("others").toFile().listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File directory, String fileName) {
-			        return fileName.endsWith(".conf");
-				}
-			});
-		
-			for (File file : files) {
-				identifiers.add(file.getName().replace("(.conf)$", ""));
-			}
-			
-			return identifiers.build();
-		});
+		return CompletableFuture.supplyAsync(() -> this.plugin.getConfigs().getCollections(), this.plugin.getThreadAsync());
 	}
 
 	@Override

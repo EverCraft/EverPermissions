@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectReference;
 
 import com.google.common.base.Preconditions;
@@ -42,11 +43,13 @@ public class EUserCollection extends ESubjectCollection<EUserSubject> {
 	
 	@Override
 	public void suggestUnload(String identifier) {
+		if (!this.getIdentifier().equals(PermissionService.SUBJECTS_USER)) return;
+		
 		try {
 			if (this.plugin.getGame().getServer().getPlayer(UUID.fromString(identifier)).isPresent()) return;
 		} catch (Exception e) {}
 		
-		EUserSubject player = this.subjects.remove(identifier);
+		EUserSubject player = this.identifierSubjects.remove(identifier);
 		if (player != null) {
 			this.plugin.getELogger().debug("Unloading the player : " + identifier);
 		}

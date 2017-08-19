@@ -16,12 +16,20 @@
  */
 package fr.evercraft.everpermissions;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableMap;
+
 import fr.evercraft.everapi.plugin.file.EConfig;
 import fr.evercraft.everapi.plugin.file.EMessage;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
 public class EPConfig extends EConfig<EverPermissions> {
 	
-	private static final String DEFAULT = "default";
+	public static final String DEFAULT = "default";
 	
 	public EPConfig(final EverPermissions plugin) {
 		super(plugin);
@@ -46,14 +54,14 @@ public class EPConfig extends EConfig<EverPermissions> {
 		addDefault("SQL.url", "jdbc:mysql://root:password@localhost:3306/minecraft");
 		addDefault("SQL.prefix", "everpermissions_");
 		
-		addComment("groups", 	"Configure the groups for each world",
+		addComment("collections.groups", 	"Configure the groups for each world",
 								"Example : ",
 								"	world=default",
 								"	DIM1=default",
 								"	DIM-1=nether",
 								"The worlds 'world' and 'DIM1' will have the same groups but not 'DIM-1'");
 		
-		addComment("users", 	"Configure the users for each world",
+		addComment("collections.users", 	"Configure the users for each world",
 								"Example : ",
 								"	world=default",
 								"	DIM1=default",
@@ -61,18 +69,27 @@ public class EPConfig extends EConfig<EverPermissions> {
 								"The worlds 'world' and 'DIM1' will have the same users but not 'DIM-1'");
 	}
 
-	public String get(String collection, String world) {
-		String name = this.get(collection + "." + world).getString(null);
-		if (name == null) {
-			name = EPConfig.DEFAULT;
-			this.get("users." + world).setValue(name);
-			this.save(true);
-		}		
-		return name;
+	public Map<String, String> getTypeWorld(String collection) {
+		ImmutableMap.Builder<String, String> worlds = ImmutableMap.builder();
+		for (Entry<Object, ? extends CommentedConfigurationNode> value : this.get("collections." + collection).getChildrenMap().entrySet()) {
+			worlds.put(value.getKey().toString(), value.getValue().getString(EPConfig.DEFAULT));
+		}
+		return worlds.build();
+	}
+	public Set<String> getCollections() {
+		return this.get("collections").getChildrenMap().keySet().stream().map(collection -> collection.toString()).collect(Collectors.toSet());
 	}
 
-	public String register(String collection, String world) {
-		// TODO Auto-generated method stub
-		return null;
+	public void registerWorld(String world) {
+		for (Entry<Object, ? extends CommentedConfigurationNode> value : this.get("collections").getChildrenMap().entrySet()) {
+			CommentedConfigurationNode typeWorld = value.getValue().getNode(world);
+			if (typeWorld.isVirtual()) {
+				typeWorld.setValue(EPConfig.DEFAULT);
+			}
+		}
+	}
+
+	public String getTypeWorld(String collection, String world) {
+		return this.get("collections." + collection + "." + world).getString(EPConfig.DEFAULT);
 	}
 }

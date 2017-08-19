@@ -16,6 +16,7 @@
  */
 package fr.evercraft.everpermissions.service.permission.storage;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,7 +72,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 	
 	@Override
-	public boolean load(Set<ESubject> subjects) {
+	public boolean load(Collection<ESubject> subjects) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.load(subjects)) return false;
 		}

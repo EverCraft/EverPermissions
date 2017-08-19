@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -77,7 +78,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
     }
     
-    public boolean load(final Set<ESubject> subjects) {
+    public boolean load(final Collection<ESubject> subjects) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();

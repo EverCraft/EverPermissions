@@ -17,6 +17,9 @@
 package fr.evercraft.everpermissions.service.permission.collection;
 
 import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.permission.storage.EConfigCollectionStorage;
+import fr.evercraft.everpermissions.service.permission.storage.ESqlCollectionStorage;
+import fr.evercraft.everpermissions.service.permission.storage.ICollectionStorage;
 import fr.evercraft.everpermissions.service.permission.subject.ESubject;
 import fr.evercraft.everpermissions.service.permission.subject.ESubjectReference;
 
@@ -48,22 +51,50 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	protected final EverPermissions plugin;
 	
 	private final String identifier;
-	protected final ConcurrentMap<String, T> subjects;
+	protected final ConcurrentMap<String, T> identifierSubjects;
+	protected final ConcurrentMap<String, T> nameSubjects;
+	
+	protected ICollectionStorage storage;
+	protected ConcurrentMap<String, String> worlds;
 
 	public ESubjectCollection(final EverPermissions plugin, final String identifier) {
 		this.plugin = plugin;
 		this.identifier = identifier;
 		
-		this.subjects = new ConcurrentHashMap<String, T>();
+		this.identifierSubjects = new ConcurrentHashMap<String, T>();
+		this.nameSubjects = new ConcurrentHashMap<String, T>();
 	}
 	
 	/**
 	 * Rechargement : Vide le cache et recharge tous les joueurs
 	 */
 	public void reload() {
-		for (T subject : this.subjects.values()) {
+		this.reloadConfig();
+		
+		for (T subject : this.identifierSubjects.values()) {
 			subject.reload();
 		}
+	}
+	
+	public void reloadConfig() {
+		this.worlds.clear();
+		this.worlds.putAll(this.plugin.getConfigs().getTypeWorld(this.getIdentifier()));
+		
+		if (this.plugin.getDataBases().isEnable() && !(this.storage instanceof ESqlCollectionStorage)) {
+			this.storage = new ESqlCollectionStorage(this.plugin, this.getIdentifier());
+		} else if (!this.plugin.getDataBases().isEnable() && !(this.storage instanceof EConfigCollectionStorage)) {
+			this.storage = new EConfigCollectionStorage(this.plugin, this.getIdentifier());
+		}
+	}
+	
+	public void registerTypeWorld(final String world) {
+		if (!this.worlds.containsKey(world)) {
+			this.worlds.put(world, this.plugin.getConfigs().getTypeWorld(this.getIdentifier(), world));
+		}
+	}
+	
+	public Optional<String> getTypeWorld(final String world) {
+		return Optional.ofNullable(this.worlds.get(world));
 	}
 	
 	public CompletableFuture<Boolean> load() {
@@ -72,16 +103,36 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	
 	protected abstract T add(String identifier);
 	
+	public Optional<T> get(String identifier) {
+		identifier = identifier.toLowerCase();
+		
+		if (identifier.length() == 36) {
+			T subject = this.identifierSubjects.get(identifier);
+			if (subject != null) return Optional.of(subject);
+		}
+		return Optional.ofNullable(this.identifierSubjects.get(identifier));
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public Optional<Subject> getSubject(String identifier) {
+		return (Optional) this.get(identifier);
+	}
+	
+	
 	@Override
 	public CompletableFuture<Subject> loadSubject(String identifier) {
-		T cache = this.subjects.get(identifier);
-		if (cache != null) return CompletableFuture.completedFuture(cache);
+		identifier = identifier.toLowerCase();
+		
+		Optional<T> cache = this.get(identifier);
+		if (cache.isPresent()) return CompletableFuture.completedFuture(cache.get());
 		
 		final T subject = this.add(identifier);
-		this.subjects.put(subject.getIdentifier().toLowerCase(), subject);
+		this.identifierSubjects.put(subject.getIdentifier().toLowerCase(), subject);
+		subject.getFriendlyIdentifier().ifPresent(name -> this.nameSubjects.put(name.toLowerCase(), subject));
 		
 		return CompletableFuture.supplyAsync(() -> {
-			this.plugin.getManagerData().get(this.getIdentifier()).load(subject);
+			this.storage.load(subject);
 			return subject;
 		}, this.plugin.getThreadAsync());
 	}
@@ -91,36 +142,36 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		ImmutableMap.Builder<String, Subject> subjects = ImmutableMap.builder();
 		Set<ESubject> newSubjects = new HashSet<ESubject>();
 		for (String identifier : identifiers) {
-			T subject = this.subjects.get(identifier);
+			identifier = identifier.toLowerCase();
+			
+			T subject = this.get(identifier).orElse(null);
 			if (subject == null) {
-				subject = this.add(identifier);
-				newSubjects.add(subject);
+				T newSubject = this.add(identifier);
+				newSubjects.add(newSubject);
+				
+				this.identifierSubjects.put(newSubject.getIdentifier().toLowerCase(), newSubject);
+				newSubject.getFriendlyIdentifier().ifPresent(name -> this.nameSubjects.put(name.toLowerCase(), newSubject));
+			} else {
+				subjects.put(subject.getIdentifier().toLowerCase(), subject);
 			}
-			this.subjects.put(subject.getIdentifier().toLowerCase(), subject);
-			subjects.put(subject.getIdentifier().toLowerCase(), subject);
 		}
 		
 		if (newSubjects.isEmpty()) return CompletableFuture.completedFuture(subjects.build());
 		
 		return CompletableFuture.supplyAsync(() -> {
-			this.plugin.getManagerData().get(this.getIdentifier()).load(newSubjects);
+			this.storage.load(newSubjects);
 			return subjects.build();
 		}, this.plugin.getThreadAsync());
 	}
 	
 	@Override
 	public void suggestUnload(String identifier) {
-		this.subjects.remove(identifier);
+		this.identifierSubjects.remove(identifier);
 	}
 
 	@Override
-	public Optional<Subject> getSubject(String identifier) {
-		return Optional.ofNullable(this.subjects.get(identifier));
-	}
-	
-	@Override
 	public Collection<Subject> getLoadedSubjects() {
-		return ImmutableSet.copyOf(this.subjects.values());
+		return ImmutableSet.copyOf(this.identifierSubjects.values());
 	}
 	
 	public Predicate<String> getIdentifierValidityPredicate() {
@@ -149,7 +200,7 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		Preconditions.checkNotNull(permission, "permission");
 		
 		ImmutableMap.Builder<Subject, Boolean> builder = ImmutableMap.builder();
-		for (Subject subject : this.subjects.values()) {
+		for (Subject subject : this.identifierSubjects.values()) {
 			Tristate value = subject.getPermissionValue(subject.getActiveContexts(), permission);
 			if (!value.equals(Tristate.UNDEFINED)) {
 				builder.put(subject, value.asBoolean());
@@ -164,7 +215,7 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		Preconditions.checkNotNull(permission, "permission");
 		
 		ImmutableMap.Builder<Subject, Boolean> builder = ImmutableMap.builder();
-		for (Subject subject : this.subjects.values()) {
+		for (Subject subject : this.identifierSubjects.values()) {
 			Tristate value = subject.getPermissionValue(contexts, permission);
 			if (!value.equals(Tristate.UNDEFINED)) {
 				builder.put(subject, value.asBoolean());
@@ -178,14 +229,14 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		Preconditions.checkNotNull(identifier, "identifier");
 		
 		return CompletableFuture.supplyAsync(() -> {
-			return this.plugin.getManagerData().get(this.getIdentifier()).hasSubject(identifier);
+			return this.storage.hasSubject(identifier);
 		}, this.plugin.getThreadAsync());
 	}
 	
 	@Override
 	public CompletableFuture<Set<String>> getAllIdentifiers() {
 		return CompletableFuture.supplyAsync(() -> {
-			return this.plugin.getManagerData().get(this.getIdentifier()).getAllIdentifiers();
+			return this.storage.getAllIdentifiers();
 		}, this.plugin.getThreadAsync());
 	}
 
@@ -201,7 +252,11 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		Preconditions.checkNotNull(permission, "permission");
 		
 		return CompletableFuture.supplyAsync(() -> {
-			return this.plugin.getManagerData().get(this.getIdentifier()).getAllWithPermission(typeWorld, permission);
+			return this.storage.getAllWithPermission(typeWorld, permission.toLowerCase());
 		}, this.plugin.getThreadAsync());
+	}
+
+	public ICollectionStorage getStorage() {
+		return this.storage;
 	}
 }

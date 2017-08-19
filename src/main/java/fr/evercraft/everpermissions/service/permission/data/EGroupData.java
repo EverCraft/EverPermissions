@@ -132,7 +132,7 @@ public class EGroupData extends ESubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).removeParent(this, typeWorld, parent)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().removeParent(this, typeWorld, parent)) return false;
 			
 			this.removeParentExecute(typeWorld, parent);
 			this.onUpdate();
@@ -167,7 +167,7 @@ public class EGroupData extends ESubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearParents(this, typeWorld)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().clearParents(this, typeWorld)) return false;
 			
 			this.clearParentsExecute(typeWorld);
 			this.onUpdate();
@@ -193,7 +193,7 @@ public class EGroupData extends ESubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearParents(this)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().clearParents(this)) return false;
 			
 			this.clearParentsExecute();
 			this.onUpdate();

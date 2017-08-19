@@ -39,7 +39,7 @@ public class EGroupSubject extends ESubject {
 	private final EGroupData data;
 	private final EGroupData transientData;
 	
-	private final Set<String> worlds;
+	private final Set<String> typeWorlds;
 	private final Set<String> defaults;
 	
     public EGroupSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<?> collection) {
@@ -48,7 +48,7 @@ public class EGroupSubject extends ESubject {
     	this.data = new EGroupData(this.plugin, this, false);
         this.transientData = new EGroupData(this.plugin, this, true);
         
-        this.worlds = new HashSet<String>();
+        this.typeWorlds = new HashSet<String>();
         this.defaults = new HashSet<String>();
     }
     
@@ -203,7 +203,7 @@ public class EGroupSubject extends ESubject {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).setDefault(this, typeWorld, value)) return false;
+			if (!this.getContainingCollection().getStorage().setDefault(this, typeWorld, value)) return false;
 			
 			this.setDefaultExecute(typeWorld, value);
 			this.getSubjectData().onUpdate();
@@ -224,28 +224,28 @@ public class EGroupSubject extends ESubject {
 		}
 	}
 	
-	public Set<String> getWorlds() {
+	public Set<String> getTypeWorlds() {
 		this.read_lock.lock();
 		try {
-			return ImmutableSet.copyOf(this.worlds);
+			return ImmutableSet.copyOf(this.typeWorlds);
 		} finally {
 			this.read_lock.unlock();
 		}
 	}
 	
-	public boolean hasWorld(final String typeWorld) {
+	public boolean hasTypeWorld(final String typeWorld) {
 		this.read_lock.lock();
 		try {
-			return this.worlds.contains(typeWorld);
+			return this.typeWorlds.contains(typeWorld);
 		} finally {
 			this.read_lock.unlock();
 		}
 	}
 	
-	public boolean registerWorld(final String typeWorld) {
+	public boolean registerTypeWorld(final String typeWorld) {
 		this.write_lock.lock();
 		try {
-			return this.worlds.add(typeWorld);
+			return this.typeWorlds.add(typeWorld);
 		} finally {
 			this.write_lock.unlock();
 		}
@@ -262,9 +262,13 @@ public class EGroupSubject extends ESubject {
 			this.transientData.clearOptions(typeWorld);
 			this.transientData.clearPermissions(typeWorld);
 		
-			this.worlds.remove(typeWorld);
+			this.typeWorlds.remove(typeWorld);
 		} finally {
 			this.write_lock.unlock();
 		}
+	}
+
+	public CompletableFuture<Boolean> remove(String typeWorld) {
+		return null;
 	}
 }

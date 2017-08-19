@@ -16,48 +16,75 @@
  */
 package fr.evercraft.everpermissions.service.permission.collection;
 
-import fr.evercraft.everapi.event.PermSystemEvent;
-import fr.evercraft.everapi.event.PermGroupEvent.Action;
-import fr.evercraft.everapi.util.Chronometer;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.storage.ICollectionStorage;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
-import fr.evercraft.everpermissions.storage.EPConfGroups;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
-import org.spongepowered.api.util.Tristate;
 
-import com.google.common.reflect.TypeToken;
+import com.google.common.base.Preconditions;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
-	private final ConcurrentMap<String, EGroupSubject> groups_default;
+	private final ConcurrentMap<String, EGroupSubject> defaults;
 
     public EGroupCollection(final EverPermissions plugin) {
     	super(plugin, PermissionService.SUBJECTS_GROUP);
-    	this.groups_default = new ConcurrentHashMap<String, EGroupSubject>();
+    	
+    	this.defaults = new ConcurrentHashMap<String, EGroupSubject>();
     }
     
-    public void reload() {}
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public CompletableFuture<Boolean> load() {
+    	return CompletableFuture.supplyAsync(() -> {
+			Set<String> identifiers = this.storage.getAllIdentifiers();
+
+			for (String identifier : identifiers) {
+				identifier = identifier.toLowerCase();
+				
+				EGroupSubject newSubject = this.add(identifier);
+				this.identifierSubjects.put(newSubject.getIdentifier().toLowerCase(), newSubject);
+				newSubject.getFriendlyIdentifier().ifPresent(name -> this.nameSubjects.put(name.toLowerCase(), newSubject));
+			}
+			
+			return this.storage.load((Collection) this.identifierSubjects.values());
+		}, this.plugin.getThreadAsync());
+    }
+    
+    public void reload() {
+    	this.defaults.clear();
+    	this.identifierSubjects.clear();
+    	this.nameSubjects.clear();
+    	
+    	this.reloadConfig();
+    	
+    	this.load().join();
+    }
     
     @Override
 	protected EGroupSubject add(String identifier) {
 		return new EGroupSubject(this.plugin, identifier, this);
+	}
+    
+    @Override
+	public void suggestUnload(String identifier) {}
+    
+    @Override
+	public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(Set<Context> contexts, String permission) {
+		Preconditions.checkNotNull(contexts, "contexts");
+		Preconditions.checkNotNull(permission, "permission");
+		
+		return this.getAllWithPermission(this.plugin.getService().getContextCalculator().getUser(contexts), permission);
 	}
     
     /*
@@ -70,163 +97,20 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
      * @param type Le type de groupe
      * @return False si le type de groupe n'existe pas
      */
-    public boolean register(final String identifier, final String worldType) {
-    	ICollectionStorage storage = this.plugin.getManagerData().register(PermissionService.SUBJECTS_GROUP, worldType);
-	    	
+    public CompletableFuture<Boolean> register(final String identifier, final String worldType) {
     	// Création du groupe si il n'existe pas
-    	EGroupSubject group =  this.subjects.get(identifier);
+    	EGroupSubject group =  this.identifierSubjects.get(identifier);
     	if (group != null) {
-    		group.registerWorld(worldType);
-    		return true;
+    		group.registerTypeWorld(worldType);
     		
-    	}
+    		return CompletableFuture.supplyAsync(() -> this.storage.load(group), this.plugin.getThreadAsync());
+    		
+    	} 
     	
-		group = new EGroupSubject(this.plugin, identifier, this);
-		group.registerWorld(worldType);
-		this.subjects.put(identifier.toLowerCase(), group);
-		return storage.load(group);
-    }
-    
-    /**
-     * Supprime un groupe à un type de groupe
-     * @param identifier Le nom du groupe
-     * @param type Le type de groupe
-     * @return False si le type de groupe n'existe pas
-     */
-    public boolean remove(final String identifier, final String worldType) {
-    	ICollectionStorage collectionStorage = this.plugin.getManagerData().get(worldType);
-    	if (collectionStorage == null) return false;    	
-    	
-    	if (groups.isPresent()) {
-	    	groups.get().getNode().removeChild(identifier);
-	    	EGroupSubject group = this.get(identifier);
-	    	if (group != null) {
-	    		group.clear(type);
-	    		this.groups_default.remove(type, group);
-	    		
-	    		this.plugin.getManagerData().saveGroup(type);
-	    		return true;
-	    	}
-    	}
-    	return false;
-    }
-    
-    /**
-     * Ajoute un monde
-     * @param world_name Le nom du monde
-     */
-	public void registerWorld(final String world_name) {
-		Chronometer chronometer = new Chronometer();
-		Optional<EPConfGroups> conf = this.plugin.getManagerData().registerGroup(world_name);
-		// Si c'est un nouveau type de groupe
-		if (conf.isPresent()) {
-			Optional<String> type = this.plugin.getManagerData().getTypeGroup(world_name);
-			if (type.isPresent()) {
-				Set<Context> contexts = EContextCalculator.of(type.get());
-				// Chargement des permissions et des options
-				for (Entry<Object, ? extends ConfigurationNode> group : conf.get().getNode().getChildrenMap().entrySet()) {
-					if (group.getKey() instanceof String) {
-						String group_name = (String) group.getKey();
-						// Initialisation du groupe
-			    		EGroupSubject subject;
-			    		if (!this.subject.containsKey(group_name.toLowerCase())) {
-			    			subject = new EGroupSubject(this.plugin, group_name, this);
-			    			this.subject.put(group_name.toLowerCase(), subject);
-			    		} else {
-			    			subject = get(group_name);
-			    		}
-			    		subject.registerWorld(type.get());
-			    		// Chargement des permissions
-			    		for (Entry<Object, ? extends ConfigurationNode> permission : group.getValue().getNode("permissions").getChildrenMap().entrySet()) {
-			    			if (group.getKey() instanceof String && permission.getValue().getValue() instanceof Boolean) {
-			    				subject.getSubjectData().setPermissionExecute(contexts, (String) permission.getKey(), Tristate.fromBoolean(permission.getValue().getBoolean(false)));
-			    			} else {
-			    				this.plugin.getELogger().warn("Error : Loading group ("
-			    						+ "type='" + type.get() + "';"
-			    						+ "permission='" + permission.getValue().toString() + "')");
-			    			}
-			    		}
-			    		// Chargement des options
-			    		for (Entry<Object, ? extends ConfigurationNode> options : group.getValue().getNode("options").getChildrenMap().entrySet()) {
-			    			if (group.getKey() instanceof String && options.getValue().getValue() instanceof String) {
-			    				subject.getSubjectData().setOptionExecute(contexts, (String) options.getKey(), options.getValue().getString(""));
-			    			} else {
-			    				this.plugin.getELogger().warn("Error : Loading group ("
-			    						+ "type='" + type.get() + "';"
-			    						+ "option='" + options.getValue().toString() + "')");
-			    			}
-			    		}
-					}
-				}
-				// Chargement des inheritances
-				for (Entry<Object, ? extends ConfigurationNode> group : conf.get().getNode().getChildrenMap().entrySet()) {
-					if (group.getKey() instanceof String) {
-						String group_name = (String) group.getKey();
-						EGroupSubject subject = get(group_name);
-						try {
-							for (String inheritance : group.getValue().getNode("inheritances").getList(TypeToken.of(String.class))) {
-								EGroupSubject parent = get(inheritance);
-								if (parent != null && !parent.equals(subject)) {
-									subject.getSubjectData().addParentExecute(contexts, parent);
-								} else {
-									this.plugin.getELogger().warn("Error : Loading group ("
-											+ "type='" + type.get() + "';"
-											+ "group='" + subject.getIdentifier() + "';"
-											+ "inheritance='" + inheritance +"')");
-								}
-							}
-						} catch (ObjectMappingException e) {}
-					}
-				}
-				// Event GROUP_ADDED
-				// Ajout du groupe par défaut
-				for (Entry<Object, ? extends ConfigurationNode> group : conf.get().getNode().getChildrenMap().entrySet()) {
-					if (group.getKey() instanceof String) {
-						String group_name = (String) group.getKey();
-						EGroupSubject subject = get(group_name);
-						if (subject != null) {
-							this.plugin.getManagerEvent().post(subject, Action.GROUP_ADDED);
-							// Si c'est un groupe par défaut
-							if (group.getValue().getNode("default").getBoolean(false)) {
-				    			this.groups_default.put(type.get(), subject);
-				    			
-				    			this.plugin.getELogger().debug("Group default : (world=" + type.get() + ";subject=" + subject.getIdentifier() + ")");
-				    		}
-						}
-					}
-				}
-			}
-		}
-		this.plugin.getELogger().debug("Loading world '" + world_name + "' in " +  chronometer.getMilliseconds().toString() + " ms");
-	}
-	
-	/**
-	 * Supprime un monde
-	 * @param world_name Le nom du monde
-	 */
-	public void removeWorld(final String world_name) {
-    	Optional<String> world = this.plugin.getManagerData().getTypeGroup(world_name);
-		if (world.isPresent()) {
-			Optional<EPConfGroups> conf = this.plugin.getManagerData().removeGroup(world_name);
-			if (conf.isPresent()) {
-				for (Entry<Object, ? extends ConfigurationNode> group : conf.get().getNode().getChildrenMap().entrySet()) {
-					if (group.getKey() instanceof String) {
-						EGroupSubject subject = this.get((String) group.getKey());
-						if (subject != null) {
-							subject.clear(world.get());
-							this.groups_default.remove(world.get(), subject);
-							
-							if (subject.getWorlds().isEmpty()) {
-								this.subject.remove((String) group.getKey());
-							}
-
-							this.plugin.getManagerEvent().post(subject, Action.GROUP_REMOVED);
-							this.plugin.getELogger().debug("UnLoad world (Subject='" + subject.getIdentifier() + "';World='" + world.get() + "')");
-						}
-					}
-				}
-			}
-		}
+    	EGroupSubject newGroup = new EGroupSubject(this.plugin, this.nextUUID().toString(), this);
+    	newGroup.registerTypeWorld(worldType);
+		this.identifierSubjects.put(identifier.toLowerCase(), newGroup);
+		return CompletableFuture.supplyAsync(() -> this.storage.load(newGroup), this.plugin.getThreadAsync());
     }
 	
 	/**
@@ -234,10 +118,10 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 	 * @param type Le type de groupe
 	 * @return La liste des groupes
 	 */
-	public Set<EGroupSubject> getGroups(final String type) {
+	public Set<EGroupSubject> getGroups(final String typeWorld) {
 		Set<EGroupSubject> groups = new HashSet<EGroupSubject>();
-		for (EGroupSubject group : this.subject.values()) {
-			if (group.hasWorld(type)) {
+		for (EGroupSubject group : this.identifierSubjects.values()) {
+			if (group.hasTypeWorld(typeWorld)) {
 				groups.add(group);
 			}
 		}
@@ -248,64 +132,29 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
      * GroupDefault
      */
     
-    /**
-     * La liste des groupes par défaut selon les types de groupes
-     * @return La liste des groupes par défaut
-     */
     public ConcurrentMap<String, EGroupSubject> getDefaultGroups() {
-		return groups_default;
+		return this.defaults;
 	}
 
-    /**
-     * Le groupe par défaut d'un type de groupe
-     * @param world Le monde
-     * @return Le groupe par défaut
-     */
-	public Optional<EGroupSubject> getDefaultGroup(final String type) {
-		return Optional.ofNullable(this.groups_default.get(type));
+	public Optional<EGroupSubject> getDefaultGroup(final String worldType) {
+		return Optional.ofNullable(this.defaults.get(worldType));
 	}
 	
-	/**
-	 * Ajoute un groupe par défaut et l'ajoute dans le fichier de config
-	 * @param group Le groupe
-	 * @param type Le type de groupe
-	 * @return False si il n'y a pas déjà un groupe par défaut
-	 */
-	public boolean registerDefault(final EGroupSubject group, final String type) {
-		// Il n'y a pas de groupe par défaut
-		if (!this.groups_default.containsKey(type)) {
-			Optional<EPConfGroups> groups =  this.plugin.getManagerData().getConfGroup(type);
-			// Si le fichier de configuration existe
-			if (groups.isPresent()) {
-				groups.get().get(group.getIdentifier() + ".default").setValue(true);
-				this.groups_default.putIfAbsent(type, group);
-				
-				this.plugin.getManagerData().saveGroup(type);
-				return true;
-			}
-		}
-		return false;
+	public boolean setDefaultExecute(final String worldType, final EGroupSubject group) {
+		this.defaults.put(worldType, group);
+		return true;
 	}
 	
-	/**
-	 * Supprime un groupe par défaut et le supprime du fichier de config
-	 * @param group Le groupe
-	 * @param type Le type de groupe
-	 * @return False si il y a n'était pas celui par défault
-	 */
-	public boolean removeDefault(final EGroupSubject group, final String type) {
-		// Il n'y a pas de groupe par défaut
-		if (this.groups_default.containsKey(type) && this.groups_default.get(type).equals(group)) {
-			Optional<EPConfGroups> groups =  this.plugin.getManagerData().getConfGroup(type);
-			// Si le fichier de configuration existe
-			if (groups.isPresent()) {
-				groups.get().get(group.getIdentifier() + ".default").setValue(false);
-				this.groups_default.remove(type, group);
-				
-				this.plugin.getManagerData().saveGroup(type);
-				return true;
-			}
-		}
-		return false;
+	public boolean removeDefaultExecute(final String worldType) {
+		this.defaults.remove(worldType);
+		return true;
+	}
+	
+	public UUID nextUUID() {
+		UUID uuid = null;
+		do {
+			uuid = UUID.randomUUID();
+		} while (this.identifierSubjects.containsKey(uuid.toString()));
+		return uuid;
 	}
 }

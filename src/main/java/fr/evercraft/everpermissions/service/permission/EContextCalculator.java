@@ -32,7 +32,9 @@ import org.spongepowered.api.world.Locatable;
 
 import com.google.common.collect.ImmutableSet;
 
+import fr.evercraft.everpermissions.EPConfig;
 import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 
 public class EContextCalculator implements ContextCalculator<Subject> {
 	
@@ -92,14 +94,12 @@ public class EContextCalculator implements ContextCalculator<Subject> {
 		return this.get(PermissionService.SUBJECTS_USER, contexts);
     }
     
-    public String get(final String collection, final Set<Context> contexts) {
-		for (Context context : contexts) {
-			if (context.getType().equals(Context.WORLD_KEY)) {
-				return this.plugin.getManagerData().getTypeWorld(collection, context.getName()).orElseGet(() -> 
-					this.plugin.getManagerData().getTypeWorld(collection, EContextCalculator.getWorld(SubjectData.GLOBAL_CONTEXT).orElse("")).orElse(""));
-			}
-		}
-		return "";
+    public String get(final String identifierCollection, final Set<Context> contexts) {
+    	Optional<ESubjectCollection<?>> collection = this.plugin.getService().get(identifierCollection);
+    	if (!collection.isPresent()) return EPConfig.DEFAULT;
+    	
+    	return collection.get().getTypeWorld(EContextCalculator.getWorld(contexts).orElse(""))
+    		.orElseGet(() -> collection.get().getTypeWorld(EContextCalculator.getWorld(SubjectData.GLOBAL_CONTEXT).orElse("")).orElse(EPConfig.DEFAULT));
     }
 	 
     /**

@@ -105,7 +105,7 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 		
 		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
 		// Groupe introuvable
-		if (group == null || !group.hasWorld(type_group.get())) {
+		if (group == null || !group.hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())

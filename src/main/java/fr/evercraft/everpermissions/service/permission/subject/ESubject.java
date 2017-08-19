@@ -21,7 +21,6 @@ import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollec
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.service.context.Context;
 
@@ -72,7 +71,7 @@ public abstract class ESubject implements Subject {
 	}
 	
 	@Override
-	public SubjectCollection getContainingCollection() {
+	public ESubjectCollection<?> getContainingCollection() {
 		return this.collection;
 	}
 	
@@ -144,7 +143,7 @@ public abstract class ESubject implements Subject {
 			if (this.name == null && name == null) return false;
 			if (this.name != null && name != null && this.name.equals(name)) return false;
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).setFriendlyIdentifier(this, name)) return false;
+			if (!this.getContainingCollection().getStorage().setFriendlyIdentifier(this, name)) return false;
 			
 			this.setFriendlyIdentifierExecute(name);
 			return true;

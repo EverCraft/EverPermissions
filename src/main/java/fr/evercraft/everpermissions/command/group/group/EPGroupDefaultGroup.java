@@ -90,7 +90,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String value_name, final String world_name) {
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -100,9 +100,9 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
 		// Groupe introuvable
-		if (group == null || !group.hasWorld(type_group.get())) {
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -117,49 +117,53 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		if (value.get()) {
-			// Le groupe a bien été mit par défaut
-			if (this.plugin.getService().getGroupSubjects().registerDefault(group, type_group.get())) {
-				EPMessages.GROUP_DEFAULT_GROUP_TRUE.sender()
+		Optional<EGroupSubject> oldDefault = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
+		if (oldDefault.isPresent()) {
+			// C'est déjà le groupe par défaut
+			if (value.get() && oldDefault.get().equals(group.get())) {
+				EPMessages.GROUP_DEFAULT_GROUP_ERROR_EQUALS.sender()
 					.replace("<group>", group_name)
 					.replace("<type>", type_group.get())
 					.sendTo(player);
-				this.plugin.getService().getUserSubjects().reload();
-				return CompletableFuture.completedFuture(true);
-			// Le groupe n'a pas été mit par défaut
-			} else {
-				Optional<EGroupSubject> group_default = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
-				// C'est déjà le groupe par défaut
-				if (group_default.isPresent() && group_default.get().equals(group)) {
-					EPMessages.GROUP_DEFAULT_GROUP_ERROR_EQUALS.sender()
-						.replace("<group>", group_name)
-						.replace("<type>", type_group.get())
-						.sendTo(player);
-				// Il y a déja un autre groupe par défaut
-				} else {
-					EPMessages.GROUP_DEFAULT_GROUP_ERROR_TRUE.sender()
-						.replace("<group>", group_name)
-						.replace("<type>", type_group.get())
-						.sendTo(player);
-				}
-			}
-		} else {
-			// Le groupe n'est plus un groupe par défaut
-			if (this.plugin.getService().getGroupSubjects().removeDefault(group, type_group.get())) {
-				EPMessages.GROUP_DEFAULT_GROUP_FALSE.sender()
-					.replace("<group>", group_name)
-					.replace("<type>", type_group.get())
-					.sendTo(player);
-				this.plugin.getService().getUserSubjects().reload();
-				return CompletableFuture.completedFuture(true);
+			
 			// Le groupe n'a pas un groupe par défaut
-			} else {
+			} else if (!value.get() && !oldDefault.get().equals(group.get())) {
 				EPMessages.GROUP_DEFAULT_GROUP_ERROR_FALSE.sender()
+					.replace("<group>", group_name)
+					.replace("<type>", type_group.get())
+					.sendTo(player);
+				
+			// C'est déjà le groupe par défaut
+			} else if (value.get()) {
+				EPMessages.GROUP_DEFAULT_GROUP_ERROR_TRUE.sender()
 					.replace("<group>", group_name)
 					.replace("<type>", type_group.get())
 					.sendTo(player);
 			}
 		}
-		return CompletableFuture.completedFuture(false);
+		
+		return group.get().setDefault(type_group.get(), true)
+			.exceptionally(e -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(player);
+					return false;
+				}
+				
+				if (value.get()) {
+					EPMessages.GROUP_DEFAULT_GROUP_TRUE.sender()
+						.replace("<group>", group_name)
+						.replace("<type>", type_group.get())
+						.sendTo(player);
+				} else {
+					EPMessages.GROUP_DEFAULT_GROUP_FALSE.sender()
+						.replace("<group>", group_name)
+						.replace("<type>", type_group.get())
+						.sendTo(player);
+				}
+				return true;
+			});
 	}
 }

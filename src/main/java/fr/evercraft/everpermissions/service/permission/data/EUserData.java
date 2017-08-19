@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.World;
@@ -76,14 +75,14 @@ public class EUserData extends ESubjectData {
 				this.permissions.clear();
 				this.options.clear();
 				
-				if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).load(this.subject)) return false;
+				if (!this.getSubject().getContainingCollection().getStorage().load(this.subject)) return false;
 				
 				// Chargement des groupes par défault
 				for (World world : this.plugin.getGame().getServer().getWorlds()) {
 					if (!world.isLoaded()) continue;
 					
-					Optional<String> type_group = this.plugin.getManagerData().getTypeWorld(PermissionService.SUBJECTS_GROUP, world.getName());
-					Optional<String> type_user = this.plugin.getManagerData().getTypeWorld(PermissionService.SUBJECTS_USER, world.getName());
+					Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world.getName());
+					Optional<String> type_user = this.plugin.getService().getUserSubjects().getTypeWorld(world.getName());
 					if (!type_group.isPresent() || !type_user.isPresent()) continue;
 					if (this.getGroup(type_user.get()).isPresent()) continue;
 					
@@ -242,7 +241,7 @@ public class EUserData extends ESubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).setGroup(this, typeWorld, parent, insert)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().setGroup(this, typeWorld, parent, insert)) return false;
 			
 			this.setGroupExecute(typeWorld, parent);
 			this.onUpdate();
@@ -287,7 +286,7 @@ public class EUserData extends ESubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).removeParent(this, typeWorld, parent)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().removeParent(this, typeWorld, parent)) return false;
 			
 			this.removeParentExecute(typeWorld, parent);
 			this.onUpdate();
@@ -327,7 +326,7 @@ public class EUserData extends ESubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearParents(this, typeWorld)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().clearParents(this, typeWorld)) return false;
 			
 			this.clearParentsExecute(typeWorld);
 			this.onUpdate();
@@ -354,7 +353,7 @@ public class EUserData extends ESubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearParents(this)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().clearParents(this)) return false;
 			
 			this.clearParentsExecute();
 			this.onUpdate();

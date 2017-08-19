@@ -87,7 +87,7 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String world_name) {
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -97,9 +97,9 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
 		// Groupe introuvable
-		if (group == null || !group.hasWorld(type_group.get())) {
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -108,17 +108,20 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 		}
 		
 		// Le groupe n'a pas été supprimé
-		if (!this.plugin.getService().getGroupSubjects().remove(group_name, type_group.get())) {
-			EAMessages.COMMAND_ERROR.sender()
-				.prefix(EPMessages.PREFIX)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		EPMessages.GROUP_DEL_GROUP_STAFF.sender()
-				.replace("<group>", group_name)
-				.replace("<type>", type_group.get());
-		this.plugin.getService().getUserSubjects().reload();
-		return CompletableFuture.completedFuture(true);
+		return group.get().remove(type_group.get())
+			.exceptionally(e -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(player);
+					return false;
+				}
+				
+				EPMessages.GROUP_DEL_GROUP_STAFF.sender()
+					.replace("<group>", group_name)
+					.replace("<type>", type_group.get());
+				return true;
+			});
 	}
 }

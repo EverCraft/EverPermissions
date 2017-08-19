@@ -16,40 +16,21 @@
  */
 package fr.evercraft.everpermissions.command;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
-
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
-import com.google.common.reflect.TypeToken;
-
-import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.storage.EPConfUsers;
-import fr.evercraft.everpermissions.storage.EPManagerStorage;
 
 public class EPTransfert extends ECommand<EverPermissions> {
 	
@@ -85,7 +66,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		if (args.size() == 1) {
 			//Si la base de donnée est activé
-			if (this.plugin.getManagerData().isSQL()) {
+			if (this.plugin.getDataBases().isEnable()) {
 				// Transféré vers une base de donnée SQL
 				if (args.get(0).equalsIgnoreCase("sql")) {
 					EPMessages.TRANSFERT_SQL_CONFIRMATION.sender()
@@ -106,7 +87,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
 			}
 		} else if (args.size() == 2 && args.get(1).equalsIgnoreCase("confirmation")) {
 			//Si la base de donnée est activé
-			if (this.plugin.getManagerData().isSQL()) {
+			if (this.plugin.getDataBases().isEnable()) {
 				// Transféré vers une base de donnée SQL
 				if (args.get(0).equalsIgnoreCase("sql")) {
 					this.plugin.getGame().getScheduler().createTaskBuilder().async().execute(() -> commandSQL(source)).submit(this.plugin);
@@ -150,26 +131,26 @@ public class EPTransfert extends ECommand<EverPermissions> {
 	 */
 	private CompletableFuture<Boolean> commandSQL(final CommandSource player) {
 		boolean resultat = false;
-		
+		/*
 		Connection connection = null;
 		PreparedStatement preparedPermissions = null;
 		PreparedStatement preparedGroups = null;
 		PreparedStatement preparedOptions = null;
 		
-		String queryPermissions = "INSERT INTO `" + this.plugin.getManagerData().getDataBases().getTableUsersPermissions() + "` "
+		String queryPermissions = "INSERT INTO `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
 								+ "VALUES (?, ?, ?, ?);";
 		
-		String queryGroups =  "INSERT INTO `" + this.plugin.getManagerData().getDataBases().getTableUsersGroups() + "` "
+		String queryGroups =  "INSERT INTO `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
 							+ "VALUES (?, ?, ?, ?);";
 		
-		String queryOptions = "INSERT INTO `" + this.plugin.getManagerData().getDataBases().getTableUsersOptions() + "` "
+		String queryOptions = "INSERT INTO `" + this.plugin.getDataBases().getTableUsersOptions() + "` "
 							+ "VALUES (?, ?, ?, ?);";
 		
 		try {
-    		connection = this.plugin.getManagerData().getDataBases().getConnection();
+    		connection = this.plugin.getDataBases().getConnection();
     		
     		// Suppression des données qu'il y a actuellement dans base de données
-    		if (this.plugin.getManagerData().getDataBases().clear(connection)) {
+    		if (this.plugin.getDataBases().clear(connection)) {
     			preparedPermissions = connection.prepareStatement(queryPermissions);
     			preparedGroups = connection.prepareStatement(queryGroups);
     			preparedOptions = connection.prepareStatement(queryOptions);
@@ -178,7 +159,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
     			ConfigurationNode config = null;
     			
     			// Pour tous les types de joueurs
-    			for (String world : new HashSet<String>(this.plugin.getManagerData().getWorldUsers().values())) {
+    			for (String world : new HashSet<String>(this.plugin.getManagerData().get(PermissionService.SUBJECTS_USER).values())) {
     				file = this.plugin.getPath().resolve(EPManagerStorage.MKDIR_USERS + "/" + world + ".conf").toFile();
     				// Si le fichier existe
     				if (file.exists()) {
@@ -267,12 +248,12 @@ public class EPTransfert extends ECommand<EverPermissions> {
 		} else {
 			EPMessages.TRANSFERT_ERROR.sendTo(player);
 		}
-		
+		*/
 		return CompletableFuture.completedFuture(resultat);
 	}
 
 	private void commandConf(final CommandSource source) {
-		boolean resultat = false;
+		/*boolean resultat = false;
 		
 		Connection connection = null;
 		PreparedStatement preparedPermissions = null;
@@ -283,19 +264,19 @@ public class EPTransfert extends ECommand<EverPermissions> {
 		EPConfUsers config = null;
 		
 		String queryPermissions = "SELECT *" 
-								+ "FROM `" + this.plugin.getManagerData().getDataBases().getTableUsersPermissions() + "` "
+								+ "FROM `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
 								+ "WHERE `world` = ? ;";
 		
 		String queryGroups =  "SELECT *" 
-							+ "FROM `" + this.plugin.getManagerData().getDataBases().getTableUsersGroups() + "` "
+							+ "FROM `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
 							+ "WHERE `world` = ? ;";
 		
 		String queryOptions = "SELECT *" 
-							+ "FROM `" + this.plugin.getManagerData().getDataBases().getTableUsersOptions() + "` "
+							+ "FROM `" + this.plugin.getDataBases().getTableUsersOptions() + "` "
 							+ "WHERE `world` = ? ;";
 		
 		try {
-    		connection = this.plugin.getManagerData().getDataBases().getConnection();
+    		connection = this.plugin.getDataBases().getConnection();
 
 			preparedPermissions = connection.prepareStatement(queryPermissions);
 			preparedGroups = connection.prepareStatement(queryGroups);
@@ -374,6 +355,6 @@ public class EPTransfert extends ECommand<EverPermissions> {
 		} else {
 			EPMessages.TRANSFERT_ERROR.sendTo(source);
 		}
+	}*/
 	}
-	
 }

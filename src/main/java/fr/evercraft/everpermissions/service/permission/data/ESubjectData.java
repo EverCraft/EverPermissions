@@ -162,7 +162,7 @@ public abstract class ESubjectData implements SubjectData {
 			if (insert && value.equals(Tristate.UNDEFINED)) return false;
 			if (!insert && !value.equals(Tristate.UNDEFINED) && oldValue.booleanValue() == value.asBoolean()) return false;
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).setPermission(this, typeWorld, permission, value, insert)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().setPermission(this, typeWorld, permission, value, insert)) return false;
 			
 			this.setPermissionExecute(typeWorld, permission, value);
 			this.onUpdate();
@@ -201,7 +201,7 @@ public abstract class ESubjectData implements SubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearPermissions(this, typeWorld)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().clearPermissions(this, typeWorld)) return false;
 			
 			this.clearPermissionsExecute(typeWorld);
 			this.onUpdate();
@@ -228,7 +228,7 @@ public abstract class ESubjectData implements SubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearPermissions(this)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().clearPermissions(this)) return false;
 			
 			this.clearPermissionsExecute();
 			this.onUpdate();
@@ -288,7 +288,7 @@ public abstract class ESubjectData implements SubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).addParent(this, typeWorld, parent)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().addParent(this, typeWorld, parent)) return false;
 			
 			this.addParentExecute(typeWorld, parent);
 			this.onUpdate();
@@ -344,7 +344,7 @@ public abstract class ESubjectData implements SubjectData {
 			if (insert && value == null) return false;
 			if (!insert && value != null && oldValue.equals(value)) return false;
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).setOption(this, typeWorld, key, value, insert)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().setOption(this, typeWorld, key, value, insert)) return false;
 			
 			this.setOptionExecute(typeWorld, key, oldValue);
 			this.onUpdate();
@@ -383,7 +383,7 @@ public abstract class ESubjectData implements SubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearOptions(this, typeWorld)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().clearOptions(this, typeWorld)) return false;
 			
 			this.clearOptionsExecute(typeWorld);
 			this.onUpdate();
@@ -411,7 +411,7 @@ public abstract class ESubjectData implements SubjectData {
 				this.read_lock.unlock();
 			}
 			
-			if (!this.plugin.getManagerData().get(this.getCollectionIdentifier()).clearOptions(this)) return false;
+			if (!this.getSubject().getContainingCollection().getStorage().clearOptions(this)) return false;
 			
 			this.clearOptionsExecute();
 			this.onUpdate();

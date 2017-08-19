@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with EverPermissions.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.evercraft.everpermissions.storage;
+package fr.evercraft.everpermissions;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.EDataBase;
-import fr.evercraft.everpermissions.EverPermissions;
 
 public class EPDataBases extends EDataBase<EverPermissions> {
 	private static final String TABLE_USERS_PROFILS = "users_profils";

@@ -87,7 +87,7 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String world_name) {
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -97,9 +97,9 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().loadSubject(group_name).join();
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
 		// Groupe existant
-		if (group != null && group.hasWorld(type_group.get())) {
+		if (group.isPresent() && group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_ADD_GROUP_ERROR.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -107,18 +107,21 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		// Le groupe n'a pas été ajouté
-		if (!this.plugin.getService().getGroupSubjects().register(group_name, type_group.get())) {
-			EAMessages.COMMAND_ERROR.sender()
-				.prefix(EPMessages.PREFIX)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		EPMessages.GROUP_ADD_GROUP_STAFF.sender()
-			.replace("<group>", group_name)
-			.replace("<type>", type_group.get())
-			.sendTo(player);
-		return CompletableFuture.completedFuture(true);
+		return this.plugin.getService().getGroupSubjects().register(group_name, type_group.get())
+			.exceptionally(result -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(player);
+					return false;
+				}
+				
+				EPMessages.GROUP_ADD_GROUP_STAFF.sender()
+					.replace("<group>", group_name)
+					.replace("<type>", type_group.get())
+					.sendTo(player);
+				return true;
+			});
 	}
 }

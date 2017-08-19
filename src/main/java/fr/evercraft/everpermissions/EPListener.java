@@ -19,7 +19,6 @@ package fr.evercraft.everpermissions;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.event.world.LoadWorldEvent;
-import org.spongepowered.api.event.world.UnloadWorldEvent;
 
 public class EPListener {
 	private EverPermissions plugin;
@@ -51,24 +50,7 @@ public class EPListener {
     public void onLoadWorldEvent(final LoadWorldEvent event) {
     	if (!event.isCancelled()) {
     		this.plugin.getELogger().debug("Load world : " + event.getTargetWorld().getName());
-    		this.plugin.getService().getGroupSubjects().registerWorld(event.getTargetWorld().getName());
-    		this.plugin.getManagerData().register(event.getTargetWorld().getName());
-    		
-    		this.plugin.getService().getUserSubjects().reload();
-    	}
-    }
-    
-    /**
-     * Déchargement du monde
-     */
-    @Listener
-    public void onUnloadWorldEvent(final UnloadWorldEvent event) {
-    	if (!event.isCancelled()) {
-    		this.plugin.getELogger().debug("Unload world : " + event.getTargetWorld().getName());
-    		this.plugin.getService().getGroupSubjects().removeWorld(event.getTargetWorld().getName());
-    		this.plugin.getManagerData().removeUser(event.getTargetWorld().getName());
-    		
-    		this.plugin.getService().getUserSubjects().reload();
+    		this.plugin.getConfigs().registerWorld(event.getTargetWorld().getName());
     	}
     }
 }

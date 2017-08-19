@@ -93,7 +93,7 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String world_name) {
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -105,7 +105,7 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 		
 		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
 		// Groupe existant
-		if (group == null || !group.hasWorld(type_group.get())) {
+		if (group == null || !group.hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())

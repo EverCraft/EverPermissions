@@ -16,6 +16,7 @@
  */
 package fr.evercraft.everpermissions.service.permission.storage;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,7 +35,7 @@ public interface ICollectionStorage {
     
     public boolean load(ESubject subject);
     
-    public boolean load(Set<ESubject> subject);
+    public boolean load(Collection<ESubject> subjects);
     
     public boolean setFriendlyIdentifier(ESubject subject, @Nullable String name);
     
