@@ -114,8 +114,23 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 		return CompletableFuture.completedFuture(false);
 	}
 	
-	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final String type, final String world_name) {
-		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final String option, final String world_name) {
+		return this.plugin.getService().getUserSubjects().load(user.getIdentifier())
+			.exceptionally(e -> null)
+			.thenCompose(subject -> {
+				if (subject == null) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return CompletableFuture.completedFuture(false);
+				}
+				
+				return this.command(staff, user, subject, option, world_name);
+			});
+	}
+	
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final String option, final String world_name) {
+		Optional<String> type_user = this.plugin.getService().getUserSubjects().getTypeWorld(world_name);
 		// Monde existant
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -125,33 +140,22 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-		// User inexistant
-		if (subject == null) {
-			EAMessages.PLAYER_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("<player>", user.getIdentifier())
-				.sendTo(staff);
-			return CompletableFuture.completedFuture(false);
-		}
-		
 		Set<Context> contexts = EContextCalculator.of(world_name);
-
-		Optional<String> name = subject.getOption(contexts, type);
+		Optional<String> value = subject.getOption(contexts, option);
 		// Il y a une valeur
-		if (!name.isPresent()) {
+		if (!value.isPresent()) {
 			// La source et le joueur sont identique
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_CHECK_OPTION_UNDEFINED_EQUALS.sender()
 					.replace("<player>", user.getName())
-					.replace("<option>", type)
+					.replace("<option>", option)
 					.replace("<type>", type_user.get())
 					.sendTo(staff);
 			// La source et le joueur ne sont pas identique
 			} else {
 				EPMessages.USER_CHECK_OPTION_UNDEFINED_STAFF.sender()
 					.replace("<player>", user.getName())
-					.replace("<option>", type)
+					.replace("<option>", option)
 					.replace("<type>", type_user.get())
 					.sendTo(staff);
 			}
@@ -162,17 +166,17 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 		if (staff.getIdentifier().equals(user.getIdentifier())) {
 			EPMessages.USER_CHECK_OPTION_DEFINED_EQUALS.sender()
 				.replace("<player>", user.getName())
-				.replace("<option>", type)
+				.replace("<option>", option)
 				.replace("<type>", type_user.get())
-				.replace("<value>", Text.of(name.get()))
+				.replace("<value>", Text.of(value.get()))
 				.sendTo(staff);
 		// La source et le joueur ne sont pas identique
 		} else {
 			EPMessages.USER_CHECK_OPTION_DEFINED_STAFF.sender()
 				.replace("<player>", user.getName())
-				.replace("<option>", type)
+				.replace("<option>", option)
 				.replace("<type>", type_user.get())
-				.replace("<value>", Text.of(name.get()))
+				.replace("<value>", Text.of(value.get()))
 				.sendTo(staff);
 		}
 		return CompletableFuture.completedFuture(true);

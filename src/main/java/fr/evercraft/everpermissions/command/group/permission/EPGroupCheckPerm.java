@@ -94,7 +94,7 @@ public class EPGroupCheckPerm extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String permission, final String world_name) {
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -104,9 +104,9 @@ public class EPGroupCheckPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-		// Groupe introuvable
-		if (group == null || !group.hasTypeWorld(type_group.get())) {
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -115,26 +115,26 @@ public class EPGroupCheckPerm extends ECommand<EverPermissions> {
 		}
 		
 		Set<Context> contexts = EContextCalculator.of(type_group.get());
-		Tristate value = group.getPermissionValue(contexts, permission);
+		Tristate value = group.get().getPermissionValue(contexts, permission);
 		
 		// Permission : True
 		if (value.equals(Tristate.TRUE)) {
 			EPMessages.GROUP_CHECK_PERMISSION_TRUE.sender()
-				.replace("<group>", group.getIdentifier())
+				.replace("<group>", group.get().getIdentifier())
 				.replace("<permission>", permission)
 				.replace("<type>", type_group.get())
 				.sendTo(player);
 		// Permission : False
 		} else if (value.equals(Tristate.FALSE)) {
 			EPMessages.GROUP_CHECK_PERMISSION_FALSE.sender()
-				.replace("<group>", group.getIdentifier())
+				.replace("<group>", group.get().getIdentifier())
 				.replace("<permission>", permission)
 				.replace("<type>", type_group.get())
 				.sendTo(player);
 		// Permission : Undefined
 		} else {
 			EPMessages.GROUP_CHECK_PERMISSION_UNDEFINED.sender()
-				.replace("<group>", group.getIdentifier())
+				.replace("<group>", group.get().getIdentifier())
 				.replace("<permission>", permission)
 				.replace("<type>", type_group.get())
 				.sendTo(player);

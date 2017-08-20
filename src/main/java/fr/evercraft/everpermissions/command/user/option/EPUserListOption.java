@@ -23,13 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -40,7 +38,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 
 public class EPUserListOption extends ECommand<EverPermissions> {
@@ -114,7 +111,7 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource staff, final User user, final String world_name) {
-		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
+		Optional<String> type_user = this.plugin.getService().getUserSubjects().getTypeWorld(world_name);
 		// Monde existant
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -124,9 +121,9 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 			
-		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
+		Optional<EUserSubject> subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
 		// User inexistant
-		if (subject == null) {
+		if (!subject.isPresent()) {
 			EAMessages.PLAYER_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
 				.replace("<player>", user.getIdentifier())
@@ -134,11 +131,9 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.of(world_name);
 		List<Text> list = new ArrayList<Text>();
-		
 		// La liste des options
-		Map<String, String> options = subject.getSubjectData().getOptions(contexts);
+		Map<String, String> options = subject.get().getSubjectData().getOptions(type_user.get());
 		if (options.isEmpty()) {
 			list.add(EPMessages.USER_LIST_OPTION_OPTION_EMPTY.getText());
 		} else {
@@ -151,7 +146,7 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 		}
 		
 		// La liste des options temporaires
-		options = user.getTransientSubjectData().getOptions(contexts);
+		options = subject.get().getTransientSubjectData().getOptions(type_user.get());
 		if (!options.isEmpty()) {
 			list.add(EPMessages.USER_LIST_OPTION_TRANSIENT.getText());
 			for (Entry<String, String> permission : options.entrySet()) {

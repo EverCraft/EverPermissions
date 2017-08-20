@@ -20,24 +20,21 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.server.player.EPlayer;
+import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 
 public class EPUserAddOption extends ECommand<EverPermissions> {
@@ -80,7 +77,7 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		// Si on ne connait pas le monde
 		if (args.size() == 3) {
-			Optional<User> optUser = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optUser = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optUser.isPresent()){
 				// Si la source est un joueur
@@ -98,7 +95,7 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 			}
 		// On connais le monde
 		} else if (args.size() == 4) {
-			Optional<User> optPlayer = this.plugin.getEServer().getUser(args.get(0));
+			Optional<EUser> optPlayer = this.plugin.getEServer().getEUser(args.get(0));
 			// Le joueur existe
 			if (optPlayer.isPresent()){
 				return this.command(source, optPlayer.get(), args.get(1), args.get(2), args.get(3));
@@ -116,8 +113,23 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 		return CompletableFuture.completedFuture(false);
 	}
 	
-	private CompletableFuture<Boolean> command(final CommandSource staff, final User user, final String type, String name, final String world_name) {
-		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final String option, final String value, final String world_name) {
+		return this.plugin.getService().getUserSubjects().load(user.getIdentifier())
+			.exceptionally(e -> null)
+			.thenCompose(subject -> {
+				if (subject == null) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return CompletableFuture.completedFuture(false);
+				}
+				
+				return this.command(staff, user, subject, option, value, world_name);
+			});
+	}
+	
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final String option, final String value, final String world_name) {
+		Optional<String> type_user = this.plugin.getService().getUserSubjects().getTypeWorld(world_name);
 		// Monde existant
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -127,43 +139,34 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-		// User inexistant
-		if (subject == null) {
-			EAMessages.PLAYER_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("<player>", user.getIdentifier())
-				.sendTo(staff);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Set<Context> contexts = EContextCalculator.of(world_name);
-		
-		// La permission n'a pas été ajouté
-		if (!subject.getSubjectData().setOption(contexts, type, name)) {
-			EAMessages.COMMAND_ERROR.sender()
-				.prefix(EPMessages.PREFIX)
-				.sendTo(staff);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		// La source et le joueur sont identique
-		if (staff.getIdentifier().equals(user.getIdentifier())) {
-			EPMessages.USER_ADD_OPTION_EQUALS.sender()
-				.replace("<player>", user.getName())
-				.replace("<option>", type)
-				.replace("<type>", type_user.get())
-				.replace("<value>", Text.of(name))
-				.sendTo(staff);
-		// La source et le joueur ne sont pas identique
-		} else {
-			EPMessages.USER_ADD_OPTION_STAFF.sender()
-				.replace("<player>", user.getName())
-				.replace("<option>", type)
-				.replace("<type>", type_user.get())
-				.replace("<value>", Text.of(name))
-				.sendTo(staff);
-		}
-		return CompletableFuture.completedFuture(true);
+		return subject.getSubjectData().setOption(type_user.get(), option, value)
+			.exceptionally(e -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return false;
+				}
+				
+				// La source et le joueur sont identique
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
+					EPMessages.USER_ADD_OPTION_EQUALS.sender()
+						.replace("<player>", user.getName())
+						.replace("<option>", type_user.get())
+						.replace("<type>", type_user.get())
+						.replace("<value>", Text.of(value))
+						.sendTo(staff);
+				// La source et le joueur ne sont pas identique
+				} else {
+					EPMessages.USER_ADD_OPTION_STAFF.sender()
+						.replace("<player>", user.getName())
+						.replace("<option>", type_user.get())
+						.replace("<type>", type_user.get())
+						.replace("<value>", Text.of(value))
+						.sendTo(staff);
+				}
+				return true;
+			});
 	}
 }

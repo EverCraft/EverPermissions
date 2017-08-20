@@ -143,8 +143,9 @@ public class EPMessage extends EMessage<EverPermissions> {
 		USER_LIST_GROUP_SUBGROUP("user.group.list.subgroup", 				"    &6&l➤  Les sous-groupes : "),
 		USER_LIST_GROUP_SUBGROUP_LINE("user.group.list.subgroupLine", 		"        &7&l●  &7<group>"),
 		USER_LIST_GROUP_SUBGROUP_EMPTY("user.group.list.subgroupEmpty", 	"    &6&l➤  Sous-groupes : &7Aucun"),
-		USER_LIST_GROUP_TRANSIENT("user.group.list.transient", 				"    &6&l➤  Les groupes temporaires : "),
-		USER_LIST_GROUP_TRANSIENT_LINE("user.group.list.transientLine", 	"        &7&l●  &7<group>"),
+		USER_LIST_GROUP_TRANSIENT_GROUP("user.group.list.transtienGroup", 					"    &6&l➤  Groupe temporaire : &7<group>"),
+		USER_LIST_GROUP_TRANSIENT_SUBGROUP("user.group.list.transientSubgroup", 			"    &6&l➤  Les groupes temporaires : "),
+		USER_LIST_GROUP_TRANSIENT_SUBGROUP_LINE("user.group.list.transientSubgroupLine", 	"        &7&l●  &7<group>"),
 		
 		// User : Permission
 		USER_ADD_PERMISSION_DESCRIPTION("user.permission.add.description", 				"Ajoute une permission à un joueur",

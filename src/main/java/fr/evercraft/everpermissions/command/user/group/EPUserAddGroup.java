@@ -20,12 +20,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -37,8 +36,8 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 
 public class EPUserAddGroup extends ECommand<EverPermissions> {
 	
@@ -115,8 +114,23 @@ public class EPUserAddGroup extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final String group_name, final String world_name) {
-		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		return this.plugin.getService().getUserSubjects().load(user.getIdentifier())
+			.exceptionally(e -> null)
+			.thenCompose(subject -> {
+				if (subject == null) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return CompletableFuture.completedFuture(false);
+				}
+				
+				return this.command(staff, user, subject, group_name, world_name);
+			});
+	}
+	
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final String group_name, final String world_name) {
+		Optional<String> type_user = this.plugin.getService().getUserSubjects().getTypeWorld(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde existant
 		if (!type_user.isPresent() || !type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -126,9 +140,9 @@ public class EPUserAddGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-		// Groupe introuvable
-		if (group == null || !group.hasTypeWorld(type_group.get())) {
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -136,58 +150,67 @@ public class EPUserAddGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.of(world_name);
-		
-		// Le groupe n'a pas été ajouté
-		if (!user.getSubjectData().addParent(contexts, group)) {
+		Optional<SubjectReference> oldGroup = subject.getSubjectData().getGroup(type_user.get());
+		if (oldGroup.isPresent() && oldGroup.get().equals(group.get().asSubjectReference())) {
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_ADD_GROUP_ERROR_EQUALS.sender()
 					.replace("<player>", user.getName())
-					.replace("<group>", group.getIdentifier())
+					.replace("<group>", group.get().getIdentifier())
 					.replace("<type>", type_user.get());
 			} else {
 				EPMessages.USER_ADD_GROUP_ERROR_STAFF.sender()
 					.replace("<player>", user.getName())
-					.replace("<group>", group.getIdentifier())
+					.replace("<group>", group.get().getIdentifier())
 					.replace("<type>", type_user.get())
 					.sendTo(staff);
 			}
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		if (staff.getIdentifier().equals(user.getIdentifier())) {
-			EPMessages.USER_ADD_GROUP_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<group>", group.getIdentifier())
-					.replace("<type>", type_user.get())
-					.sendTo(staff);
-			
-			this.plugin.getService().broadcastMessage(staff,
-				EPMessages.USER_ADD_GROUP_BROADCAST_EQUALS.sender()
-					.replace("<staff>", staff.getName())
-					.replace("<player>", user.getName())
-					.replace("<group>", group.getIdentifier())
-					.replace("<type>", type_user.get()));
-		} else {
-			EPMessages.USER_ADD_GROUP_STAFF.sender()
-				.replace("<player>", user.getName())
-				.replace("<group>", group.getIdentifier())
-				.replace("<type>", type_user.get())
-				.sendTo(staff);
-			
-			EPMessages.USER_ADD_GROUP_PLAYER.sender()
-				.replace("<staff>", staff.getName())
-				.replace("<group>", group.getIdentifier())
-				.replace("<type>", type_user.get())
-				.sendTo(user);
-			
-			this.plugin.getService().broadcastMessage(staff, user.getUniqueId(), 
-				EPMessages.USER_ADD_GROUP_BROADCAST_PLAYER.sender()
-					.replace("<staff>", staff.getName())
-					.replace("<player>", user.getName())
-					.replace("<group>", group.getIdentifier())
-					.replace("<type>", type_user.get()));
-		}
-		return CompletableFuture.completedFuture(true);
+		return subject.getSubjectData().setGroup(type_user.get(), group.get().asSubjectReference())
+			.exceptionally(e -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return false;
+				}
+				
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
+					EPMessages.USER_ADD_GROUP_EQUALS.sender()
+							.replace("<player>", user.getName())
+							.replace("<group>", group.get().getIdentifier())
+							.replace("<type>", type_user.get())
+							.sendTo(staff);
+					
+					this.plugin.getService().broadcastMessage(staff,
+						EPMessages.USER_ADD_GROUP_BROADCAST_EQUALS.sender()
+							.replace("<staff>", staff.getName())
+							.replace("<player>", user.getName())
+							.replace("<group>", group.get().getIdentifier())
+							.replace("<type>", type_user.get()));
+				} else {
+					EPMessages.USER_ADD_GROUP_STAFF.sender()
+						.replace("<player>", user.getName())
+						.replace("<group>", group.get().getIdentifier())
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+					
+					EPMessages.USER_ADD_GROUP_PLAYER.sender()
+						.replace("<staff>", staff.getName())
+						.replace("<group>", group.get().getIdentifier())
+						.replace("<type>", type_user.get())
+						.sendTo(user);
+					
+					this.plugin.getService().broadcastMessage(staff, user.getUniqueId(), 
+						EPMessages.USER_ADD_GROUP_BROADCAST_PLAYER.sender()
+							.replace("<staff>", staff.getName())
+							.replace("<player>", user.getName())
+							.replace("<group>", group.get().getIdentifier())
+							.replace("<type>", type_user.get()));
+				}
+				return true;
+			});
 	}
 }

@@ -20,12 +20,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -37,7 +35,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 
 public class EPGroupDelPerm extends ECommand<EverPermissions> {
@@ -95,7 +92,7 @@ public class EPGroupDelPerm extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String permission, final String world_name) {
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -105,9 +102,9 @@ public class EPGroupDelPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-		// Groupe introuvable
-		if (group == null || !group.hasTypeWorld(type_group.get())) {
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -115,23 +112,31 @@ public class EPGroupDelPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.of(type_group.get());
-		
-		// La permission n'a pas été supprimé
-		if (!group.getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED)) {
+		if (group.get().getSubjectData().getPermissions(type_group.get()).get(permission) != null) {
 			EPMessages.GROUP_DEL_PERMISSION_ERROR.sender()
-				.replace("<group>", group.getIdentifier())
+				.replace("<group>", group.get().getIdentifier())
 				.replace("<permission>", permission)
 				.replace("<type>", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EPMessages.GROUP_DEL_PERMISSION_STAFF.sender()
-			.replace("<group>", group.getIdentifier())
-			.replace("<permission>", permission)
-			.replace("<type>", type_group.get())
-			.sendTo(player);
-		return CompletableFuture.completedFuture(true);
+		return group.get().getSubjectData().setPermission(type_group.get(), permission, Tristate.UNDEFINED)
+			.exceptionally(e -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(player);
+					return false;
+				}
+				
+				EPMessages.GROUP_DEL_PERMISSION_STAFF.sender()
+					.replace("<group>", group.get().getIdentifier())
+					.replace("<permission>", permission)
+					.replace("<type>", type_group.get())
+					.sendTo(player);
+				return true;
+			});
 	}
 }

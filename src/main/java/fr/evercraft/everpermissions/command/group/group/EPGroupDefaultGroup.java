@@ -125,6 +125,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 					.replace("<group>", group_name)
 					.replace("<type>", type_group.get())
 					.sendTo(player);
+				return CompletableFuture.completedFuture(false);
 			
 			// Le groupe n'a pas un groupe par défaut
 			} else if (!value.get() && !oldDefault.get().equals(group.get())) {
@@ -132,6 +133,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 					.replace("<group>", group_name)
 					.replace("<type>", type_group.get())
 					.sendTo(player);
+				return CompletableFuture.completedFuture(false);
 				
 			// C'est déjà le groupe par défaut
 			} else if (value.get()) {
@@ -139,6 +141,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 					.replace("<group>", group_name)
 					.replace("<type>", type_group.get())
 					.sendTo(player);
+				return CompletableFuture.completedFuture(false);
 			}
 		}
 		

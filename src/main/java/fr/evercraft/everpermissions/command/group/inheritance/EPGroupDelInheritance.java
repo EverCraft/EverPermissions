@@ -25,8 +25,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -37,7 +35,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 
 public class EPGroupDelInheritance extends ECommand<EverPermissions> {
@@ -107,9 +104,9 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
 		// Groupe existant
-		if (group == null || !group.hasTypeWorld(type_group.get())) {
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -117,9 +114,9 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Subject inheritance = this.plugin.getService().getGroupSubjects().get(inheritance_name);
+		Optional<EGroupSubject> inheritance = this.plugin.getService().getGroupSubjects().get(inheritance_name);
 		// Groupe inheritance existant
-		if (inheritance == null) {
+		if (!inheritance.isPresent() || !inheritance.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", inheritance_name)
 				.replace("<type>", type_group.get())
@@ -127,22 +124,32 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.of(type_group.get());
-		// L'inheritance n'a pas été supprimé
-		if (!group.getSubjectData().removeParent(contexts, inheritance)) {
+		if (!group.get().getParents(type_group.get()).contains(inheritance.get().asSubjectReference())) {
 			EPMessages.GROUP_DEL_INHERITANCE_ERROR.sender()
-				.replace("<inheritance>", inheritance.getIdentifier())
-				.replace("<group>", group.getIdentifier())
+				.replace("<inheritance>", inheritance.get().getIdentifier())
+				.replace("<group>", group.get().getIdentifier())
 				.replace("<type>", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EPMessages.GROUP_DEL_INHERITANCE_STAFF.sender()
-				.replace("<inheritance>", inheritance.getIdentifier())
-				.replace("<group>", group.getIdentifier())
-				.replace("<type>", type_group.get())
-				.sendTo(player);
-		return CompletableFuture.completedFuture(true);
+		// L'inheritance n'a pas été supprimé
+		return group.get().getSubjectData().removeParent(type_group.get(), inheritance.get().asSubjectReference())
+			.exceptionally(e -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(player);
+					return false;
+				}
+				
+				EPMessages.GROUP_DEL_INHERITANCE_STAFF.sender()
+					.replace("<inheritance>", inheritance.get().getIdentifier())
+					.replace("<group>", group.get().getIdentifier())
+					.replace("<type>", type_group.get())
+					.sendTo(player);
+				return true;
+			});
 	}
 }

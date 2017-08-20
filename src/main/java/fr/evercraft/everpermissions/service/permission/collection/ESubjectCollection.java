@@ -113,15 +113,13 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		return Optional.ofNullable(this.identifierSubjects.get(identifier));
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	@Override
 	public Optional<Subject> getSubject(String identifier) {
-		return (Optional) this.get(identifier);
+		return (Optional<Subject>) this.get(identifier);
 	}
 	
-	
-	@Override
-	public CompletableFuture<Subject> loadSubject(String identifier) {
+	public CompletableFuture<T> load(String identifier) {
 		identifier = identifier.toLowerCase();
 		
 		Optional<T> cache = this.get(identifier);
@@ -135,6 +133,13 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 			this.storage.load(subject);
 			return subject;
 		}, this.plugin.getThreadAsync());
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public CompletableFuture<Subject> loadSubject(String identifier) {
+		return (CompletableFuture<Subject>) this.load(identifier);
 	}
 	
 	@Override

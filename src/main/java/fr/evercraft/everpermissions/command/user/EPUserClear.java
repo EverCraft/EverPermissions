@@ -86,21 +86,24 @@ public class EPUserClear extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user) {
-		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-		// User inexistant
-		if (subject == null) {
-			EAMessages.PLAYER_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("<player>", user.getIdentifier())
-				.sendTo(staff);
-			return CompletableFuture.completedFuture(false);
-		}
-		
+		return this.plugin.getService().getUserSubjects().load(user.getIdentifier())
+			.exceptionally(e -> null)
+			.thenCompose(subject -> {
+				if (subject == null) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return CompletableFuture.completedFuture(false);
+				}
+				
+				return this.command(staff, user, subject);
+			});
+	}
+	
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject) {		
 		subject.getSubjectData().clearParents();
-		subject.getSubjectData().clearSubParents();
 		subject.getSubjectData().clearPermissions();
 		subject.getSubjectData().clearOptions();
-		subject.reload();
 		if (staff.getIdentifier().equals(user.getIdentifier())) {
 			EPMessages.USER_CLEAR_EQUALS.sender()
 				.replace("<player>", user.getName())

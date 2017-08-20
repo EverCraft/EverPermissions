@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -117,8 +117,23 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final String group_name, final String world_name) {
-		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		return this.plugin.getService().getUserSubjects().load(user.getIdentifier())
+			.exceptionally(e -> null)
+			.thenCompose(subject -> {
+				if (subject == null) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return CompletableFuture.completedFuture(false);
+				}
+				
+				return this.command(staff, user, subject, group_name, world_name);
+			});
+	}
+	
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final String group_name, final String world_name) {
+		Optional<String> type_user = this.plugin.getService().getUserSubjects().getTypeWorld(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde existant
 		if (!type_user.isPresent() || !type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -128,9 +143,9 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-		// Groupe introuvable
-		if (group == null || !group.hasTypeWorld(type_group.get())) {
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -138,98 +153,93 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-		// User inexistant
-		if (subject == null) {
-			EAMessages.PLAYER_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("<player>", user.getIdentifier())
-				.sendTo(staff);
-			return CompletableFuture.completedFuture(false);
-		}
-		
 		Set<Context> contexts = EContextCalculator.of(world_name);
-		Optional<Subject> parent = subject.getSubjectData().getGroup(contexts);
+		Optional<SubjectReference> oldGroup = subject.getSubjectData().getGroup(contexts);
 		
-		// Le groupe du joueur est égale au nouveau groupe
-		if (parent.isPresent() && parent.get().equals(group)) {
-			if (staff.getIdentifier().equals(user.getIdentifier())) {
-				EPMessages.USER_DEMOTE_ERROR_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<group>", group.getIdentifier())
-					.replace("<type>", type_user.get())
-					.sendTo(staff);
-			} else {
-				EPMessages.USER_DEMOTE_ERROR_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<group>", group.getIdentifier())
-					.replace("<type>", type_user.get())
-					.sendTo(staff);
+		if (oldGroup.isPresent()) {
+			// Le groupe du joueur est égale au nouveau groupe
+			if (oldGroup.get().equals(group.get().asSubjectReference())) {
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
+					EPMessages.USER_DEMOTE_ERROR_EQUALS.sender()
+						.replace("<player>", user.getName())
+						.replace("<group>", group.get().getIdentifier())
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+				} else {
+					EPMessages.USER_DEMOTE_ERROR_STAFF.sender()
+						.replace("<player>", user.getName())
+						.replace("<group>", group.get().getIdentifier())
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+				}
+				return CompletableFuture.completedFuture(false);
 			}
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		// Le groupe est supérieur au groupe actuelle du joueur
-		if (parent.isPresent() && group.isChildOf(EContextCalculator.of(type_group.get()), parent.get())) {
-			if (staff.getIdentifier().equals(user.getIdentifier())) {
-				EPMessages.USER_DEMOTE_ERROR_PROMOTE_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<group>", group.getIdentifier())
-					.replace("<parent>", parent.get().getIdentifier())
-					.replace("<type>", type_user.get())
-					.sendTo(staff);
-			} else {
-				EPMessages.USER_DEMOTE_ERROR_PROMOTE_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<group>", group.getIdentifier())
-					.replace("<parent>", parent.get().getIdentifier())
-					.replace("<type>", type_user.get())
-					.sendTo(staff);
+			
+			// Le groupe est supérieur au groupe actuelle du joueur
+			if (group.get().isChildOf(contexts, oldGroup.get())) {
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
+					EPMessages.USER_DEMOTE_ERROR_PROMOTE_EQUALS.sender()
+						.replace("<player>", user.getName())
+						.replace("<group>", group.get().getIdentifier())
+						.replace("<parent>", oldGroup.get().getSubjectIdentifier())
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+				} else {
+					EPMessages.USER_DEMOTE_ERROR_PROMOTE_STAFF.sender()
+						.replace("<player>", user.getName())
+						.replace("<group>", group.get().getIdentifier())
+						.replace("<parent>", oldGroup.get().getSubjectIdentifier())
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+				}
+				return CompletableFuture.completedFuture(false);
 			}
-			return CompletableFuture.completedFuture(false);
 		}
 		
-		// Le groupe n'a pas été changé
-		if (!user.getSubjectData().addParent(contexts, group)) {
-			EAMessages.COMMAND_ERROR.sender()
-				.prefix(EPMessages.PREFIX)
-				.sendTo(staff);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		if (staff.getIdentifier().equals(user.getIdentifier())) {
-			EPMessages.USER_DEMOTE_EQUALS.sender()
-				.replace("<player>", user.getName())
-				.replace("<group>", group.getIdentifier())
-				.replace("<type>", type_user.get())
-				.sendTo(staff);
-			
-			this.plugin.getService().broadcastMessage(staff,
-				EPMessages.USER_DEMOTE_BROADCAST_EQUALS.sender()
-					.replace("<staff>", staff.getName())
-					.replace("<player>", user.getName())
-					.replace("<group>", user.getIdentifier())
-					.replace("<type>", type_user.get()));
-		} else {
-			EPMessages.USER_DEMOTE_STAFF.sender()
-				.replace("<player>", user.getName())
-				.replace("<group>", group.getIdentifier())
-				.replace("<type>", type_user.get())
-				.sendTo(staff);
-			
-			EPMessages.USER_DEMOTE_PLAYER.sender()
-				.replace("<staff>", staff.getName())
-				.replace("<group>", group.getIdentifier())
-				.replace("<type>", type_user.get())
-				.sendTo(user);
-			
-			this.plugin.getService().broadcastMessage(staff, user.getUniqueId(), 
-				EPMessages.USER_DEMOTE_BROADCAST_PLAYER.sender()
-					.replace("<staff>", staff.getName())
-					.replace("<player>", user.getName())
-					.replace("<group>", user.getIdentifier())
-					.replace("<type>", type_user.get()));
-		}
-		return CompletableFuture.completedFuture(true);
+		return subject.getSubjectData().setGroup(type_user.get(), group.get().asSubjectReference())
+			.exceptionally(e -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return false;
+				}
+				
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
+					EPMessages.USER_DEMOTE_EQUALS.sender()
+						.replace("<player>", user.getName())
+						.replace("<group>", group.get().getIdentifier())
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+					
+					this.plugin.getService().broadcastMessage(staff,
+						EPMessages.USER_DEMOTE_BROADCAST_EQUALS.sender()
+							.replace("<staff>", staff.getName())
+							.replace("<player>", user.getName())
+							.replace("<group>", user.getIdentifier())
+							.replace("<type>", type_user.get()));
+				} else {
+					EPMessages.USER_DEMOTE_STAFF.sender()
+						.replace("<player>", user.getName())
+						.replace("<group>", group.get().getIdentifier())
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+					
+					EPMessages.USER_DEMOTE_PLAYER.sender()
+						.replace("<staff>", staff.getName())
+						.replace("<group>", group.get().getIdentifier())
+						.replace("<type>", type_user.get())
+						.sendTo(user);
+					
+					this.plugin.getService().broadcastMessage(staff, user.getUniqueId(), 
+						EPMessages.USER_DEMOTE_BROADCAST_PLAYER.sender()
+							.replace("<staff>", staff.getName())
+							.replace("<player>", user.getName())
+							.replace("<group>", user.getIdentifier())
+							.replace("<type>", type_user.get()));
+				}
+				return true;
+			});
 	}
 }

@@ -295,7 +295,9 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 	}
 	
 	public boolean clearParents(final ESubjectData subject) {
-		this.get(subject.getIdentifier()).removeChild(this.parentIdentifier);
+		ConfigurationNode config = this.get(subject.getIdentifier());
+		config.removeChild(this.parentIdentifier);
+		config.removeChild("group");
 		this.plugin.getELogger().debug("Removed the group configuration file : (identifier='" + subject + "';type='" + this.typeWorld + "')");
 		return this.save(true);
 	}

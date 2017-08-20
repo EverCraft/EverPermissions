@@ -23,12 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -39,7 +37,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 
 public class EPGroupListOption extends ECommand<EverPermissions> {
@@ -93,7 +90,7 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String world_name) {
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -103,9 +100,9 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-		// Groupe introuvable
-		if (group == null || !group.hasTypeWorld(type_group.get())) {
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -113,11 +110,10 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		List<Text> list = new ArrayList<Text>();
 		
 		// La liste des options
-		Map<String, String> options = group.getSubjectData().getOptions(contexts);
+		Map<String, String> options = group.get().getSubjectData().getOptions(type_group.get());
 		if (options.isEmpty()) {
 			list.add(EPMessages.GROUP_LIST_OPTION_OPTION_EMPTY.getText());
 		} else {
@@ -130,7 +126,7 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 		}
 				
 		// La liste des options temporaires
-		options = group.getTransientSubjectData().getOptions(contexts);
+		options = group.get().getTransientSubjectData().getOptions(type_group.get());
 		if (!options.isEmpty()) {
 			list.add(EPMessages.GROUP_LIST_OPTION_TRANSIENT.getText());
 			for (Entry<String, String> permission : options.entrySet()) {

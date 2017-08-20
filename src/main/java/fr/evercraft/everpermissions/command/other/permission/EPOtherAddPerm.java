@@ -19,25 +19,19 @@ package fr.evercraft.everpermissions.command.other.permission;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.Tristate;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
-import fr.evercraft.everapi.java.UtilsBoolean;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
 public class EPOtherAddPerm extends ECommand<EverPermissions> {
 	
@@ -75,7 +69,7 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 	
 	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		if (args.size() == 3) {
-			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
+			/*Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le joueur existe
 			if (optSubject.isPresent()){
 				return this.command(source, optSubject.get(), args.get(1), args.get(2));
@@ -84,14 +78,14 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 				EPMessages.OTHER_NOT_FOUND.sender()
 					.replace("<other>", args.get(0))
 					.sendTo(source);
-			}
+			}*/
 		// Nombre d'argument incorrect
 		} else {
 			source.sendMessage(this.help(source));
 		}
 		return CompletableFuture.completedFuture(false);
 	}
-	
+	/*
 	private CompletableFuture<Boolean> command(final CommandSource staff, final Subject subject, final String permission, final String value_name) {
 		Optional<Boolean> value = UtilsBoolean.parseBoolean(value_name);
 		// La value n'est pas un boolean
@@ -134,5 +128,5 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 				.sendTo(staff);
 		}
 		return CompletableFuture.completedFuture(true);
-	}
+	}*/
 }

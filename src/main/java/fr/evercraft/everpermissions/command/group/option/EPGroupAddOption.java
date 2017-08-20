@@ -34,7 +34,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 
 public class EPGroupAddOption extends ECommand<EverPermissions> {
@@ -52,9 +51,9 @@ public class EPGroupAddOption extends ECommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/permgaddo {" + EAMessages.ARGS_GROUP.getString() + "} "
-									 + "{" + EAMessages.ARGS_OPTION.getString() + "} "
-									 + "{" + EAMessages.ARGS_VALUE.getString() + "} "
+		return Text.builder("/permgaddo <" + EAMessages.ARGS_GROUP.getString() + "> "
+									 + "<" + EAMessages.ARGS_OPTION.getString() + "> "
+									 + "<" + EAMessages.ARGS_VALUE.getString() + "> "
 									 + "[" + EAMessages.ARGS_WORLD.getString() + "]")
 					.onClick(TextActions.suggestCommand("/permgaddo "))
 					.color(TextColors.RED)
@@ -95,40 +94,43 @@ public class EPGroupAddOption extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String option, String value, final String world_name) {
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("{world}", world_name)
+				.replace("<world>", world_name)
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-		// Groupe introuvable
-		if (group == null || !group.hasTypeWorld(type_group.get())) {
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", group_name)
-				.replace("{type}", type_group.get())
+				.replace("<group>", group_name)
+				.replace("<type>", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		// L'option n'a pas été ajouté
-		if (!group.getSubjectData().setOption(EContextCalculator.of(type_group.get()), option, value)) {
-			EAMessages.COMMAND_ERROR.sender()
-				.prefix(EPMessages.PREFIX)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		EPMessages.GROUP_ADD_OPTION_STAFF.sender()
-				.replace("{group}", group.getIdentifier())
-				.replace("{option}", option)
-				.replace("{type}", type_group.get())
-				.replace("{value}", Text.of(value))
-				.sendTo(player);
-		return CompletableFuture.completedFuture(true);
+		return group.get().getSubjectData().setOption(type_group.get(), option, value)
+			.exceptionally(e -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(player);
+					return false;
+				}
+				
+				EPMessages.GROUP_ADD_OPTION_STAFF.sender()
+					.replace("<group>", group.get().getIdentifier())
+					.replace("<option>", option)
+					.replace("<type>", type_group.get())
+					.replace("<value>", Text.of(value))
+					.sendTo(player);
+				return true;
+			});
 	}
 }

@@ -94,7 +94,7 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String world_name) {
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -104,9 +104,9 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-		// Groupe introuvable
-		if (group == null || !group.hasTypeWorld(type_group.get())) {
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -118,7 +118,7 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 		List<Text> list = new ArrayList<Text>();
 		
 		// La liste des permissions
-		Map<String, Boolean> permissions = group.getSubjectData().getPermissions(contexts);
+		Map<String, Boolean> permissions = group.get().getSubjectData().getPermissions(contexts);
 		if (permissions.isEmpty()) {
 			list.add(EPMessages.GROUP_LIST_PERMISSION_PERMISSION_EMPTY.getText());
 		} else {
@@ -135,7 +135,7 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 		}
 		
 		// La liste des permissions temporaires
-		permissions = group.getTransientSubjectData().getPermissions(contexts);
+		permissions = group.get().getTransientSubjectData().getPermissions(contexts);
 		if (!permissions.isEmpty()) {
 			list.add(EPMessages.GROUP_LIST_PERMISSION_TRANSIENT.getText());
 			for (Entry<String, Boolean> permission : permissions.entrySet()) {
@@ -151,7 +151,7 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.GROUP_LIST_PERMISSION_TITLE.getFormat().toText(
-					"<group>", group.getIdentifier(),
+					"<group>", group.get().getIdentifier(),
 					"<type>", type_group.get()), 
 				list, player);
 		return CompletableFuture.completedFuture(true);

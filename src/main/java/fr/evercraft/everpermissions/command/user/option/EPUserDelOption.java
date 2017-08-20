@@ -20,13 +20,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -37,7 +35,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 
 public class EPUserDelOption extends ECommand<EverPermissions> {
@@ -114,8 +111,23 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 		return CompletableFuture.completedFuture(false);
 	}
 	
-	private CompletableFuture<Boolean> command(final CommandSource staff, final User user, final String type, final String world_name) {
-		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
+	private CompletableFuture<Boolean> command(final CommandSource staff, final User user, final String option, final String world_name) {
+		return this.plugin.getService().getUserSubjects().load(user.getIdentifier())
+			.exceptionally(e -> null)
+			.thenCompose(subject -> {
+				if (subject == null) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return CompletableFuture.completedFuture(false);
+				}
+				
+				return this.command(staff, user, subject, option, world_name);
+			});
+	}
+	
+	private CompletableFuture<Boolean> command(final CommandSource staff, final User user, final EUserSubject subject, final String option, final String world_name) {
+		Optional<String> type_user = this.plugin.getService().getUserSubjects().getTypeWorld(world_name);
 		// Monde existant
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -125,49 +137,46 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-		// User inexistant
-		if (subject == null) {
-			EAMessages.PLAYER_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("<player>", user.getIdentifier())
-				.sendTo(staff);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Set<Context> contexts = EContextCalculator.of(world_name);
-		
-		// L'option n'a pas été supprimé
-		if (!subject.getSubjectData().setOption(contexts, type, null)) {
+		if (subject.getSubjectData().getOptions(type_user.get()).get(option) == null) {
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_DEL_OPTION_ERROR_EQUALS.sender()
 					.replace("<player>", user.getName())
-					.replace("<option>", type)
+					.replace("<option>", option)
 					.replace("<type>", type_user.get())
 					.sendTo(staff);
 			} else {
 				EPMessages.USER_DEL_OPTION_ERROR_STAFF.sender()
 					.replace("<player>", user.getName())
-					.replace("<option>", type)
+					.replace("<option>", option)
 					.replace("<type>", type_user.get())
 					.sendTo(staff);
 			}
-			return CompletableFuture.completedFuture(false);
 		}
 		
-		if (staff.getIdentifier().equals(user.getIdentifier())) {
-			EPMessages.USER_DEL_OPTION_EQUALS.sender()
-				.replace("<player>", user.getName())
-				.replace("<option>", type)
-				.replace("<type>", type_user.get())
-				.sendTo(staff);
-		} else {
-			EPMessages.USER_DEL_OPTION_STAFF.sender()
-				.replace("<player>", user.getName())
-				.replace("<option>", type)
-				.replace("<type>", type_user.get())
-				.sendTo(staff);
-		}
-		return CompletableFuture.completedFuture(true);
+		return subject.getSubjectData().setOption(type_user.get(), option, null)
+			.exceptionally(e -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return false;
+				}
+				
+				if (staff.getIdentifier().equals(user.getIdentifier())) {
+					EPMessages.USER_DEL_OPTION_EQUALS.sender()
+						.replace("<player>", user.getName())
+						.replace("<option>", option)
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+				} else {
+					EPMessages.USER_DEL_OPTION_STAFF.sender()
+						.replace("<player>", user.getName())
+						.replace("<option>", option)
+						.replace("<type>", type_user.get())
+						.sendTo(staff);
+				}
+				return true;
+			});
 	}
 }

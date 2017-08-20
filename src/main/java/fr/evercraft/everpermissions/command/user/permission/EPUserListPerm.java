@@ -23,12 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -38,10 +36,9 @@ import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 
 public class EPUserListPerm extends ECommand<EverPermissions> {
 	
@@ -115,7 +112,22 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final String world_name) {
-		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
+		return this.plugin.getService().getUserSubjects().load(user.getIdentifier())
+			.exceptionally(e -> null)
+			.thenCompose(subject -> {
+				if (subject == null) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return CompletableFuture.completedFuture(false);
+				}
+				
+				return this.command(staff, user, subject, world_name);
+			});
+	}
+	
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final String world_name) {
+		Optional<String> type_user = this.plugin.getService().getUserSubjects().getTypeWorld(world_name);
 		// Monde existant
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -125,21 +137,10 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EUserSubject subject = this.plugin.getService().getUserSubjects().get(user.getIdentifier());
-		// User inexistant
-		if (subject == null) {
-			EAMessages.PLAYER_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("<player>", user.getName())
-				.sendTo(staff);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Set<Context> contexts = EContextCalculator.of(world_name);
 		List<Text> list = new ArrayList<Text>();
-				
+		
 		// La liste des permissions
-		Map<String, Boolean> permissions = subject.getSubjectData().getNodeTree(contexts).asMap();
+		Map<String, Boolean> permissions = subject.getSubjectData().getNodeTree(type_user.get()).asMap();
 		if (permissions.isEmpty()) {
 			list.add(EPMessages.USER_LIST_PERMISSION_PERMISSION_EMPTY.getText());
 		} else {
@@ -156,7 +157,7 @@ public class EPUserListPerm extends ECommand<EverPermissions> {
 		}
 		
 		// La liste des permissions temporaires
-		permissions = subject.getTransientSubjectData().getNodeTree(contexts).asMap();
+		permissions = subject.getTransientSubjectData().getNodeTree(type_user.get()).asMap();
 		if (!permissions.isEmpty()) {
 			list.add(EPMessages.USER_LIST_PERMISSION_TRANSIENT.getText());
 			for (Entry<String, Boolean> permission : permissions.entrySet()) {

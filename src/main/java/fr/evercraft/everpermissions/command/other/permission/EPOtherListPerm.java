@@ -16,18 +16,13 @@
  */
 package fr.evercraft.everpermissions.command.other.permission;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -37,8 +32,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
 public class EPOtherListPerm extends ECommand<EverPermissions> {
 	
@@ -70,7 +63,7 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 	
 	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		if (args.size() == 1) {
-			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
+			/*Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le joueur existe
 			if (optSubject.isPresent()){
 				return this.command(source, optSubject.get());
@@ -79,14 +72,14 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 				EPMessages.OTHER_NOT_FOUND.sender()
 					.replace("<other>", args.get(0))
 					.sendTo(source);
-			}
+			}*/
 		// Nombre d'argument incorrect
 		} else {
 			source.sendMessage(this.help(source));
 		}
 		return CompletableFuture.completedFuture(false);
 	}
-	
+	/*
 	private CompletableFuture<Boolean> command(final CommandSource staff, final Subject subject) {
 		List<Text> list = new ArrayList<Text>();
 		
@@ -127,5 +120,5 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 					.toText("<subject>", subject.getIdentifier()), 
 				list, staff);
 		return CompletableFuture.completedFuture(true);
-	}
+	}*/
 }

@@ -21,13 +21,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -39,7 +36,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 
 public class EPGroupListInheritance extends ECommand<EverPermissions> {
@@ -103,9 +99,9 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
 		// Groupe existant
-		if (group == null || !group.hasTypeWorld(type_group.get())) {
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -113,32 +109,31 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.of(type_group.get());
 		List<Text> list = new ArrayList<Text>();
 
 		// La liste des inheritances
-		List<SubjectReference> groups = group.getSubjectData().getParents(contexts);
+		List<SubjectReference> groups = group.get().getSubjectData().getParents(type_group.get());
 		if (groups.isEmpty()) {
 			list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_EMPTY.getText());
 		} else {
 			list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE.getText());
-			for (Subject inheritance : groups) {
-				list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_LINE.getFormat().toText("<inheritance>", inheritance.getIdentifier()));
+			for (SubjectReference inheritance : groups) {
+				list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_LINE.getFormat().toText("<inheritance>", inheritance.getSubjectIdentifier()));
 			}
 		}
 		
 		// La liste des inheritances temporaires
-		groups = group.getTransientSubjectData().getParents(contexts);
+		groups = group.get().getTransientSubjectData().getParents(type_group.get());
 		if (!groups.isEmpty()) {
 			list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT.getText());
-			for (Subject inheritance : groups) {
-				list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.getFormat().toText("<inheritance>", inheritance.getIdentifier()));
+			for (SubjectReference inheritance : groups) {
+				list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.getFormat().toText("<inheritance>", inheritance.getSubjectIdentifier()));
 			}
 		}
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.GROUP_LIST_INHERITANCE_TITLE.getFormat().toText(
-					"<group>", group.getIdentifier(),
+					"<group>", group.get().getIdentifier(),
 					"<type>", type_group.get()), 
 				list, player);
 		return CompletableFuture.completedFuture(true);

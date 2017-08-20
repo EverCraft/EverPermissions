@@ -20,12 +20,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -39,7 +37,7 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
+import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 
 public class EPUserAddPerm extends ECommand<EverPermissions> {
 	
@@ -119,7 +117,22 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final String permission, final String value_name, final String world_name) {
-		Optional<String> type_user = this.plugin.getManagerData().getTypeUser(world_name);
+		return this.plugin.getService().getUserSubjects().load(user.getIdentifier())
+			.exceptionally(e -> null)
+			.thenCompose(subject -> {
+				if (subject == null) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return CompletableFuture.completedFuture(false);
+				}
+				
+				return this.command(staff, user, subject, permission, value_name, world_name);
+			});
+	}
+	
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final String permission, final String value_name, final String world_name) {
+		Optional<String> type_user = this.plugin.getService().getUserSubjects().getTypeWorld(world_name);
 		// Monde existant
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -138,10 +151,8 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Set<Context> contexts = EContextCalculator.of(world_name);
-		
-		// La permission n'a pas été ajouté
-		if (!user.getSubjectData().setPermission(contexts, permission, Tristate.fromBoolean(value.get()))) {
+		Boolean oldValue = subject.getSubjectData().getPermissions(type_user.get()).get(permission);
+		if (oldValue != null) {
 			// Permission : True
 			if (value.get()) {
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
@@ -173,67 +184,79 @@ public class EPUserAddPerm extends ECommand<EverPermissions> {
 						.sendTo(staff);
 				}
 			}
+			return CompletableFuture.completedFuture(false);
 		}
 		
-		// Permission : True
-		if (value.get()) {
-			if (staff.getIdentifier().equals(user.getIdentifier())) {
-				EPMessages.USER_ADD_PERMISSION_TRUE_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
-					.sendTo(staff);
+		return subject.getSubjectData().setPermission(type_user.get(), permission, Tristate.fromBoolean(value.get()))
+			.exceptionally(e -> false)
+			.thenApply(result -> {
+				if (!result) {
+					EAMessages.COMMAND_ERROR.sender()
+						.prefix(EPMessages.PREFIX)
+						.sendTo(staff);
+					return false;
+				}
 				
-				this.plugin.getService().broadcastMessage(staff,
-					EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_EQUALS.sender()
-						.replace("<staff>", staff.getName())
-						.replace("<player>", user.getName())
-						.replace("<permission>", permission)
-						.replace("<type>", type_user.get()));
-			} else {
-				EPMessages.USER_ADD_PERMISSION_TRUE_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
-					.sendTo(staff);
-				
-				this.plugin.getService().broadcastMessage(staff,
-					EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_PLAYER.sender()
-						.replace("<staff>", staff.getName())
-						.replace("<player>", user.getName())
-						.replace("<permission>", permission)
-						.replace("<type>", type_user.get()));
-			}
-		// Permission : False
-		} else {
-			if (staff.getIdentifier().equals(user.getIdentifier())) {
-				EPMessages.USER_ADD_PERMISSION_FALSE_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
-					.sendTo(staff);
-				
-				this.plugin.getService().broadcastMessage(staff,
-					EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_EQUALS.sender()
-						.replace("<staff>", staff.getName())
-						.replace("<player>", user.getName())
-						.replace("<permission>", permission)
-						.replace("<type>", type_user.get()));
-			} else {
-				EPMessages.USER_ADD_PERMISSION_FALSE_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
-					.sendTo(staff);
-				
-				this.plugin.getService().broadcastMessage(staff,
-					EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_PLAYER.sender()
-						.replace("<staff>", staff.getName())
-						.replace("<player>", user.getName())
-						.replace("<permission>", permission)
-						.replace("<type>", type_user.get()));
-			}
-		}
-		return CompletableFuture.completedFuture(true);
+				// Permission : True
+				if (value.get()) {
+					if (staff.getIdentifier().equals(user.getIdentifier())) {
+						EPMessages.USER_ADD_PERMISSION_TRUE_EQUALS.sender()
+							.replace("<player>", user.getName())
+							.replace("<permission>", permission)
+							.replace("<type>", type_user.get())
+							.sendTo(staff);
+						
+						this.plugin.getService().broadcastMessage(staff,
+							EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_EQUALS.sender()
+								.replace("<staff>", staff.getName())
+								.replace("<player>", user.getName())
+								.replace("<permission>", permission)
+								.replace("<type>", type_user.get()));
+					} else {
+						EPMessages.USER_ADD_PERMISSION_TRUE_STAFF.sender()
+							.replace("<player>", user.getName())
+							.replace("<permission>", permission)
+							.replace("<type>", type_user.get())
+							.sendTo(staff);
+						
+						this.plugin.getService().broadcastMessage(staff,
+							EPMessages.USER_ADD_PERMISSION_TRUE_BROADCAST_PLAYER.sender()
+								.replace("<staff>", staff.getName())
+								.replace("<player>", user.getName())
+								.replace("<permission>", permission)
+								.replace("<type>", type_user.get()));
+					}
+				// Permission : False
+				} else {
+					if (staff.getIdentifier().equals(user.getIdentifier())) {
+						EPMessages.USER_ADD_PERMISSION_FALSE_EQUALS.sender()
+							.replace("<player>", user.getName())
+							.replace("<permission>", permission)
+							.replace("<type>", type_user.get())
+							.sendTo(staff);
+						
+						this.plugin.getService().broadcastMessage(staff,
+							EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_EQUALS.sender()
+								.replace("<staff>", staff.getName())
+								.replace("<player>", user.getName())
+								.replace("<permission>", permission)
+								.replace("<type>", type_user.get()));
+					} else {
+						EPMessages.USER_ADD_PERMISSION_FALSE_STAFF.sender()
+							.replace("<player>", user.getName())
+							.replace("<permission>", permission)
+							.replace("<type>", type_user.get())
+							.sendTo(staff);
+						
+						this.plugin.getService().broadcastMessage(staff,
+							EPMessages.USER_ADD_PERMISSION_FALSE_BROADCAST_PLAYER.sender()
+								.replace("<staff>", staff.getName())
+								.replace("<player>", user.getName())
+								.replace("<permission>", permission)
+								.replace("<type>", type_user.get()));
+					}
+				}
+				return true;
+			});
 	}
 }

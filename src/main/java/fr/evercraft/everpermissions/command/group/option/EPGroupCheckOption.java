@@ -20,12 +20,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -36,7 +34,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 
 public class EPGroupCheckOption extends ECommand<EverPermissions> {
@@ -94,7 +91,7 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 	}
 	
 	private CompletableFuture<Boolean> command(final CommandSource player, final String group_name, final String option, final String world_name) {
-		Optional<String> type_group = this.plugin.getManagerData().getTypeGroup(world_name);
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world_name);
 		// Monde introuvable
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
@@ -104,9 +101,9 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		EGroupSubject group = this.plugin.getService().getGroupSubjects().get(group_name);
-		// Groupe introuvable
-		if (group == null || !group.hasTypeWorld(type_group.get())) {
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
+		// Groupe existant
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
 				.replace("<group>", group_name)
 				.replace("<type>", type_group.get())
@@ -115,12 +112,11 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 		}
 
 
-		Set<Context> contexts = EContextCalculator.of(type_group.get());
-		String name = group.getSubjectData().getOptions(contexts).get(option);
+		String name = group.get().getSubjectData().getOptions(type_group.get()).get(option);
 		// Si il y a une valeur
 		if (name == null) {
 			EPMessages.GROUP_CHECK_OPTION_DEFINED.sender()
-				.replace("<group>", group.getIdentifier())
+				.replace("<group>", group.get().getIdentifier())
 				.replace("<option>", option)
 				.replace("<type>", type_group.get())
 				.replace("<value>", Text.of(name))
@@ -128,7 +124,7 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 		// Il n'y a pas de valeur
 		} else {
 			EPMessages.GROUP_CHECK_OPTION_UNDEFINED.sender()
-				.replace("<group>", group.getIdentifier())
+				.replace("<group>", group.get().getIdentifier())
 				.replace("<option>", option)
 				.replace("<type>", type_group.get())
 				.sendTo(player);

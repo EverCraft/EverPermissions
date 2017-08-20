@@ -19,7 +19,6 @@ package fr.evercraft.everpermissions.command.other.option;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
@@ -33,8 +32,6 @@ import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.EOtherSubject;
 
 public class EPOtherCheckOption extends ECommand<EverPermissions> {
 	
@@ -69,7 +66,7 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 	
 	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> args) throws CommandException {
 		if (args.size() == 2) {
-			Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
+			/*Optional<EOtherSubject> optSubject = this.plugin.getService().getOtherSubject(args.get(0));
 			// Le subject existe
 			if (optSubject.isPresent()){
 				return this.command(source, optSubject.get(), args.get(1));
@@ -78,16 +75,16 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 				EPMessages.OTHER_NOT_FOUND.sender()
 					.replace("<other>", args.get(0))
 					.sendTo(source);
-			}
+			}*/
 		// Nombre d'argument incorrect
 		} else {
 			source.sendMessage(this.help(source));
 		}
 		return CompletableFuture.completedFuture(false);
 	}
-	
+	/*
 	private CompletableFuture<Boolean> command(final CommandSource staff, final EOtherSubject subject, final String type) {
-		String name = subject.getSubjectData().getOptions(EContextCalculator.EMPTY).get(type);
+		String name = subject.getOptions(EContextCalculator.EMPTY).get(type);
 		// Il n'y a pas de valeur
 		if (name == null) {
 			EPMessages.OTHER_CHECK_OPTION_UNDEFINED.sender()
@@ -103,5 +100,5 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 			.replace("<value>", Text.of(name))
 			.sendTo(staff);
 		return CompletableFuture.completedFuture(true);
-	}
+	}*/
 }
