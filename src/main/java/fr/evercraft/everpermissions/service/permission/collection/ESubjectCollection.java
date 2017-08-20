@@ -113,10 +113,10 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		return Optional.ofNullable(this.identifierSubjects.get(identifier));
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Optional<Subject> getSubject(String identifier) {
-		return (Optional<Subject>) this.get(identifier);
+		return (Optional) this.get(identifier);
 	}
 	
 	public CompletableFuture<T> load(String identifier) {
@@ -136,10 +136,10 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	}
 	
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public CompletableFuture<Subject> loadSubject(String identifier) {
-		return (CompletableFuture<Subject>) this.load(identifier);
+		return (CompletableFuture) this.load(identifier);
 	}
 	
 	@Override
