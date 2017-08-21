@@ -67,6 +67,8 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 
 	@Override
 	public boolean load(ESubject subject) {
+		System.out.println("Collection load : " + subject.getIdentifier());
+		
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.load(subject)) return false;
 		}

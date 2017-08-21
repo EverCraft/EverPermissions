@@ -141,7 +141,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		// Le groupe
 		Optional<SubjectReference> group = subject.getSubjectData().getGroup(type_user.get());
 		if (group.isPresent()) {
-			list.add(EPMessages.USER_LIST_GROUP_GROUP.getFormat().toText("<group>", group.get().getSubjectIdentifier()));
+			list.add(EPMessages.USER_LIST_GROUP_GROUP.getFormat().toText("<group>", group.get().resolve().join().getFriendlyIdentifier().orElse(group.get().getSubjectIdentifier())));
 		} else {
 			list.add(EPMessages.USER_LIST_GROUP_GROUP_EMPTY.getText());
 		}
@@ -153,14 +153,14 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		} else {
 			list.add(EPMessages.USER_LIST_GROUP_SUBGROUP.getText());
 			for (SubjectReference sub : groups) {
-				list.add(EPMessages.USER_LIST_GROUP_SUBGROUP_LINE.getFormat().toText("<group>", sub.getSubjectIdentifier()));
+				list.add(EPMessages.USER_LIST_GROUP_SUBGROUP_LINE.getFormat().toText("<group>", sub.resolve().join().getFriendlyIdentifier().orElse(sub.getSubjectIdentifier())));
 			}
 		}
 		
 		// Le groupe
 		group = subject.getTransientSubjectData().getGroup(type_user.get());
 		if (group.isPresent()) {
-			list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_GROUP.getFormat().toText("<group>", group.get().getSubjectIdentifier()));
+			list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_GROUP.getFormat().toText("<group>", group.get().resolve().join().getFriendlyIdentifier().orElse(group.get().getSubjectIdentifier())));
 		}
 		
 		// Les groupes temporaires
@@ -168,7 +168,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		if (!groups.isEmpty()) {
 			list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_SUBGROUP.getText());
 			for (SubjectReference tempo : groups) {
-				list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_SUBGROUP_LINE.getFormat().toText("<group>", tempo.getSubjectIdentifier()));
+				list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_SUBGROUP_LINE.getFormat().toText("<group>", tempo.resolve().join().getFriendlyIdentifier().orElse(tempo.getSubjectIdentifier())));
 			}
 		}
 		

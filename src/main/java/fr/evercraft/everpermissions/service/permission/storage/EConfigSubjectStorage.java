@@ -87,7 +87,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 	}
 	
 	public boolean load(final ESubject subject) {
-		if (subject.getSubjectData() instanceof ESubjectData) return true;
+		if (!(subject.getSubjectData() instanceof ESubjectData)) return true;
 		
 		ConfigurationNode configSubject = this.get(subject.getIdentifier());
 		ESubjectData dataSubject = (ESubjectData) subject.getSubjectData();
