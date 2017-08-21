@@ -56,7 +56,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     
     @Override
 	public void reload() {
-	}
+	}    
     
     public boolean load(final ESubject subject) {
     	Connection connection = null;
@@ -795,6 +795,16 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	@Override
 	public boolean setDefault(EGroupSubject subject, String typeWorld, boolean value) {
 		// Les groupes sont uniquement sauvegardé en fichier
+		return false;
+	}
+
+	@Override
+	public boolean register(String typeWorld) {
+		return false;
+	}
+
+	@Override
+	public boolean unregister(String typeWorld) {
 		return false;
 	}
 }

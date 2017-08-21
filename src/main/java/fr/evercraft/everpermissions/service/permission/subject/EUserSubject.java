@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectReference;
@@ -76,11 +75,13 @@ public class EUserSubject extends ESubject {
 		return true;
 	}
 
-    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
     public Optional<CommandSource> getCommandSource() {
-    	Optional<Player> optPlayer = this.plugin.getGame().getServer().getPlayer(UUID.fromString(this.getIdentifier()));
-        if (optPlayer.isPresent()) {
-            return Optional.of(optPlayer.get());
+        if (this.getContainingCollection().getIdentifier().equals(PermissionService.SUBJECTS_USER)) {
+        	try {
+        		return (Optional) this.plugin.getGame().getServer().getPlayer(UUID.fromString(this.getIdentifier()));
+        	} catch (Exception e) {}
         } else if (this.getContainingCollection().getIdentifier().equals(PermissionService.SUBJECTS_SYSTEM)) {
     		if (this.getIdentifier().equals("Server")) {
                 return Optional.of(this.plugin.getGame().getServer().getConsole());

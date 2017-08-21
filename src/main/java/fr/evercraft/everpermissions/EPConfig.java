@@ -21,10 +21,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.spongepowered.api.world.World;
+
 import com.google.common.collect.ImmutableMap;
 
 import fr.evercraft.everapi.plugin.file.EConfig;
 import fr.evercraft.everapi.plugin.file.EMessage;
+import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
 public class EPConfig extends EConfig<EverPermissions> {
@@ -54,19 +57,13 @@ public class EPConfig extends EConfig<EverPermissions> {
 		addDefault("SQL.url", "jdbc:mysql://root:password@localhost:3306/minecraft");
 		addDefault("SQL.prefix", "everpermissions_");
 		
-		addComment("collections.groups", 	"Configure the groups for each world",
-								"Example : ",
-								"	world=default",
-								"	DIM1=default",
-								"	DIM-1=nether",
-								"The worlds 'world' and 'DIM1' will have the same groups but not 'DIM-1'");
-		
-		addComment("collections.users", 	"Configure the users for each world",
-								"Example : ",
-								"	world=default",
-								"	DIM1=default",
-								"	DIM-1=nether",
-								"The worlds 'world' and 'DIM1' will have the same users but not 'DIM-1'");
+		addDefault("collections", ImmutableMap.of(),
+							"Configure the collection for each world",
+							"Example : ",
+							"	world=default",
+							"	DIM1=default",
+							"	DIM-1=nether",
+							"The worlds 'world' and 'DIM1' will have the same collection but not 'DIM-1'");
 	}
 
 	public Map<String, String> getTypeWorld(String collection) {
@@ -76,20 +73,48 @@ public class EPConfig extends EConfig<EverPermissions> {
 		}
 		return worlds.build();
 	}
+	
+	public String getTypeWorld(String collection, String world) {
+		return this.get("collections." + collection + "." + world).getString(EPConfig.DEFAULT);
+	}
+	
 	public Set<String> getCollections() {
 		return this.get("collections").getChildrenMap().keySet().stream().map(collection -> collection.toString()).collect(Collectors.toSet());
 	}
+	
+
+	
+	public void registerCollection(String collection) {
+		ConfigurationNode config = this.get("collections." + collection);
+		boolean save = false;
+		
+		for (World world : this.plugin.getGame().getServer().getWorlds()) {
+			ConfigurationNode typeWorld = config.getNode(world.getName());
+			if (typeWorld.isVirtual()) {
+				typeWorld.setValue(EPConfig.DEFAULT);
+				save = true;
+			}
+		}
+		
+		if (config.isVirtual()) {
+			config.setValue(ImmutableMap.of());
+			save = true;
+		}
+		
+		if (save) this.save(true);
+	}
 
 	public void registerWorld(String world) {
+		boolean save = false;
+		
 		for (Entry<Object, ? extends CommentedConfigurationNode> value : this.get("collections").getChildrenMap().entrySet()) {
 			CommentedConfigurationNode typeWorld = value.getValue().getNode(world);
 			if (typeWorld.isVirtual()) {
 				typeWorld.setValue(EPConfig.DEFAULT);
+				save = true;
 			}
 		}
-	}
-
-	public String getTypeWorld(String collection, String world) {
-		return this.get("collections." + collection + "." + world).getString(EPConfig.DEFAULT);
+		
+		if (save) this.save(true);
 	}
 }

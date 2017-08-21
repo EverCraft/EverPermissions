@@ -275,4 +275,12 @@ public class EPermissionService implements PermissionService {
 	public SubjectReference newSubjectReference(String collectionIdentifier, String subjectIdentifier) {
 		return new ESubjectReference(this, collectionIdentifier, subjectIdentifier);
 	}
+
+	public void registerWorldType(String nameWorld) {
+		this.plugin.getConfigs().registerWorld(nameWorld);
+		
+		for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
+    		collection.registerWorld(nameWorld);
+    	}
+	}
 }

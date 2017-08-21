@@ -45,6 +45,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
         this.collection = collection;
     }
     
+    @Override
     public boolean register(String typeWorld) {
     	if (this.storages.containsKey(typeWorld)) return false;
     	
@@ -52,6 +53,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
     	return true;
     }
     
+    @Override
     public boolean unregister(String typeWorld) {
     	return this.storages.remove(typeWorld) != null;
     }

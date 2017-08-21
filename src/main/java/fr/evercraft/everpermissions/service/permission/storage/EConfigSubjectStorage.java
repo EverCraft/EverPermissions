@@ -71,13 +71,18 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 	protected void loadDefault() {
 		if (!this.isNewDirs()) return;
 		
-		Optional<Asset> asset = this.plugin.getPluginContainer().getAsset("collections/" + this.collection + ".conf");
-		if (!asset.isPresent()) return;
+		String collection = this.name.split("/")[0];
+		Optional<Asset> asset = this.plugin.getPluginContainer().getAsset("collections/" + collection + ".conf");
+		if (!asset.isPresent()) {
+			this.plugin.getELogger().debug("Asset 'collections/" + collection + ".conf' not found");
+			return;
+		}
 		
 		URL jarConfigFile = asset.get().getUrl();
 		ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder().setURL(jarConfigFile).build();
 		try {
 			this.getNode().setValue(loader.load());
+			this.save(true);
 		} catch (IOException e) {}
 	}
 	

@@ -213,7 +213,9 @@ public class EUserData extends ESubjectData {
 		
 		this.read_lock.lock();
 		try {
-			return this.parents.get(typeWorld);
+			List<SubjectReference> group = this.parents.get(typeWorld);
+			if (group == null) return ImmutableList.of();
+			return ImmutableList.copyOf(group);
 		} finally {
 			this.read_lock.unlock();
 		}

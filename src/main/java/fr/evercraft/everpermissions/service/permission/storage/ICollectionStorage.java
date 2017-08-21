@@ -32,6 +32,10 @@ import fr.evercraft.everpermissions.service.permission.subject.ESubject;
 public interface ICollectionStorage {
 	
 	public void reload();
+	
+	boolean register(String typeWorld);
+
+	boolean unregister(String typeWorld);
     
     public boolean load(ESubject subject);
     

@@ -35,14 +35,14 @@ public class EPDataBases extends EDataBase<EverPermissions> {
 	}
 
 	public boolean init() throws ServerDisableException {
-		String profils ="CREATE TABLE IF NOT EXISTS <table> (" +
+		String profils ="CREATE TABLE IF NOT EXISTS {table} (" +
 							"`uuid` varchar(36) NOT NULL," +
 							"`collection` varchar(36)," +
 							"`name` varchar(36)," +
 							"PRIMARY KEY (`uuid`, `collection`, `name`));";
 		initTable(this.getTableUsersProfiles(), profils);
 		
-		String permissions ="CREATE TABLE IF NOT EXISTS <table> (" +
+		String permissions ="CREATE TABLE IF NOT EXISTS {table} (" +
 							"`uuid` varchar(36) NOT NULL," +
 							"`collection` varchar(36)," +
 							"`world` varchar(36)," +
@@ -51,7 +51,7 @@ public class EPDataBases extends EDataBase<EverPermissions> {
 							"PRIMARY KEY (`uuid`, `collection`, `world`, `permission`));";
 		initTable(this.getTableUsersPermissions(), permissions);
 		
-		String groups =		"CREATE TABLE IF NOT EXISTS <table> (" +
+		String groups =		"CREATE TABLE IF NOT EXISTS {table} (" +
 							"`uuid` varchar(36) NOT NULL," +
 							"`collection` varchar(36)," +
 							"`world` varchar(36)," +
@@ -60,7 +60,7 @@ public class EPDataBases extends EDataBase<EverPermissions> {
 							"PRIMARY KEY (`uuid`, `collection`, `world`, `group`, `priority`));";
 		initTable(this.getTableUsersGroups(), groups);
 		
-		String spawns = 	"CREATE TABLE IF NOT EXISTS <table> (" +
+		String spawns = 	"CREATE TABLE IF NOT EXISTS {table} (" +
 							"`uuid` varchar(36) NOT NULL," +
 							"`collection` varchar(36)," +
 							"`world` varchar(36) NOT NULL," +

@@ -50,7 +50,7 @@ public class EPListener {
     public void onLoadWorldEvent(final LoadWorldEvent event) {
     	if (!event.isCancelled()) {
     		this.plugin.getELogger().debug("Load world : " + event.getTargetWorld().getName());
-    		this.plugin.getConfigs().registerWorld(event.getTargetWorld().getName());
+    		this.plugin.getService().registerWorldType(event.getTargetWorld().getName());
     	}
     }
 }

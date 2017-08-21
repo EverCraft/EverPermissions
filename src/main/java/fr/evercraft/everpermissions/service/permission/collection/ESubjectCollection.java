@@ -55,7 +55,7 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	protected final ConcurrentMap<String, T> nameSubjects;
 	
 	protected ICollectionStorage storage;
-	protected ConcurrentMap<String, String> worlds;
+	protected final ConcurrentMap<String, String> worlds;
 
 	public ESubjectCollection(final EverPermissions plugin, final String identifier) {
 		this.plugin = plugin;
@@ -63,6 +63,9 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		
 		this.identifierSubjects = new ConcurrentHashMap<String, T>();
 		this.nameSubjects = new ConcurrentHashMap<String, T>();
+		this.worlds = new ConcurrentHashMap<String, String>();
+		
+		this.reloadConfig();
 	}
 	
 	/**
@@ -77,19 +80,32 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	}
 	
 	public void reloadConfig() {
+		// Stop
 		this.worlds.clear();
+		
+		// Start
+		this.plugin.getConfigs().registerCollection(this.getIdentifier());
 		this.worlds.putAll(this.plugin.getConfigs().getTypeWorld(this.getIdentifier()));
 		
-		if (this.plugin.getDataBases().isEnable() && !(this.storage instanceof ESqlCollectionStorage)) {
+		if (this.plugin.getDataBases().isEnable() && (this.storage == null || !(this.storage instanceof ESqlCollectionStorage))) {
 			this.storage = new ESqlCollectionStorage(this.plugin, this.getIdentifier());
-		} else if (!this.plugin.getDataBases().isEnable() && !(this.storage instanceof EConfigCollectionStorage)) {
+		} else if (!this.plugin.getDataBases().isEnable() && (this.storage == null || !(this.storage instanceof EConfigCollectionStorage))) {
 			this.storage = new EConfigCollectionStorage(this.plugin, this.getIdentifier());
+		} else {
+			this.storage.reload();
+		}
+		
+		for (String typeWorld : new HashSet<String>(this.worlds.values())) {
+			this.storage.register(typeWorld);
 		}
 	}
 	
-	public void registerTypeWorld(final String world) {
+	public void registerWorld(final String world) {
 		if (!this.worlds.containsKey(world)) {
-			this.worlds.put(world, this.plugin.getConfigs().getTypeWorld(this.getIdentifier(), world));
+			String typeWorld = plugin.getConfigs().getTypeWorld(this.getIdentifier(), world);
+			
+			this.worlds.put(world, this.plugin.getConfigs().getTypeWorld(this.getIdentifier(), typeWorld));
+			this.storage.register(typeWorld);
 		}
 	}
 	
@@ -128,11 +144,8 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		final T subject = this.add(identifier);
 		this.identifierSubjects.put(subject.getIdentifier().toLowerCase(), subject);
 		subject.getFriendlyIdentifier().ifPresent(name -> this.nameSubjects.put(name.toLowerCase(), subject));
-		
-		return CompletableFuture.supplyAsync(() -> {
-			this.storage.load(subject);
-			return subject;
-		}, this.plugin.getThreadAsync());
+		this.storage.load(subject);
+		return CompletableFuture.completedFuture(subject);
 	}
 	
 	

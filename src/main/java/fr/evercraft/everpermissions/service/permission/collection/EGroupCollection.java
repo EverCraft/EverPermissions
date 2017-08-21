@@ -73,7 +73,13 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
     
     @Override
 	protected EGroupSubject add(String identifier) {
-		return new EGroupSubject(this.plugin, identifier, this);
+    	try {
+    		return new EGroupSubject(this.plugin, UUID.fromString(identifier).toString(), this);
+    	} catch (IllegalArgumentException e) {
+    		EGroupSubject subject = new EGroupSubject(this.plugin, this.nextUUID().toString(), this);
+    		subject.setFriendlyIdentifierExecute(identifier);
+    		return subject;
+    	}
 	}
     
     @Override
