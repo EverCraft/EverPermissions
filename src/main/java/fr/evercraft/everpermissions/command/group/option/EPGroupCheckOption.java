@@ -116,7 +116,7 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 		// Si il y a une valeur
 		if (name == null) {
 			EPMessages.GROUP_CHECK_OPTION_DEFINED.sender()
-				.replace("<group>", group.get().getIdentifier())
+				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("<option>", option)
 				.replace("<type>", type_group.get())
 				.replace("<value>", Text.of(name))
@@ -124,7 +124,7 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 		// Il n'y a pas de valeur
 		} else {
 			EPMessages.GROUP_CHECK_OPTION_UNDEFINED.sender()
-				.replace("<group>", group.get().getIdentifier())
+				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("<option>", option)
 				.replace("<type>", type_group.get())
 				.sendTo(player);

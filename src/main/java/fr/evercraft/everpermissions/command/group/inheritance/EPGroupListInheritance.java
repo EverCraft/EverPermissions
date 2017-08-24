@@ -118,7 +118,7 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 		} else {
 			list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE.getText());
 			for (SubjectReference inheritance : groups) {
-				list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_LINE.getFormat().toText("<inheritance>", inheritance.getSubjectIdentifier()));
+				list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_LINE.getFormat().toText("<inheritance>", inheritance.resolve().join().getFriendlyIdentifier().orElse(inheritance.getSubjectIdentifier())));
 			}
 		}
 		
@@ -127,13 +127,13 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 		if (!groups.isEmpty()) {
 			list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT.getText());
 			for (SubjectReference inheritance : groups) {
-				list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.getFormat().toText("<inheritance>", inheritance.getSubjectIdentifier()));
+				list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.getFormat().toText("<inheritance>", inheritance.resolve().join().getFriendlyIdentifier().orElse(inheritance.getSubjectIdentifier())));
 			}
 		}
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.GROUP_LIST_INHERITANCE_TITLE.getFormat().toText(
-					"<group>", group.get().getIdentifier(),
+					"<group>", group.get().getFriendlyIdentifier().orElse(group_name),
 					"<type>", type_group.get()), 
 				list, player);
 		return CompletableFuture.completedFuture(true);

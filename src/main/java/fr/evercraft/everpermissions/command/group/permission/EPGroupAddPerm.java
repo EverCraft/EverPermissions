@@ -129,14 +129,14 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 		if (oldValue != null) {
 			if (oldValue && value.get()) {
 				EPMessages.GROUP_ADD_PERMISSION_ERROR_TRUE.sender()
-					.replace("<group>", group.get().getIdentifier())
+					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("<permission>", permission)
 					.replace("<type>", type_group.get())
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
 			} else if (!oldValue && !value.get()) {
 				EPMessages.GROUP_ADD_PERMISSION_ERROR_FALSE.sender()
-					.replace("<group>", group.get().getIdentifier())
+					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("<permission>", permission)
 					.replace("<type>", type_group.get())
 					.sendTo(player);
@@ -158,14 +158,14 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 				// Permission : True
 				if (value.get()) {
 					EPMessages.GROUP_ADD_PERMISSION_TRUE.sender()
-						.replace("<group>", group.get().getIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<permission>", permission)
 						.replace("<type>", type_group.get())
 						.sendTo(player);
 				// Permission : False
 				} else {
 					EPMessages.GROUP_ADD_PERMISSION_FALSE.sender()
-						.replace("<group>", group.get().getIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<permission>", permission)
 						.replace("<type>", type_group.get())
 						.sendTo(player);

@@ -141,7 +141,7 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 			for (Entry<String, String> permission : options.entrySet()) {
 				list.add(EPMessages.USER_LIST_OPTION_OPTION_LINE.getFormat().toText(
 							"<option>", permission.getKey(),
-							"<value>", Text.builder(permission.getValue())));
+							"<value>", Text.of(permission.getValue())));
 			}
 		}
 		
@@ -152,7 +152,7 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 			for (Entry<String, String> permission : options.entrySet()) {
 				list.add(EPMessages.USER_LIST_OPTION_TRANSIENT_LINE.getFormat().toText(
 							"<option>", permission.getKey(),
-							"<value>", Text.builder(permission.getValue())));
+							"<value>", Text.of(permission.getValue())));
 			}
 		}
 		

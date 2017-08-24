@@ -57,6 +57,8 @@ public abstract class ESubject implements Subject {
 		this.lock = new ReentrantReadWriteLock();
 		this.write_lock = this.lock.writeLock();
 		this.read_lock = this.lock.readLock();
+		
+		this.plugin.getELogger().debug("Creation du subject (subject='" + this.identifier + "';collection='" + this.collection + "')");
 	}
 
 	public abstract void reload();

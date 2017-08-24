@@ -120,21 +120,21 @@ public class EPGroupCheckPerm extends ECommand<EverPermissions> {
 		// Permission : True
 		if (value.equals(Tristate.TRUE)) {
 			EPMessages.GROUP_CHECK_PERMISSION_TRUE.sender()
-				.replace("<group>", group.get().getIdentifier())
+				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("<permission>", permission)
 				.replace("<type>", type_group.get())
 				.sendTo(player);
 		// Permission : False
 		} else if (value.equals(Tristate.FALSE)) {
 			EPMessages.GROUP_CHECK_PERMISSION_FALSE.sender()
-				.replace("<group>", group.get().getIdentifier())
+				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("<permission>", permission)
 				.replace("<type>", type_group.get())
 				.sendTo(player);
 		// Permission : Undefined
 		} else {
 			EPMessages.GROUP_CHECK_PERMISSION_UNDEFINED.sender()
-				.replace("<group>", group.get().getIdentifier())
+				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("<permission>", permission)
 				.replace("<type>", type_group.get())
 				.sendTo(player);

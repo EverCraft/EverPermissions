@@ -162,13 +162,13 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_DEMOTE_ERROR_EQUALS.sender()
 						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<type>", type_user.get())
 						.sendTo(staff);
 				} else {
 					EPMessages.USER_DEMOTE_ERROR_STAFF.sender()
 						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<type>", type_user.get())
 						.sendTo(staff);
 				}
@@ -180,15 +180,15 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_DEMOTE_ERROR_PROMOTE_EQUALS.sender()
 						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getIdentifier())
-						.replace("<parent>", oldGroup.get().getSubjectIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("<parent>", oldGroup.get().resolve().join().getFriendlyIdentifier().orElse(oldGroup.get().getSubjectIdentifier()))
 						.replace("<type>", type_user.get())
 						.sendTo(staff);
 				} else {
 					EPMessages.USER_DEMOTE_ERROR_PROMOTE_STAFF.sender()
 						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getIdentifier())
-						.replace("<parent>", oldGroup.get().getSubjectIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("<parent>", oldGroup.get().resolve().join().getFriendlyIdentifier().orElse(oldGroup.get().getSubjectIdentifier()))
 						.replace("<type>", type_user.get())
 						.sendTo(staff);
 				}
@@ -209,7 +209,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_DEMOTE_EQUALS.sender()
 						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<type>", type_user.get())
 						.sendTo(staff);
 					
@@ -217,18 +217,18 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 						EPMessages.USER_DEMOTE_BROADCAST_EQUALS.sender()
 							.replace("<staff>", staff.getName())
 							.replace("<player>", user.getName())
-							.replace("<group>", user.getIdentifier())
+							.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 							.replace("<type>", type_user.get()));
 				} else {
 					EPMessages.USER_DEMOTE_STAFF.sender()
 						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<type>", type_user.get())
 						.sendTo(staff);
 					
 					EPMessages.USER_DEMOTE_PLAYER.sender()
 						.replace("<staff>", staff.getName())
-						.replace("<group>", group.get().getIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<type>", type_user.get())
 						.sendTo(user);
 					
@@ -236,7 +236,7 @@ public class EPUserDemoteGroup extends ECommand<EverPermissions> {
 						EPMessages.USER_DEMOTE_BROADCAST_PLAYER.sender()
 							.replace("<staff>", staff.getName())
 							.replace("<player>", user.getName())
-							.replace("<group>", user.getIdentifier())
+							.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 							.replace("<type>", type_user.get()));
 				}
 				return true;

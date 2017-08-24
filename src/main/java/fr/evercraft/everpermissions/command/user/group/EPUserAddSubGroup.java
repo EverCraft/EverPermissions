@@ -153,13 +153,13 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_ADD_SUBGROUP_ERROR_EQUALS.sender()
 					.replace("<player>", user.getName())
-					.replace("<group>", group.get().getIdentifier())
+					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("<type>", type_user.get())
 					.sendTo(staff);
 			} else {
 				EPMessages.USER_ADD_SUBGROUP_ERROR_STAFF.sender()
 					.replace("<player>", user.getName())
-					.replace("<group>", group.get().getIdentifier())
+					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("<type>", type_user.get())
 					.sendTo(staff);
 			}
@@ -179,7 +179,7 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_ADD_SUBGROUP_EQUALS.sender()
 						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<type>", type_user.get())
 						.sendTo(staff);
 					
@@ -187,18 +187,18 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 						EPMessages.USER_ADD_SUBGROUP_BROADCAST_EQUALS.sender()
 							.replace("<staff>", staff.getName())
 							.replace("<player>", user.getName())
-							.replace("<group>", group.get().getIdentifier())
+							.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 							.replace("<type>", type_user.get()));
 				} else {
 					EPMessages.USER_ADD_SUBGROUP_STAFF.sender()
 						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<type>", type_user.get())
 						.sendTo(staff);
 					
 					EPMessages.USER_ADD_SUBGROUP_PLAYER.sender()
 						.replace("<staff>", staff.getName())
-						.replace("<group>", group.get().getIdentifier())
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<type>", type_user.get())
 						.sendTo(user);
 					
@@ -206,7 +206,7 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 						EPMessages.USER_ADD_SUBGROUP_BROADCAST_PLAYER.sender()
 							.replace("<staff>", staff.getName())
 							.replace("<player>", user.getName())
-							.replace("<group>", group.get().getIdentifier())
+							.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 							.replace("<type>", type_user.get()));
 				}
 				return true;

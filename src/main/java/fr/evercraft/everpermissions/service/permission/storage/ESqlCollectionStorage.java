@@ -69,6 +69,9 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 				this.loadOptions(connection, (ESubjectData) data);
 				this.loadGroups(connection, (ESubjectData) data);
 			}
+			
+			this.plugin.getELogger().debug("Chargement du subject (subject='" + subject.getIdentifier() + "';collection='" + subject.getCollectionIdentifier() + "')");
+			return true;
 		} catch (ServerDisableException e) {
 			e.execute();
 		} catch (SQLException e) {
@@ -90,7 +93,10 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 					this.loadOptions(connection, (ESubjectData) data);
 					this.loadGroups(connection, (ESubjectData) data);
 				}
+				
+				this.plugin.getELogger().debug("Chargement du subject (subject='" + subject.getIdentifier() + "';collection='" + subject.getCollectionIdentifier() + "')");
 			}
+			return true;
 		} catch (ServerDisableException e) {
 			e.execute();
 		} catch (SQLException e) {

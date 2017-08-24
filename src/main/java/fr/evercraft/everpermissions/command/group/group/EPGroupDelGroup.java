@@ -101,7 +101,7 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 		// Groupe introuvable
 		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("<group>", group_name)
+				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("<type>", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
@@ -119,7 +119,7 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 				}
 				
 				EPMessages.GROUP_DEL_GROUP_STAFF.sender()
-					.replace("<group>", group_name)
+					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("<type>", type_group.get());
 				return true;
 			});

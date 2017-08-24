@@ -138,7 +138,7 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.GROUP_LIST_OPTION_TITLE.getFormat().toText(
-						"<player>", player.getName(),
+						"<group>", group.get().getFriendlyIdentifier().orElse(group_name),
 						"<type>", type_group.get()), 
 				list, player);
 		return CompletableFuture.completedFuture(true);

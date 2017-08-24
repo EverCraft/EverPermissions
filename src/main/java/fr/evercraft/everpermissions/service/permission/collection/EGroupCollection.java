@@ -45,20 +45,22 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public CompletableFuture<Boolean> load() {
-    	return CompletableFuture.supplyAsync(() -> {
-			Set<String> identifiers = this.storage.getAllIdentifiers();
-
-			for (String identifier : identifiers) {
-				identifier = identifier.toLowerCase();
-				
-				EGroupSubject newSubject = this.add(identifier);
-				this.identifierSubjects.put(newSubject.getIdentifier().toLowerCase(), newSubject);
-				newSubject.getFriendlyIdentifier().ifPresent(name -> this.nameSubjects.put(name.toLowerCase(), newSubject));
-			}
+	public boolean load() {
+		Set<String> identifiers = this.storage.getAllIdentifiers();
+	
+		for (String identifier : identifiers) {
+			identifier = identifier.toLowerCase();
 			
-			return this.storage.load((Collection) this.identifierSubjects.values());
-		}, this.plugin.getThreadAsync());
+			EGroupSubject newSubject = this.add(identifier);
+			this.identifierSubjects.put(identifier, newSubject);
+		}
+		
+		if (!this.storage.load((Collection) this.identifierSubjects.values())) return false;
+		
+		for (EGroupSubject subject : this.identifierSubjects.values()) {
+			subject.getFriendlyIdentifier().ifPresent(name -> this.nameSubjects.put(name.toLowerCase(), subject));
+		}
+		return true;
     }
     
     public void reload() {
@@ -68,7 +70,7 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
     	
     	this.reloadConfig();
     	
-    	this.load().join();
+    	this.load();
     }
     
     @Override
@@ -103,9 +105,9 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
      * @param type Le type de groupe
      * @return False si le type de groupe n'existe pas
      */
-    public CompletableFuture<Boolean> register(final String identifier, final String worldType) {
+    public CompletableFuture<Boolean> register(final String name, final String worldType) {
     	// Création du groupe si il n'existe pas
-    	EGroupSubject group =  this.identifierSubjects.get(identifier);
+    	EGroupSubject group =  this.identifierSubjects.get(name);
     	if (group != null) {
     		group.registerTypeWorld(worldType);
     		
@@ -113,9 +115,14 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
     		
     	} 
     	
-    	EGroupSubject newGroup = new EGroupSubject(this.plugin, this.nextUUID().toString(), this);
+    	String identifier = this.nextUUID().toString();
+    	
+    	EGroupSubject newGroup = new EGroupSubject(this.plugin, identifier, this);
+    	newGroup.setFriendlyIdentifierExecute(name);
     	newGroup.registerTypeWorld(worldType);
-		this.identifierSubjects.put(identifier.toLowerCase(), newGroup);
+    	
+		this.identifierSubjects.put(identifier, newGroup);
+		this.nameSubjects.put(name.toLowerCase(), newGroup);
 		return CompletableFuture.supplyAsync(() -> this.storage.load(newGroup), this.plugin.getThreadAsync());
     }
 	
@@ -142,17 +149,16 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 		return this.defaults;
 	}
 
-	public Optional<EGroupSubject> getDefaultGroup(final String worldType) {
-		return Optional.ofNullable(this.defaults.get(worldType));
+	public Optional<EGroupSubject> getDefaultGroup(final String typeWorld) {
+		return Optional.ofNullable(this.defaults.get(typeWorld));
 	}
 	
-	public boolean setDefaultExecute(final String worldType, final EGroupSubject group) {
-		this.defaults.put(worldType, group);
-		return true;
-	}
-	
-	public boolean removeDefaultExecute(final String worldType) {
-		this.defaults.remove(worldType);
+	public boolean setDefaultExecute(final String typeWorld, final EGroupSubject group, boolean value) {
+		if (value) {
+			this.defaults.put(typeWorld, group);
+		} else {
+			this.defaults.remove(typeWorld);
+		}
 		return true;
 	}
 	

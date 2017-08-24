@@ -23,6 +23,7 @@ import fr.evercraft.everpermissions.service.permission.storage.ICollectionStorag
 import fr.evercraft.everpermissions.service.permission.subject.ESubject;
 import fr.evercraft.everpermissions.service.permission.subject.ESubjectReference;
 
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
@@ -87,9 +88,11 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		this.plugin.getConfigs().registerCollection(this.getIdentifier());
 		this.worlds.putAll(this.plugin.getConfigs().getTypeWorld(this.getIdentifier()));
 		
-		if (this.plugin.getDataBases().isEnable() && (this.storage == null || !(this.storage instanceof ESqlCollectionStorage))) {
-			this.storage = new ESqlCollectionStorage(this.plugin, this.getIdentifier());
-		} else if (!this.plugin.getDataBases().isEnable() && (this.storage == null || !(this.storage instanceof EConfigCollectionStorage))) {
+		if (this.plugin.getDataBases().isEnable() && (this.storage == null || !(this.storage instanceof ESqlCollectionStorage)) && this.identifier.equals(PermissionService.SUBJECTS_GROUP)) {
+			if (this.identifier.equals(PermissionService.SUBJECTS_GROUP) ) {
+				this.storage = new ESqlCollectionStorage(this.plugin, this.getIdentifier());
+			}
+		} else if ((!this.plugin.getDataBases().isEnable() || this.identifier.equals(PermissionService.SUBJECTS_GROUP)) && (this.storage == null || !(this.storage instanceof EConfigCollectionStorage))) {
 			this.storage = new EConfigCollectionStorage(this.plugin, this.getIdentifier());
 		} else {
 			this.storage.reload();
@@ -113,8 +116,8 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		return Optional.ofNullable(this.worlds.get(world));
 	}
 	
-	public CompletableFuture<Boolean> load() {
-		return CompletableFuture.completedFuture(true);
+	public boolean load() {
+		return true;
 	}
 	
 	protected abstract T add(String identifier);
@@ -126,7 +129,7 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 			T subject = this.identifierSubjects.get(identifier);
 			if (subject != null) return Optional.of(subject);
 		}
-		return Optional.ofNullable(this.identifierSubjects.get(identifier));
+		return Optional.ofNullable(this.nameSubjects.get(identifier));
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

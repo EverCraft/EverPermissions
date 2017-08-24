@@ -38,7 +38,6 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
@@ -92,24 +91,25 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 		ConfigurationNode configSubject = this.get(subject.getIdentifier());
 		ESubjectData dataSubject = (ESubjectData) subject.getSubjectData();
 		
-		// Si le fichier de configuration existe
-		if (!configSubject.isVirtual()) {
+		if (configSubject.isVirtual()) {
+			if (subject instanceof EGroupSubject) {
+				EGroupSubject group = (EGroupSubject) subject;
+				if (!group.hasTypeWorld(this.typeWorld)) return true;
+				
+				configSubject.setValue(ImmutableMap.of());
+				subject.getFriendlyIdentifier().ifPresent(name -> configSubject.getNode("name").setValue(name));
+				return this.save(true);
+			}
+		} else {
 			// Chargement du name
 			String name = configSubject.getNode("name").getString(null);
 			if (name != null) {
 				Optional<String> oldName = subject.getFriendlyIdentifier();
 				if (!oldName.isPresent()) {
 					subject.setFriendlyIdentifierExecute(name);
-					this.plugin.getELogger().debug("Loading : ("
-							+ "identifier=" + subject.getIdentifier() + ";"
-							+ "name=" + name + ";"
-							+ "type=" + this.typeWorld + ")");
+					this.plugin.getELogger().debug("Loading : (identifier=" + subject.getIdentifier() + ";name=" + name + ";type=" + this.typeWorld + ")");
 				} else if (!oldName.get().equals(name)) {
-					this.plugin.getELogger().warn("Loading error : ("
-							+ "identifier=" + subject.getIdentifier() + ";"
-							+ "name1=" + name + ";"
-							+ "name2=" + oldName.get() + ";"
-							+ "type=" + this.typeWorld + ")");
+					this.plugin.getELogger().warn("Loading error : (identifier=" + subject.getIdentifier() + ";name1=" + name + ";name2=" + oldName.get() + ";type=" + this.typeWorld + ")");
 				}
 			}
 			
@@ -151,44 +151,28 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 			// Chargement les sous-groupes
 			try {
 				for (String subgroup : configSubject.getNode(this.parentIdentifier).getList(TypeToken.of(String.class))) {
-					Subject group = this.plugin.getService().getGroupSubjects().loadSubject(subgroup).join();
-					if (group != null) {
-						dataSubject.addParentExecute(this.typeWorld, group.asSubjectReference());
-						this.plugin.getELogger().debug("Loading : ("
-								+ "identifier=" + subject.getIdentifier() + ";"
-								+ "subgroup=" + group.getIdentifier() + ";"
-								+ "type=" + this.typeWorld + ")");
-					} else {
-						this.plugin.getELogger().warn("Loading error : ("
-								+ "identifier=" + subject.getIdentifier() + ";"
-								+ "subgroup=" + subgroup + ";"
-								+ "type=" + this.typeWorld + ")");
-					}
+					dataSubject.addParentExecute(this.typeWorld, this.plugin.getService().getGroupSubjects().newSubjectReference(subgroup));
+					this.plugin.getELogger().debug("Loading : ("
+							+ "identifier=" + subject.getIdentifier() + ";"
+							+ "subgroup=" + subgroup + ";"
+							+ "type=" + this.typeWorld + ")");
 				}
 			} catch (ObjectMappingException e) {}
 			
 			// Chargement du groupe
-			String groups = configSubject.getNode("group").getString(null);
-			if (dataSubject instanceof EUserData && groups != null) {
-				Subject group = this.plugin.getService().getGroupSubjects().loadSubject(groups).join();
-				if (group != null) {
-					((EUserData) dataSubject).setGroupExecute(this.typeWorld, group.asSubjectReference());
-					this.plugin.getELogger().debug("Loading : ("
-							+ "identifier=" + subject.getIdentifier() + ";"
-							+ "group=" + group.getIdentifier() + ";"
-							+ "type=" + this.typeWorld + ")");
-				} else {
-					this.plugin.getELogger().warn("Loading error : ("
-							+ "identifier=" + subject.getIdentifier() + ";"
-							+ "group=" + group + ";"
-							+ "type=" + this.typeWorld + ")");
-				}
+			String group = configSubject.getNode("group").getString(null);
+			if (dataSubject instanceof EUserData && group != null) {
+				((EUserData) dataSubject).setGroupExecute(this.typeWorld, this.plugin.getService().getGroupSubjects().newSubjectReference(group));
+				this.plugin.getELogger().debug("Loading : ("
+						+ "identifier=" + subject.getIdentifier() + ";"
+						+ "group=" + group + ";"
+						+ "type=" + this.typeWorld + ")");
 			}
 			
 			// Chargement du default
 			boolean isDefault = configSubject.getNode("default").getBoolean(false);
 			if (subject instanceof EGroupSubject && isDefault) {
-				((EGroupSubject) subject).setDefault(this.typeWorld, true);
+				this.plugin.getService().getGroupSubjects().setDefaultExecute(this.typeWorld, (EGroupSubject) subject, true);
 				this.plugin.getELogger().debug("Loading : ("
 						+ "identifier=" + subject.getIdentifier() + ";"
 						+ "default='true';"
@@ -196,16 +180,19 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 			}
 			
 			if (subject instanceof EGroupSubject) {
+				System.out.println("registerTypeWorld " + subject.getFriendlyIdentifier() + " : " + this.typeWorld);
 				((EGroupSubject) subject).registerTypeWorld(this.typeWorld);
 			}
-			return true;
 		}
-		return false;
+		return true;
 	}
 	
 	public boolean load(Collection<ESubject> subjects) {
 		for (ESubject subject : subjects) {
-			if (!this.load(subject)) return false;
+			if (!this.load(subject)) {
+				System.err.println("erreur load : " + subject);
+				return false;
+			}
 		}
 		return true;
 	}

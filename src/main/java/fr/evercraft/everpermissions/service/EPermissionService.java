@@ -104,6 +104,12 @@ public class EPermissionService implements PermissionService {
     	this.subjectCollections.put(PermissionService.SUBJECTS_ROLE_TEMPLATE.toLowerCase(), new ETemplateCollection(this.plugin));
     }
     
+    public void load() {
+    	for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
+    		collection.load();
+    	}
+    }
+     
     /**
      * Rechargement de toutes les collections
      */
@@ -176,7 +182,10 @@ public class EPermissionService implements PermissionService {
 		
 		final ESubjectCollection<?> newCollection = new EUserCollection(this.plugin, identifier);
 		this.subjectCollections.put(identifier.toLowerCase(), newCollection);
-		return newCollection.load().thenApply(result -> newCollection);
+		return CompletableFuture.supplyAsync(() -> {
+				newCollection.load();
+				return newCollection;
+			}, this.plugin.getThreadAsync());
 	}
 
 	@Override

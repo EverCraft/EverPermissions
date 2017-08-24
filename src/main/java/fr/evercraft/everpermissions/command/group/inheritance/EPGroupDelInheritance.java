@@ -126,8 +126,8 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 		
 		if (!group.get().getParents(type_group.get()).contains(inheritance.get().asSubjectReference())) {
 			EPMessages.GROUP_DEL_INHERITANCE_ERROR.sender()
-				.replace("<inheritance>", inheritance.get().getIdentifier())
-				.replace("<group>", group.get().getIdentifier())
+				.replace("<inheritance>", inheritance.get().getFriendlyIdentifier().orElse(inheritance_name))
+				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("<type>", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
@@ -145,8 +145,8 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
 				}
 				
 				EPMessages.GROUP_DEL_INHERITANCE_STAFF.sender()
-					.replace("<inheritance>", inheritance.get().getIdentifier())
-					.replace("<group>", group.get().getIdentifier())
+					.replace("<inheritance>", inheritance.get().getFriendlyIdentifier().orElse(inheritance_name))
+					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("<type>", type_group.get())
 					.sendTo(player);
 				return true;

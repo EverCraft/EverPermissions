@@ -112,7 +112,7 @@ public class EPGroupDelOption extends ECommand<EverPermissions> {
 		
 		if (group.get().getSubjectData().getOptions(type_group.get()).get(option) == null) {
 			EPMessages.GROUP_DEL_OPTION_ERROR.sender()
-				.replace("<group>", group.get().getIdentifier())
+				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("<option>", option)
 				.replace("<type>", type_group.get())
 				.sendTo(player);
@@ -131,7 +131,7 @@ public class EPGroupDelOption extends ECommand<EverPermissions> {
 				}
 				
 				EPMessages.GROUP_DEL_OPTION_STAFF.sender()
-				.replace("<group>", group.get().getIdentifier())
+				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("<option>", option)
 				.replace("<type>", type_group.get())
 				.sendTo(player);

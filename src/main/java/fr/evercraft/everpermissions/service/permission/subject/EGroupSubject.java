@@ -40,7 +40,6 @@ public class EGroupSubject extends ESubject {
 	private final EGroupData transientData;
 	
 	private final Set<String> typeWorlds;
-	private final Set<String> defaults;
 	
     public EGroupSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<?> collection) {
     	super(plugin, identifier, collection);
@@ -49,7 +48,6 @@ public class EGroupSubject extends ESubject {
         this.transientData = new EGroupData(this.plugin, this, true);
         
         this.typeWorlds = new HashSet<String>();
-        this.defaults = new HashSet<String>();
     }
     
     public void reload() {
@@ -196,33 +194,27 @@ public class EGroupSubject extends ESubject {
     	
     	return CompletableFuture.supplyAsync(() -> {
 			this.read_lock.lock();
+			
+			Optional<EGroupSubject> oldDefault = this.plugin.getService().getGroupSubjects().getDefaultGroup(typeWorld);
 			try {
-				if (value && this.defaults.contains(typeWorld)) return false;
-				if (!value && !this.defaults.contains(typeWorld)) return false;
+				if (value && oldDefault.isPresent()) return false;
+				if (!value && !oldDefault.isPresent()) return false;
 			} finally {
 				this.read_lock.unlock();
 			}
 			
 			if (!this.getContainingCollection().getStorage().setDefault(this, typeWorld, value)) return false;
 			
-			this.setDefaultExecute(typeWorld, value);
+			this.plugin.getService().getGroupSubjects().setDefaultExecute(typeWorld, this, value);
 			this.getSubjectData().onUpdate();
 			return true;
 		}, this.plugin.getThreadAsync());
 	}
-	
-	public void setDefaultExecute(final String typeWorld, boolean value) {
-		this.write_lock.lock();
-		try {
-			if (value) {
-				this.defaults.add(typeWorld);
-			} else {
-				this.defaults.remove(typeWorld);
-			}
-		} finally {
-			this.write_lock.unlock();
-		}
-	}
+    
+    public boolean isDefault(final String typeWorld) {
+    	Optional<EGroupSubject> oldDefault = this.plugin.getService().getGroupSubjects().getDefaultGroup(typeWorld);
+    	return oldDefault.isPresent() && oldDefault.get().equals(this);
+    }
 	
 	public Set<String> getTypeWorlds() {
 		this.read_lock.lock();

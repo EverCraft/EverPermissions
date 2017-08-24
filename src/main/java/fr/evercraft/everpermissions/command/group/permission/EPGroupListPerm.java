@@ -151,7 +151,7 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.GROUP_LIST_PERMISSION_TITLE.getFormat().toText(
-					"<group>", group.get().getIdentifier(),
+						"<group>", group.get().getFriendlyIdentifier().orElse(group_name),
 					"<type>", type_group.get()), 
 				list, player);
 		return CompletableFuture.completedFuture(true);

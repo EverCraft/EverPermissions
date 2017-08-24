@@ -67,18 +67,21 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 
 	@Override
 	public boolean load(ESubject subject) {
-		System.out.println("Collection load : " + subject.getIdentifier());
-		
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.load(subject)) return false;
 		}
+		
+		this.plugin.getELogger().debug("Chargement du subject (subject='" + subject.getIdentifier() + "';collection='" + subject.getCollectionIdentifier() + "')");
 		return true;
 	}
 	
 	@Override
 	public boolean load(Collection<ESubject> subjects) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
-			if (!storage.load(subjects)) return false;
+			if (!storage.load(subjects)) {
+				System.err.println("EConfigCollectionStorage erreur load : " + storage);
+				return false;
+			}
 		}
 		return true;
 	}

@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -137,8 +138,8 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Optional<SubjectReference> group = subject.getSubjectData().getGroup(type_user.get());
-		if (!group.isPresent()) {
+		Optional<SubjectReference> optGroup = subject.getSubjectData().getGroup(type_user.get());
+		if (!optGroup.isPresent()) {
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_DEL_GROUP_ERROR_EQUALS.sender()
 					.replace("<player>", user.getName())
@@ -153,7 +154,8 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		return subject.getSubjectData().removeParent(type_user.get(), group.get())
+		Subject group = optGroup.get().resolve().join();
+		return subject.getSubjectData().removeParent(type_user.get(), optGroup.get())
 			.exceptionally(e -> false)
 			.thenApply(result -> {
 				if (!result) {
@@ -166,7 +168,7 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_DEL_GROUP_EQUALS.sender()
 						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getSubjectIdentifier())
+						.replace("<group>", group.getFriendlyIdentifier().orElse(group.getIdentifier()))
 						.replace("<type>", type_user.get())
 						.sendTo(staff);
 
@@ -174,18 +176,18 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 						EPMessages.USER_DEL_GROUP_BROADCAST_EQUALS.sender()
 							.replace("<staff>", staff.getName())
 							.replace("<player>", user.getName())
-							.replace("<group>", group.get().getSubjectIdentifier())
+							.replace("<group>", group.getFriendlyIdentifier().orElse(group.getIdentifier()))
 							.replace("<type>", type_user.get()));
 				} else {
 					EPMessages.USER_DEL_GROUP_STAFF.sender()
 						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getSubjectIdentifier())
+						.replace("<group>", group.getFriendlyIdentifier().orElse(group.getIdentifier()))
 						.replace("<type>", type_user.get())
 						.sendTo(staff);
 					
 					EPMessages.USER_DEL_GROUP_PLAYER.sender()
 						.replace("<staff>", staff.getName())
-						.replace("<group>", group.get().getSubjectIdentifier())
+						.replace("<group>", group.getFriendlyIdentifier().orElse(group.getIdentifier()))
 						.replace("<type>", type_user.get())
 						.sendTo(user);
 					
@@ -194,7 +196,7 @@ public class EPUserDelGroup extends ECommand<EverPermissions> {
 							EPMessages.USER_DEL_GROUP_BROADCAST_PLAYER.sender()
 								.replace("<staff>", staff.getName())
 								.replace("<player>", user.getName())
-								.replace("<group>", group.get().getSubjectIdentifier())
+								.replace("<group>", group.getFriendlyIdentifier().orElse(group.getIdentifier()))
 								.replace("<type>", type_user.get()));
 					}
 				}

@@ -125,7 +125,7 @@ public class EPGroupAddOption extends ECommand<EverPermissions> {
 				}
 				
 				EPMessages.GROUP_ADD_OPTION_STAFF.sender()
-					.replace("<group>", group.get().getIdentifier())
+					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("<option>", option)
 					.replace("<type>", type_group.get())
 					.replace("<value>", Text.of(value))

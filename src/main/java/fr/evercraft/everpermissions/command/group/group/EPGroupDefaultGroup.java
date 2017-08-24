@@ -122,7 +122,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 			// C'est déjà le groupe par défaut
 			if (value.get() && oldDefault.get().equals(group.get())) {
 				EPMessages.GROUP_DEFAULT_GROUP_ERROR_EQUALS.sender()
-					.replace("<group>", group_name)
+					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("<type>", type_group.get())
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
@@ -130,7 +130,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 			// Le groupe n'a pas un groupe par défaut
 			} else if (!value.get() && !oldDefault.get().equals(group.get())) {
 				EPMessages.GROUP_DEFAULT_GROUP_ERROR_FALSE.sender()
-					.replace("<group>", group_name)
+					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("<type>", type_group.get())
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
@@ -138,7 +138,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 			// C'est déjà le groupe par défaut
 			} else if (value.get()) {
 				EPMessages.GROUP_DEFAULT_GROUP_ERROR_TRUE.sender()
-					.replace("<group>", group_name)
+					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("<type>", type_group.get())
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
@@ -157,12 +157,12 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
 				
 				if (value.get()) {
 					EPMessages.GROUP_DEFAULT_GROUP_TRUE.sender()
-						.replace("<group>", group_name)
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<type>", type_group.get())
 						.sendTo(player);
 				} else {
 					EPMessages.GROUP_DEFAULT_GROUP_FALSE.sender()
-						.replace("<group>", group_name)
+						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("<type>", type_group.get())
 						.sendTo(player);
 				}

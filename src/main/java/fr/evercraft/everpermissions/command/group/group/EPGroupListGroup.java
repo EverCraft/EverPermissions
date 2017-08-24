@@ -108,14 +108,14 @@ public class EPGroupListGroup extends ECommand<EverPermissions> {
 			Optional<EGroupSubject> subject = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
 			if (subject.isPresent()) {
 				list.add(EPMessages.GROUP_LIST_GROUP_DEFAULT.getFormat()
-						.toText("<group>", subject.get().getIdentifier()));
+						.toText("<group>", subject.get().getFriendlyIdentifier().orElse(subject.get().getIdentifier())));
 			}
 			
 			// La liste des groupes
 			list.add(EPMessages.GROUP_LIST_GROUP_NAME.getText());
 			for (EGroupSubject group : groups) {
 				list.add(EPMessages.GROUP_LIST_GROUP_LINE.getFormat()
-						.toText("<group>", group.getIdentifier()));
+						.toText("<group>", group.getFriendlyIdentifier().orElse(group.getIdentifier())));
 			}
 		}
 		

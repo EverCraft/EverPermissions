@@ -54,6 +54,7 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 		this.database = new EPDataBases(this);
 		
 		this.service = new EPermissionService(this);
+		this.service.load();
 		this.getGame().getServiceManager().setProvider(this, PermissionService.class, this.service);
 	}
 	
