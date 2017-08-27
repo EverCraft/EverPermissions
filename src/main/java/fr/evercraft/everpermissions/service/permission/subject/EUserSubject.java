@@ -47,6 +47,11 @@ public class EUserSubject extends ESubject {
         this.transientData = new EUserData(this.plugin, this, true);
     }
     
+    public void reload() {
+		this.data.reload();
+		//this.transientData.reload();
+    }
+    
     /*
      * Accesseurs
      */
@@ -158,7 +163,19 @@ public class EUserSubject extends ESubject {
     			this.plugin.getELogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
+    	// Subject Default
+    	} else {
+    		String typeWorldGroup = this.plugin.getService().getContextCalculator().getGroup(contexts);
+    		Optional<EGroupSubject> defaultGroup = this.plugin.getService().getGroupSubjects().getDefaultGroup(typeWorldGroup);
+    		if(defaultGroup.isPresent()) {
+        		value = defaultGroup.get().getPermissionValue(contexts, permission);
+        		if (!value.equals(Tristate.UNDEFINED)) {
+        			this.plugin.getELogger().debug("SubjectData 'Default' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
+        			return value;
+        		}
+    		}
     	}
+    	
     	this.plugin.getELogger().debug("Undefined : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='UNDEFINED')");
         return Tristate.UNDEFINED;
     }
@@ -220,14 +237,20 @@ public class EUserSubject extends ESubject {
     			this.plugin.getELogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
     			return Optional.of(value);
     		}
+    	// Subject Default
+    	} else {
+    		String typeWorldGroup = this.plugin.getService().getContextCalculator().getGroup(contexts);
+    		Optional<EGroupSubject> defaultGroup = this.plugin.getService().getGroupSubjects().getDefaultGroup(typeWorldGroup);
+    		if(defaultGroup.isPresent()) {
+        		value = defaultGroup.get().getOption(contexts, option).orElse(null);
+        		if (value != null) {
+        			this.plugin.getELogger().debug("SubjectData 'Default' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
+        			return Optional.of(value);
+        		}
+    		}
     	}
     	this.plugin.getELogger().debug("Undefined : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='EMPTY')");
         return Optional.empty();
-    }
-	
-	public void reload() {
-		this.data.reload();
-		this.transientData.reload();
     }
 	
 	/*

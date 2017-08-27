@@ -180,7 +180,6 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 			}
 			
 			if (subject instanceof EGroupSubject) {
-				System.out.println("registerTypeWorld " + subject.getFriendlyIdentifier() + " : " + this.typeWorld);
 				((EGroupSubject) subject).registerTypeWorld(this.typeWorld);
 			}
 		}

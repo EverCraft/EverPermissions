@@ -75,12 +75,17 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	/**
 	 * Rechargement : Vide le cache et recharge tous les joueurs
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void reload() {
 		this.reloadConfig();
+		
+		if (this.isTransient()) return;
 		
 		for (T subject : this.identifierSubjects.values()) {
 			subject.reload();
 		}
+		
+		this.storage.load((Collection) this.identifierSubjects.values());
 	}
 	
 	public void reloadConfig() {

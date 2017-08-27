@@ -51,15 +51,9 @@ public class EGroupSubject extends ESubject {
     
     public void reload() {
 		this.data.reload();
-		this.transientData.reload();
+		//this.transientData.reload();
+		this.typeWorlds.clear();
     }
-    
-    public CompletableFuture<Boolean> load() {
-    	return this.data.load().thenCompose(result -> {
-    		if (!result) return CompletableFuture.completedFuture(false);
-    		return this.transientData.load();
-    	});
-	}
 
     /*
      * Accesseurs

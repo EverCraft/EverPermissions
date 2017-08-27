@@ -38,10 +38,6 @@ public class EGroupData extends ESubjectData {
         super(plugin, subject, transientData);
     }
     
-    public CompletableFuture<Boolean> load() {
-    	return CompletableFuture.completedFuture(true);
-    }
-    
     /*
      * Permissions
      */

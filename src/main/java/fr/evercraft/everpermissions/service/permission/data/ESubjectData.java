@@ -91,17 +91,15 @@ public abstract class ESubjectData implements SubjectData {
 	public boolean isTransient() {
 		return this.transientData;
 	}
-	
-	public abstract CompletableFuture<Boolean> load();
 
-	public CompletableFuture<Boolean> reload() {
+	public boolean reload() {
 		this.write_lock.lock();
 		try {
 			this.permissions.clear();
 			this.options.clear();
 			this.parents.clear();
 			
-			return CompletableFuture.completedFuture(true);
+			return true;
 		} finally {
 			this.write_lock.unlock();
 		}

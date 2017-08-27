@@ -31,7 +31,6 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.world.World;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -39,7 +38,6 @@ import com.google.common.collect.ImmutableMap;
 
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 import fr.evercraft.everpermissions.service.permission.subject.ESubject;
 
 public class EUserData extends ESubjectData {	
@@ -52,55 +50,17 @@ public class EUserData extends ESubjectData {
 	}
 
 	@Override
-	public CompletableFuture<Boolean> reload() {
-		return super.reload().thenCompose(result -> {
-			if (!result) return CompletableFuture.completedFuture(false);
-			
-			this.write_lock.lock();
-			try {
-				this.groups.clear();
-			} finally {
-				this.write_lock.unlock();
-			}
-			
-			return this.load();
-		});
-	}
-	
-	public CompletableFuture<Boolean> load() {
-		return CompletableFuture.supplyAsync(() -> {
-			this.write_lock.lock();
-			try {
-				this.parents.clear();
-				this.groups.clear();
-				this.permissions.clear();
-				this.options.clear();
-				
-				if (!this.getSubject().getContainingCollection().getStorage().load(this.subject)) return false;
-				
-				// Chargement des groupes par défault
-				for (World world : this.plugin.getGame().getServer().getWorlds()) {
-					if (!world.isLoaded()) continue;
-					
-					Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(world.getName());
-					Optional<String> type_user = this.plugin.getService().getUserSubjects().getTypeWorld(world.getName());
-					if (!type_group.isPresent() || !type_user.isPresent()) continue;
-					if (this.getGroup(type_user.get()).isPresent()) continue;
-					
-					Optional<EGroupSubject> subject = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
-					if (subject.isPresent()) {
-						this.addParentExecute(type_user.get(), subject.get().asSubjectReference());
-						this.plugin.getELogger().debug("Loading : ("
-								+ "identifier=" + this.getIdentifier() + ";"
-								+ "default_group=" + subject.get().getIdentifier() + ";"
-								+ "type=" + type_user.get() + ")");
-					}
-				}
-				return true;
-			} finally {
-				this.write_lock.unlock();
-			}
-		}, this.plugin.getThreadAsync());
+	public boolean reload() {
+		if (!super.reload()) return false;
+		
+		this.write_lock.lock();
+		try {
+			this.groups.clear();
+		} finally {
+			this.write_lock.unlock();
+		}
+		
+		return true;
 	}
 	
 	/*
@@ -224,6 +184,7 @@ public class EUserData extends ESubjectData {
 	
 	public CompletableFuture<Boolean> setGroup(final Set<Context> contexts, final SubjectReference parent) {
 		Preconditions.checkNotNull(contexts, "contexts");
+		
 		if (!parent.getCollectionIdentifier().equals(PermissionService.SUBJECTS_GROUP)) return CompletableFuture.completedFuture(false);
 		
 		return this.setGroup(this.plugin.getService().getContextCalculator().getUser(contexts), parent);
@@ -269,6 +230,7 @@ public class EUserData extends ESubjectData {
 
 	public CompletableFuture<Boolean> addParent(final Set<Context> contexts, final SubjectReference parent) {
 		Preconditions.checkNotNull(contexts, "contexts");
+		
 		if (!parent.getCollectionIdentifier().equals(PermissionService.SUBJECTS_GROUP)) return CompletableFuture.completedFuture(false);
 		
 		return this.addParent(this.plugin.getService().getContextCalculator().getUser(contexts), parent);
