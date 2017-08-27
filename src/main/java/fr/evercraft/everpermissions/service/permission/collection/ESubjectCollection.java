@@ -52,6 +52,7 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	protected final EverPermissions plugin;
 	
 	private final String identifier;
+	
 	protected final ConcurrentMap<String, T> identifierSubjects;
 	protected final ConcurrentMap<String, T> nameSubjects;
 	
@@ -69,6 +70,8 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		this.reloadConfig();
 	}
 	
+	public abstract boolean isTransient();
+	
 	/**
 	 * Rechargement : Vide le cache et recharge tous les joueurs
 	 */
@@ -85,30 +88,33 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		this.worlds.clear();
 		
 		// Start
-		this.plugin.getConfigs().registerCollection(this.getIdentifier());
-		this.worlds.putAll(this.plugin.getConfigs().getTypeWorld(this.getIdentifier()));
+		this.plugin.getConfigs().registerCollection(this.identifier);
+		this.worlds.putAll(this.plugin.getConfigs().getTypeWorld(this.identifier));
 		
-		if (this.plugin.getDataBases().isEnable() && (this.storage == null || !(this.storage instanceof ESqlCollectionStorage)) && this.identifier.equals(PermissionService.SUBJECTS_GROUP)) {
-			if (this.identifier.equals(PermissionService.SUBJECTS_GROUP) ) {
-				this.storage = new ESqlCollectionStorage(this.plugin, this.getIdentifier());
+		if (!this.isTransient()) {
+			if (this.plugin.getDataBases().isEnable() && (this.storage == null || !(this.storage instanceof ESqlCollectionStorage)) && this.identifier.equals(PermissionService.SUBJECTS_GROUP)) {
+				if (this.identifier.equals(PermissionService.SUBJECTS_GROUP) ) {
+					this.storage = new ESqlCollectionStorage(this.plugin, this.identifier);
+				}
+			} else if ((!this.plugin.getDataBases().isEnable() || this.identifier.equals(PermissionService.SUBJECTS_GROUP)) && (this.storage == null || !(this.storage instanceof EConfigCollectionStorage))) {
+				this.storage = new EConfigCollectionStorage(this.plugin, this.identifier);
+			} else {
+				this.storage.reload();
 			}
-		} else if ((!this.plugin.getDataBases().isEnable() || this.identifier.equals(PermissionService.SUBJECTS_GROUP)) && (this.storage == null || !(this.storage instanceof EConfigCollectionStorage))) {
-			this.storage = new EConfigCollectionStorage(this.plugin, this.getIdentifier());
-		} else {
-			this.storage.reload();
-		}
-		
-		for (String typeWorld : new HashSet<String>(this.worlds.values())) {
-			this.storage.register(typeWorld);
+			
+			for (String typeWorld : new HashSet<String>(this.worlds.values())) {
+				this.storage.register(typeWorld);
+			}
 		}
 	}
 	
 	public void registerWorld(final String world) {
 		if (!this.worlds.containsKey(world)) {
-			String typeWorld = plugin.getConfigs().getTypeWorld(this.getIdentifier(), world);
+			String typeWorld = plugin.getConfigs().getTypeWorld(this.identifier, world);
 			
-			this.worlds.put(world, this.plugin.getConfigs().getTypeWorld(this.getIdentifier(), typeWorld));
-			this.storage.register(typeWorld);
+			this.worlds.put(world, this.plugin.getConfigs().getTypeWorld(this.identifier, typeWorld));
+			
+			if (!this.isTransient()) this.storage.register(typeWorld);
 		}
 	}
 	
@@ -177,7 +183,7 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 			}
 		}
 		
-		if (newSubjects.isEmpty()) return CompletableFuture.completedFuture(subjects.build());
+		if (newSubjects.isEmpty() || this.isTransient()) return CompletableFuture.completedFuture(subjects.build());
 		
 		return CompletableFuture.supplyAsync(() -> {
 			this.storage.load(newSubjects);
@@ -213,7 +219,7 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	public SubjectReference newSubjectReference(String subjectIdentifier) {
 		Preconditions.checkNotNull(subjectIdentifier, "subjectIdentifier");
 		
-		return new ESubjectReference(this.plugin.getService(), this.getIdentifier(), subjectIdentifier);
+		return new ESubjectReference(this.plugin.getService(), this.identifier, subjectIdentifier);
 	}
 	
 	@Override
@@ -249,6 +255,9 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	public CompletableFuture<Boolean> hasSubject(String identifier) {
 		Preconditions.checkNotNull(identifier, "identifier");
 		
+		if (this.get(identifier).isPresent()) return CompletableFuture.completedFuture(true);
+		if (this.isTransient()) return CompletableFuture.completedFuture(false);
+		
 		return CompletableFuture.supplyAsync(() -> {
 			return this.storage.hasSubject(identifier);
 		}, this.plugin.getThreadAsync());
@@ -256,6 +265,8 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	
 	@Override
 	public CompletableFuture<Set<String>> getAllIdentifiers() {
+		if (this.isTransient()) return CompletableFuture.completedFuture(this.identifierSubjects.keySet());
+		
 		return CompletableFuture.supplyAsync(() -> {
 			return this.storage.getAllIdentifiers();
 		}, this.plugin.getThreadAsync());

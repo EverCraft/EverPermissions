@@ -27,16 +27,15 @@ import org.spongepowered.api.util.Tristate;
 import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class ETemplateSubject extends ESubject {
+public class ETransientSubject extends ESubject {
 	private final MemorySubjectData data;
 	private final MemorySubjectData transientData;
 
-    public ETemplateSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<?> collection) {
+    public ETransientSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<?> collection) {
     	super(plugin, identifier, collection);
     	
     	this.data = new MemorySubjectData(plugin.getService());
@@ -59,9 +58,8 @@ public class ETemplateSubject extends ESubject {
 		}
     	
 		// TempoData : Groupes
-    	Iterator<SubjectReference> subjects = this.transientData.getParents(contexts).iterator();
-    	while(subjects.hasNext()) {
-    		value = subjects.next().resolve().join().getPermissionValue(contexts, permission);
+    	for (SubjectReference subject : this.transientData.getParents(contexts)) {
+    		value = subject.resolve().join().getPermissionValue(contexts, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
     			return value;
     		}
@@ -74,11 +72,10 @@ public class ETemplateSubject extends ESubject {
 		}
     	
 		// MemoryData : Groupes
-    	subjects = this.data.getParents(contexts).iterator();
-    	while(subjects.hasNext()) {
-    		Tristate tristate = subjects.next().resolve().join().getPermissionValue(contexts, permission);
-    		if (!tristate.equals(Tristate.UNDEFINED)) {
-    			return tristate;
+    	for (SubjectReference subject : this.data.getParents(contexts)) {
+    		value = subject.resolve().join().getPermissionValue(contexts, permission);
+    		if (!value.equals(Tristate.UNDEFINED)) {
+    			return value;
     		}
     	}
         return Tristate.UNDEFINED;
@@ -98,9 +95,8 @@ public class ETemplateSubject extends ESubject {
 		}
     	
 		// TempoData : Groups
-    	Iterator<SubjectReference> subjects = this.transientData.getParents(contexts).iterator();
-    	while(subjects.hasNext()) {
-    		value = ((ESubject)subjects.next().resolve().join()).getOption(contexts, option).orElse(null);
+		for (SubjectReference subject : this.transientData.getParents(contexts)) {
+    		value = subject.resolve().join().getOption(contexts, option).orElse(null);
     		if (value != null) {
     			this.plugin.getELogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';option='" + option + "';value='" + value + "')");
     			return Optional.of(value);
@@ -115,9 +111,8 @@ public class ETemplateSubject extends ESubject {
 		}
     	
     	// SubjectData : SubGroup
-    	subjects = this.data.getParents(contexts).iterator();
-    	while(subjects.hasNext()) {
-    		value = subjects.next().resolve().join().getOption(contexts, option).orElse(null);
+		for (SubjectReference subject : this.transientData.getParents(contexts)) {
+    		value = subject.resolve().join().getOption(contexts, option).orElse(null);
     		if (value != null) {
     			this.plugin.getELogger().debug("SubjectData 'Parent' : (identifier='" + this.identifier + "';option='" + option + "';value='" + value + "')");
     			return Optional.of(value);

@@ -19,7 +19,6 @@ package fr.evercraft.everpermissions.service.permission.subject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -105,52 +104,62 @@ public class EUserSubject extends ESubject {
      * Permission
      */
 	
-    public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {    	
+    public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {
+    	// TODO Cache
+    	
 		String typeWorldUser = this.plugin.getService().getContextCalculator().getUser(contexts);
 		// TempoData : Permissions
-		Tristate value = this.getTransientSubjectData().getNodeTree(typeWorldUser).getTristate(permission);
+		Tristate value = this.transientData.getNodeTree(typeWorldUser).getTristate(permission);
 		if (!value.equals(Tristate.UNDEFINED)) {
-			this.plugin.getELogger().debug("TransientSubjectData 'Permissions' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
+			this.plugin.getELogger().debug("TransientSubjectData 'Permissions' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
 			return value;
 		}
-    	
-		// TempoData : Groups
-    	Iterator<SubjectReference> subjects = this.getTransientSubjectData().getParents(typeWorldUser).iterator();
-    	while(subjects.hasNext()) {
-    		value = ((ESubject)subjects.next().resolve().join()).getPermissionValue(contexts, permission);
+		
+    	// TempoData : SubGroup
+    	for (SubjectReference subGroup : this.transientData.getSubGroup(typeWorldUser)) {
+    		value = subGroup.resolve().join().getPermissionValue(contexts, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
-    			this.plugin.getELogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
+    			this.plugin.getELogger().debug("SubjectData 'SubGroup' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
+    			return value;
+    		}
+    	}
+    	
+    	// TempoData : Groups
+    	Optional<SubjectReference> subject = this.transientData.getGroup(typeWorldUser);
+    	if(subject.isPresent()) {
+    		value = subject.get().resolve().join().getPermissionValue(contexts, permission);
+    		if (!value.equals(Tristate.UNDEFINED)) {
+    			this.plugin.getELogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
     	
     	// SubjectData : Permissions
-    	value = this.getSubjectData().getNodeTree(typeWorldUser).getTristate(permission);
+    	value = this.data.getNodeTree(typeWorldUser).getTristate(permission);
 		if (!value.equals(Tristate.UNDEFINED)) {
-			this.plugin.getELogger().debug("SubjectData 'Permissions' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
+			this.plugin.getELogger().debug("SubjectData 'Permissions' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
 			return value;
 		}
     	
     	// SubjectData : SubGroup
-    	subjects = this.getSubjectData().getSubGroup(typeWorldUser).iterator();
-    	while(subjects.hasNext()) {
-    		value = subjects.next().resolve().join().getPermissionValue(contexts, permission);
+		for (SubjectReference subGroup : this.data.getSubGroup(typeWorldUser)) {
+    		value = subGroup.resolve().join().getPermissionValue(contexts, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
-    			this.plugin.getELogger().debug("SubjectData 'SubGroup' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
+    			this.plugin.getELogger().debug("SubjectData 'SubGroup' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
     	
     	// SubjectData : Groups
-    	Optional<SubjectReference> subject = this.getSubjectData().getGroup(typeWorldUser);
+    	subject = this.data.getGroup(typeWorldUser);
     	if(subject.isPresent()) {
     		value = subject.get().resolve().join().getPermissionValue(contexts, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
-    			this.plugin.getELogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';permission='" + permission + "';value='" + value.name() + "')");
+    			this.plugin.getELogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
-    	this.plugin.getELogger().debug("SubjectData '' : (identifier='" + this.identifier + "';permission='" + permission + "';value='UNDEFINED')");
+    	this.plugin.getELogger().debug("Undefined : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='UNDEFINED')");
         return Tristate.UNDEFINED;
     }
     
@@ -162,49 +171,57 @@ public class EUserSubject extends ESubject {
     public Optional<String> getOption(final Set<Context> contexts, final String option) {
     	String typeWorldUser = this.plugin.getService().getContextCalculator().getUser(contexts);
 		// TempoData : Permissions
-    	String value = this.getTransientSubjectData().getOptions(typeWorldUser).get(option);
+    	String value = this.transientData.getOptions(typeWorldUser).get(option);
 		if (value != null) {
-			this.plugin.getELogger().debug("TransientSubjectData 'Options' : (identifier='" + this.identifier + "';option='" + option + "';value='" + value + "')");
+			this.plugin.getELogger().debug("TransientSubjectData 'Options' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
 			return Optional.of(value);
 		}
     	
-		// TempoData : Groups
-    	Iterator<SubjectReference> subjects = this.getTransientSubjectData().getParents(typeWorldUser).iterator();
-    	while(subjects.hasNext()) {
-    		value = ((ESubject)subjects.next().resolve().join()).getOption(contexts, option).orElse(null);
+		// TempoData : SubGroup
+    	for (SubjectReference subGroup : this.transientData.getSubGroup(typeWorldUser)) {
+    		value = subGroup.resolve().join().getOption(contexts, option).orElse(null);
     		if (value != null) {
-    			this.plugin.getELogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';option='" + option + "';value='" + value + "')");
+    			this.plugin.getELogger().debug("TransientSubjectData 'Permissions' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
+    			return Optional.of(value);
+    		}
+    	}
+    	
+    	// TempoData : Groups
+    	Optional<SubjectReference> subject = this.transientData.getGroup(typeWorldUser);
+    	if(subject.isPresent()) {
+    		value = subject.get().resolve().join().getOption(contexts, option).orElse(null);
+    		if (value != null) {
+    			this.plugin.getELogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
     			return Optional.of(value);
     		}
     	}
     	
     	// SubjectData : Permissions
-    	value = this.getSubjectData().getOptions(typeWorldUser).get(option);
+    	value = this.data.getOptions(typeWorldUser).get(option);
 		if (value != null) {
-			this.plugin.getELogger().debug("SubjectData 'Options' : (identifier='" + this.identifier + "';option='" + option + "';value='" + value + "')");
+			this.plugin.getELogger().debug("SubjectData 'Options' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
 			return Optional.of(value);
 		}
     	
     	// SubjectData : SubGroup
-    	subjects = this.getSubjectData().getSubGroup(typeWorldUser).iterator();
-    	while(subjects.hasNext()) {
-    		value = subjects.next().resolve().join().getOption(contexts, option).orElse(null);
+		for (SubjectReference subGroup : this.data.getSubGroup(typeWorldUser)) {
+    		value = subGroup.resolve().join().getOption(contexts, option).orElse(null);
     		if (value != null) {
-    			this.plugin.getELogger().debug("SubjectData 'SubGroup' : (identifier='" + this.identifier + "';option='" + option + "';value='" + value + "')");
+    			this.plugin.getELogger().debug("SubjectData 'SubGroup' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
     			return Optional.of(value);
     		}
     	}
     	
     	// SubjectData : Groups
-    	Optional<SubjectReference> subject = this.getSubjectData().getGroup(typeWorldUser);
+    	subject = this.data.getGroup(typeWorldUser);
     	if(subject.isPresent()) {
     		value = subject.get().resolve().join().getOption(contexts, option).orElse(null);
     		if (value != null) {
-    			this.plugin.getELogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';option='" + option + "';value='" + value + "')");
+    			this.plugin.getELogger().debug("SubjectData 'Groups' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
     			return Optional.of(value);
     		}
     	}
-    	this.plugin.getELogger().debug("SubjectData '' : (identifier='" + this.identifier + "';option='" + option + "';value='EMPTY')");
+    	this.plugin.getELogger().debug("Undefined : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='EMPTY')");
         return Optional.empty();
     }
 	
@@ -225,8 +242,8 @@ public class EUserSubject extends ESubject {
     
     public List<SubjectReference> getParents(final String typeWorldUser) {
     	List<SubjectReference> list = new ArrayList<SubjectReference>();
-    	list.addAll(this.getSubjectData().getParents(typeWorldUser));
-    	list.addAll(this.getTransientSubjectData().getParents(typeWorldUser));
+    	list.addAll(this.data.getParents(typeWorldUser));
+    	list.addAll(this.transientData.getParents(typeWorldUser));
         return list;
     }
 }

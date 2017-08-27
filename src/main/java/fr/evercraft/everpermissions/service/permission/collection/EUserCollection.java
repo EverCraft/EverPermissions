@@ -62,4 +62,9 @@ public class EUserCollection extends ESubjectCollection<EUserSubject> {
 		
 		return this.getAllWithPermission(this.plugin.getService().getContextCalculator().getUser(contexts), permission);
 	}
+	
+	@Override
+	public boolean isTransient() {
+		return false;
+	}
 }

@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.World;
@@ -223,6 +224,8 @@ public class EUserData extends ESubjectData {
 	
 	public CompletableFuture<Boolean> setGroup(final Set<Context> contexts, final SubjectReference parent) {
 		Preconditions.checkNotNull(contexts, "contexts");
+		if (!parent.getCollectionIdentifier().equals(PermissionService.SUBJECTS_GROUP)) return CompletableFuture.completedFuture(false);
+		
 		return this.setGroup(this.plugin.getService().getContextCalculator().getUser(contexts), parent);
 	}
 	
@@ -266,11 +269,15 @@ public class EUserData extends ESubjectData {
 
 	public CompletableFuture<Boolean> addParent(final Set<Context> contexts, final SubjectReference parent) {
 		Preconditions.checkNotNull(contexts, "contexts");
+		if (!parent.getCollectionIdentifier().equals(PermissionService.SUBJECTS_GROUP)) return CompletableFuture.completedFuture(false);
+		
 		return this.addParent(this.plugin.getService().getContextCalculator().getUser(contexts), parent);
 	}
 	
 	public CompletableFuture<Boolean> removeParent(final Set<Context> contexts, final SubjectReference parent) {
 		Preconditions.checkNotNull(contexts, "contexts");
+		if (!parent.getCollectionIdentifier().equals(PermissionService.SUBJECTS_GROUP)) return CompletableFuture.completedFuture(false);
+		
 		return this.removeParent(this.plugin.getService().getContextCalculator().getUser(contexts), parent);
 	}
 	

@@ -169,4 +169,9 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 		} while (this.identifierSubjects.containsKey(uuid.toString()));
 		return uuid;
 	}
+
+	@Override
+	public boolean isTransient() {
+		return false;
+	}
 }

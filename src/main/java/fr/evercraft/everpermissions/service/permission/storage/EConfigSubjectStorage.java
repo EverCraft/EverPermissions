@@ -59,7 +59,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 	private final String parentIdentifier;
 
 	public EConfigSubjectStorage(final EverPermissions plugin, final String collection, final String typeWorld) {
-		super(plugin, collection + "/" + typeWorld);
+		super(plugin, collection + "/" + typeWorld, false);
 		this.collection = collection;
 		this.typeWorld = typeWorld;
 		

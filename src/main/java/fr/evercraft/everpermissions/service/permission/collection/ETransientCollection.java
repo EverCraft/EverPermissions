@@ -17,27 +17,29 @@
 package fr.evercraft.everpermissions.service.permission.collection;
 
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.subject.ETemplateSubject;
+import fr.evercraft.everpermissions.service.permission.subject.ETransientSubject;
 
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
+import org.spongepowered.api.util.Tristate;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class ETemplateCollection extends ESubjectCollection<ETemplateSubject> {
+public class ETransientCollection extends ESubjectCollection<ETransientSubject> {
 
-    public ETemplateCollection(final EverPermissions plugin) {
-    	super(plugin, PermissionService.SUBJECTS_ROLE_TEMPLATE);
+    public ETransientCollection(final EverPermissions plugin, String collection) {
+    	super(plugin, collection);
     }
     
 	@Override
-	protected ETemplateSubject add(String identifier) {
-    	return new ETemplateSubject(this.plugin, identifier, this);
+	protected ETransientSubject add(String identifier) {
+    	return new ETransientSubject(this.plugin, identifier, this);
 	}
 	
 	@Override
@@ -48,6 +50,18 @@ public class ETemplateCollection extends ESubjectCollection<ETemplateSubject> {
 		Preconditions.checkNotNull(contexts, "contexts");
 		Preconditions.checkNotNull(permission, "permission");
 		
-		return this.getAllWithPermission(this.plugin.getService().getContextCalculator().getUser(contexts), permission);
+		ImmutableMap.Builder<SubjectReference, Boolean> builder = ImmutableMap.builder();
+		for (Subject subject : this.identifierSubjects.values()) {
+			Tristate value = subject.getPermissionValue(contexts, permission);
+			if (!value.equals(Tristate.UNDEFINED)) {
+				builder.put(subject.asSubjectReference(), value.asBoolean());
+			}
+		}
+		return CompletableFuture.completedFuture(builder.build());
+	}
+	
+	@Override
+	public boolean isTransient() {
+		return true;
 	}
 }

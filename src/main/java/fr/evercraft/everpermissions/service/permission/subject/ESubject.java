@@ -38,7 +38,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public abstract class ESubject implements Subject {
 	protected final EverPermissions plugin;
 	
-	private final ESubjectCollection<?> collection;
+	protected final ESubjectCollection<?> collection;
 	protected final String identifier;
 	protected String name;
 	

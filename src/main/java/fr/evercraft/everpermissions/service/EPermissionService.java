@@ -27,10 +27,9 @@ import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.EPermissionDescription;
 import fr.evercraft.everpermissions.service.permission.collection.EGroupCollection;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
-import fr.evercraft.everpermissions.service.permission.collection.ETemplateCollection;
+import fr.evercraft.everpermissions.service.permission.collection.ETransientCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EUserCollection;
 import fr.evercraft.everpermissions.service.permission.subject.ESubjectReference;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -56,114 +55,111 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Predicate;
 
 public class EPermissionService implements PermissionService {
-	public static final String IDENTIFIER_COMMAND_BLOCK = "CommandBlock";
-	public static final String SUBJECT_DEFAULT = "Default";
+	public static final String SUBJECT_DEFAULT = "default";
 	
 	private final EverPermissions plugin;
 
-	private final Subject defaults;
+	private Subject defaults;
 
-    private final EUserCollection userCollection;
-    private final EGroupCollection groupCollection;
-    private final EUserCollection commandBlockCollection;
+	private final EUserCollection userCollection;
+	private final EGroupCollection groupCollection;
+	private final EUserCollection commandBlockCollection;
 	private final EUserCollection systemCollection;
 	private final EUserCollection defaultsCollection;
-    
-    private final EContextCalculator contextCalculator;
-    
-    private final CopyOnWriteArraySet<ContextCalculator<Subject>> contextCalculators;
-    private final ConcurrentMap<String, ESubjectCollection<?>> subjectCollections; 
-    private final ConcurrentMap<String, EPermissionDescription> descriptions;
+	
+	private final EContextCalculator contextCalculator;
+	
+	private final CopyOnWriteArraySet<ContextCalculator<Subject>> contextCalculators;
+	private final ConcurrentMap<String, ESubjectCollection<?>> subjectCollections; 
+	private final ConcurrentMap<String, EPermissionDescription> descriptions;
 
-    public EPermissionService(final EverPermissions plugin) throws PluginDisableException {
-    	this.plugin = plugin;
-    	
-    	// Default
-    	this.defaultsCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_DEFAULT);
-    	this.defaults = new EUserSubject(this.plugin, SUBJECT_DEFAULT, this.defaultsCollection);
-    	
-    	this.descriptions = new ConcurrentHashMap<String, EPermissionDescription>();
-    	
-    	// Context
-    	this.contextCalculators = new CopyOnWriteArraySet<ContextCalculator<Subject>>();
-    	this.contextCalculator = new EContextCalculator(this.plugin);
-    	this.contextCalculators.add(this.contextCalculator);
-    	
-    	// Collection
-    	this.groupCollection = new EGroupCollection(this.plugin);
-    	this.userCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_USER);
-    	this.systemCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_SYSTEM);
-    	this.commandBlockCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_COMMAND_BLOCK);
-    	
-    	this.subjectCollections = new ConcurrentHashMap<String, ESubjectCollection<?>>();
-    	this.subjectCollections.put(PermissionService.SUBJECTS_USER.toLowerCase(), this.userCollection);
-    	this.subjectCollections.put(PermissionService.SUBJECTS_GROUP.toLowerCase(), this.groupCollection);
-    	this.subjectCollections.put(PermissionService.SUBJECTS_SYSTEM.toLowerCase(), this.systemCollection);
-    	this.subjectCollections.put(PermissionService.SUBJECTS_COMMAND_BLOCK.toLowerCase(), this.commandBlockCollection);
-    	this.subjectCollections.put(PermissionService.SUBJECTS_DEFAULT.toLowerCase(), this.defaultsCollection);
-    	this.subjectCollections.put(PermissionService.SUBJECTS_ROLE_TEMPLATE.toLowerCase(), new ETemplateCollection(this.plugin));
-    }
-    
-    public void load() {
-    	for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
-    		collection.load();
-    	}
-    }
-     
-    /**
-     * Rechargement de toutes les collections
-     */
-    public void reload() {    	
-    	for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
-    		collection.reload();
-    	}
-    }
-    
-    /*
-     * Accesseur : Collection
-     */
-    
-    @Override
-    public EUserCollection getUserSubjects() {
-    	return this.userCollection;
-    }
+	public EPermissionService(final EverPermissions plugin) throws PluginDisableException {
+		this.plugin = plugin;
+		
+		// Default
+		this.defaultsCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_DEFAULT);
+		
+		this.descriptions = new ConcurrentHashMap<String, EPermissionDescription>();
+		
+		// Context
+		this.contextCalculators = new CopyOnWriteArraySet<ContextCalculator<Subject>>();
+		this.contextCalculator = new EContextCalculator(this.plugin);
+		this.contextCalculators.add(this.contextCalculator);
+		
+		// Collection
+		this.groupCollection = new EGroupCollection(this.plugin);
+		this.userCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_USER);
+		this.systemCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_SYSTEM);
+		this.commandBlockCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_COMMAND_BLOCK);
+		
+		this.subjectCollections = new ConcurrentHashMap<String, ESubjectCollection<?>>();
+		this.subjectCollections.put(PermissionService.SUBJECTS_USER.toLowerCase(), this.userCollection);
+		this.subjectCollections.put(PermissionService.SUBJECTS_GROUP.toLowerCase(), this.groupCollection);
+		this.subjectCollections.put(PermissionService.SUBJECTS_SYSTEM.toLowerCase(), this.systemCollection);
+		this.subjectCollections.put(PermissionService.SUBJECTS_COMMAND_BLOCK.toLowerCase(), this.commandBlockCollection);
+		this.subjectCollections.put(PermissionService.SUBJECTS_DEFAULT.toLowerCase(), this.defaultsCollection);
+		this.subjectCollections.put(PermissionService.SUBJECTS_ROLE_TEMPLATE.toLowerCase(), new ETransientCollection(this.plugin, PermissionService.SUBJECTS_ROLE_TEMPLATE));
+	}
+	
+	public void load() {
+		this.defaults = this.defaultsCollection.load(SUBJECT_DEFAULT).join();
+		
+		for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
+			collection.load();
+		}
+	}
+	
+	public void reload() {		
+		for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
+			collection.reload();
+		}
+	}
+	
+	/*
+	 * Accesseur : Collection
+	 */
+	
+	@Override
+	public EUserCollection getUserSubjects() {
+		return this.userCollection;
+	}
 
-    @Override
-    public EGroupCollection getGroupSubjects() {
-    	return this.groupCollection;
-    }
+	@Override
+	public EGroupCollection getGroupSubjects() {
+		return this.groupCollection;
+	}
 
-    public EUserCollection getCommandBlockSubjects() {
-    	return this.commandBlockCollection;
-    }
-    
-    public EUserCollection getSytemSubjects() {
-    	return this.systemCollection;
-    }
-    
-    public Set<String> getSuggestsOthers() {
-    	TreeSet<String> suggests = new TreeSet<String>();
-    	for (Subject subject : this.plugin.getService().getSytemSubjects().getLoadedSubjects()) {
+	public EUserCollection getCommandBlockSubjects() {
+		return this.commandBlockCollection;
+	}
+	
+	public EUserCollection getSytemSubjects() {
+		return this.systemCollection;
+	}
+	
+	public Set<String> getSuggestsOthers() {
+		TreeSet<String> suggests = new TreeSet<String>();
+		for (Subject subject : this.plugin.getService().getSytemSubjects().getLoadedSubjects()) {
 			suggests.add(subject.getIdentifier());
 		}
 		for (Subject subject : this.plugin.getService().getCommandBlockSubjects().getLoadedSubjects()) {
 			suggests.add(subject.getIdentifier());
 		}
 		return suggests;
-    }
-    
-    @Override
-    public Subject getDefaults() {
-        return this.defaults;
-    }
-    
-    /**
-     * Retourne un EOtherSubject (Server, CommandBlock)
-     * @param identifier L'identifiant du EOtherSubject
-     * @return Un EOtherSubject
-     */
-    public Optional<Subject> getOtherSubject(final String identifier) {
-    	Optional<Subject> subject = this.plugin.getService().getSytemSubjects().getSubject(identifier);
+	}
+	
+	@Override
+	public Subject getDefaults() {
+		return this.defaults;
+	}
+	
+	/**
+	 * Retourne un EOtherSubject (Server, CommandBlock)
+	 * @param identifier L'identifiant du EOtherSubject
+	 * @return Un EOtherSubject
+	 */
+	public Optional<Subject> getOtherSubject(final String identifier) {
+		Optional<Subject> subject = this.plugin.getService().getSytemSubjects().getSubject(identifier);
 		if (subject.isPresent()) {
 			return subject;
 		}
@@ -174,8 +170,8 @@ public class EPermissionService implements PermissionService {
 		}
 		return Optional.empty();
 	}
-    
-    @Override
+	
+	@Override
 	public CompletableFuture<SubjectCollection> loadCollection(String identifier) {
 		ESubjectCollection<?> collection = this.subjectCollections.get(identifier.toLowerCase());
 		if (collection != null) return CompletableFuture.completedFuture(collection);
@@ -205,7 +201,7 @@ public class EPermissionService implements PermissionService {
 			File[] files = this.plugin.getPath().resolve("others").toFile().listFiles(new FilenameFilter() {
 				@Override
 				public boolean accept(File directory, String fileName) {
-			        return fileName.endsWith(".conf") && fileName.equalsIgnoreCase(identifier + ".conf");
+					return fileName.endsWith(".conf") && fileName.equalsIgnoreCase(identifier + ".conf");
 				}
 			});
 		
@@ -217,35 +213,35 @@ public class EPermissionService implements PermissionService {
 	 * Context
 	 */
 
-    @Override
-    public void registerContextCalculator(final ContextCalculator<Subject> calculator) {}
-    
-    public EContextCalculator getContextCalculator() {
+	@Override
+	public void registerContextCalculator(final ContextCalculator<Subject> calculator) {}
+	
+	public EContextCalculator getContextCalculator() {
 		return this.contextCalculator;
 	}
 
-    /*
-     * Description
-     */
-    
-    @Override
-    public PermissionDescription.Builder newDescriptionBuilder(final Object instance) {
-        Optional<PluginContainer> container = this.plugin.getGame().getPluginManager().fromInstance(instance);
-        if (!container.isPresent()) {
-        	throw new IllegalArgumentException("Couldn't find a plugin container for " + instance.getClass().getSimpleName());
-        }
-        return new EPermissionDescription.Builder(this, container.get());
-    }
+	/*
+	 * Description
+	 */
+	
+	@Override
+	public PermissionDescription.Builder newDescriptionBuilder(final Object instance) {
+		Optional<PluginContainer> container = this.plugin.getGame().getPluginManager().fromInstance(instance);
+		if (!container.isPresent()) {
+			throw new IllegalArgumentException("Couldn't find a plugin container for " + instance.getClass().getSimpleName());
+		}
+		return new EPermissionDescription.Builder(this, container.get());
+	}
 
-    @Override
-    public Optional<PermissionDescription> getDescription(final String identifier) {
-        return Optional.ofNullable(this.descriptions.get(identifier));
-    }
+	@Override
+	public Optional<PermissionDescription> getDescription(final String identifier) {
+		return Optional.ofNullable(this.descriptions.get(identifier));
+	}
 
-    @Override
-    public Collection<PermissionDescription> getDescriptions() {
-        return ImmutableSet.<PermissionDescription>copyOf(this.descriptions.values());
-    }
+	@Override
+	public Collection<PermissionDescription> getDescriptions() {
+		return ImmutableSet.<PermissionDescription>copyOf(this.descriptions.values());
+	}
 
 	public void registerDescription(final EPermissionDescription description) {
 		this.descriptions.put(description.getId(), description);
@@ -289,7 +285,7 @@ public class EPermissionService implements PermissionService {
 		this.plugin.getConfigs().registerWorld(nameWorld);
 		
 		for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
-    		collection.registerWorld(nameWorld);
-    	}
+			collection.registerWorld(nameWorld);
+		}
 	}
 }
