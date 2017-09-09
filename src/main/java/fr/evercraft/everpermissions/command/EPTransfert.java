@@ -39,7 +39,7 @@ public class EPTransfert extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.TRANSFERT.get());
+		return source.hasPermission(EPPermissions.MIGRATE.get());
 	}
 
 	public Text description(final CommandSource source) {

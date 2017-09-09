@@ -153,7 +153,7 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_ADD_OPTION_EQUALS.sender()
 						.replace("<player>", user.getName())
-						.replace("<option>", type_user.get())
+						.replace("<option>", option)
 						.replace("<type>", type_user.get())
 						.replace("<value>", Text.of(value))
 						.sendTo(staff);
@@ -161,7 +161,7 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 				} else {
 					EPMessages.USER_ADD_OPTION_STAFF.sender()
 						.replace("<player>", user.getName())
-						.replace("<option>", type_user.get())
+						.replace("<option>", option)
 						.replace("<type>", type_user.get())
 						.replace("<value>", Text.of(value))
 						.sendTo(staff);
