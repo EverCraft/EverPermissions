@@ -70,12 +70,12 @@ public class EPTransfert extends ECommand<EverPermissions> {
 				// Transféré vers une base de donnée SQL
 				if (args.get(0).equalsIgnoreCase("sql")) {
 					EPMessages.TRANSFERT_SQL_CONFIRMATION.sender()
-						.replace("{confirmation}", () -} this.getButtonConfirmationSQL())
+						.replace("{confirmation}", () -> this.getButtonConfirmationSQL())
 						.sendTo(source);
 				// Transféré vers un fichier de config
 				} else if (args.get(0).equalsIgnoreCase("conf")) {
 					EPMessages.TRANSFERT_CONF_CONFIRMATION.sender()
-						.replace("{confirmation}", () -} this.getButtonConfirmationConf())
+						.replace("{confirmation}", () -> this.getButtonConfirmationConf())
 						.sendTo(source);
 				// Erreur : sql ou conf
 				} else {
