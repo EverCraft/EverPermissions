@@ -66,8 +66,8 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 	}
 	
 	@Override
-	protected void onReload() throws PluginDisableException {
-		this.reloadConfigurations();
+	protected void onReload() throws PluginDisableException, ServerDisableException {
+		super.onReload();
 		
 		this.service.reload();
 	}

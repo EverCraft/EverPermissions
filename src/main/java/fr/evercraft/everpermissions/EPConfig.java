@@ -26,7 +26,7 @@ import org.spongepowered.api.world.World;
 import com.google.common.collect.ImmutableMap;
 
 import fr.evercraft.everapi.plugin.file.EConfig;
-import fr.evercraft.everapi.plugin.file.EMessage;
+
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 
@@ -45,17 +45,8 @@ public class EPConfig extends EConfig<EverPermissions> {
 	
 	@Override
 	public void loadDefault() {
-		addDefault("DEBUG", false, "Displays plugin performance in the logs");
-		addDefault("LANGUAGE", EMessage.FRENCH, "Select language messages", "Examples : ", "  French : FR_fr", "  English : EN_en");
-		
-		addComment("SQL", 	"Save the user in a database : ",
-							" H2 : \"jdbc:h2:" + this.plugin.getPath().toAbsolutePath() + "/permissions\"",
-							" SQL : \"jdbc:mysql://[login[:password]@]<host>:<port>/<database>\"",
-							"By default users are saving in the 'users/'");
-		
-		addDefault("SQL.enable", false);
-		addDefault("SQL.url", "jdbc:mysql://root:password@localhost:3306/minecraft");
-		addDefault("SQL.prefix", "everpermissions_");
+		this.configDefault();
+		this.sqlDefault();
 		
 		addDefault("collections", ImmutableMap.of(),
 							"Configure the collection for each world",
