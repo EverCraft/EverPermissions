@@ -91,7 +91,7 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// On connais le joueur
@@ -104,7 +104,7 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -120,7 +120,7 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -133,16 +133,16 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			// La source et le joueur sont identique
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_CHECK_PERMISSION_TRUE_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{permission}", permission)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			// La source et le joueur ne sont pas identique
 			} else {
 				EPMessages.USER_CHECK_PERMISSION_TRUE_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{permission}", permission)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			}
 		// Permission : False
@@ -150,16 +150,16 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			// La source et le joueur sont identique
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_CHECK_PERMISSION_FALSE_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{permission}", permission)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			// La source et le joueur ne sont pas identique
 			} else {
 				EPMessages.USER_CHECK_PERMISSION_FALSE_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{permission}", permission)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			}
 		// Permission : Undefined
@@ -167,16 +167,16 @@ public class EPUserCheckPerm extends ECommand<EverPermissions> {
 			// La source et le joueur sont identique
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_CHECK_PERMISSION_UNDEFINED_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{permission}", permission)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			// La source et le joueur ne sont pas identique
 			} else {
 				EPMessages.USER_CHECK_PERMISSION_UNDEFINED_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{permission}", permission)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			}
 		}

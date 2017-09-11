@@ -73,7 +73,7 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 			// Le subject est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
-					.replace("<other>", args.get(0))
+					.replace("{other}", args.get(0))
 					.sendTo(source);
 			}*/
 		// Nombre d'argument incorrect
@@ -88,16 +88,16 @@ public class EPOtherCheckOption extends ECommand<EverPermissions> {
 		// Il n'y a pas de valeur
 		if (name == null) {
 			EPMessages.OTHER_CHECK_OPTION_UNDEFINED.sender()
-				.replace("<subject>", subject.getIdentifier())
-				.replace("<option>", type)
+				.replace("{subject}", subject.getIdentifier())
+				.replace("{option}", type)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
 		
 		EPMessages.OTHER_CHECK_OPTION_DEFINED.sender()
-			.replace("<subject>", subject.getIdentifier())
-			.replace("<option>", type)
-			.replace("<value>", Text.of(name))
+			.replace("{subject}", subject.getIdentifier())
+			.replace("{option}", type)
+			.replace("{value}", Text.of(name))
 			.sendTo(staff);
 		return CompletableFuture.completedFuture(true);
 	}*/

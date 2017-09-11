@@ -92,7 +92,7 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -101,8 +101,8 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 		// Groupe introuvable
 		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-				.replace("<type>", type_group.get())
+				.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+				.replace("{type}", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -119,8 +119,8 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 				}
 				
 				EPMessages.GROUP_DEL_GROUP_STAFF.sender()
-					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-					.replace("<type>", type_group.get());
+					.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+					.replace("{type}", type_group.get());
 				return true;
 			});
 	}

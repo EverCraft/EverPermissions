@@ -91,7 +91,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// On connais le monde
@@ -104,7 +104,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -135,7 +135,7 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -147,16 +147,16 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 			// La source et le joueur sont identique
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_CHECK_OPTION_UNDEFINED_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<option>", option)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{option}", option)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			// La source et le joueur ne sont pas identique
 			} else {
 				EPMessages.USER_CHECK_OPTION_UNDEFINED_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<option>", option)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{option}", option)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			}
 			return CompletableFuture.completedFuture(false);
@@ -165,18 +165,18 @@ public class EPUserCheckOption extends ECommand<EverPermissions> {
 		// La source et le joueur sont identique
 		if (staff.getIdentifier().equals(user.getIdentifier())) {
 			EPMessages.USER_CHECK_OPTION_DEFINED_EQUALS.sender()
-				.replace("<player>", user.getName())
-				.replace("<option>", option)
-				.replace("<type>", type_user.get())
-				.replace("<value>", Text.of(value.get()))
+				.replace("{player}", user.getName())
+				.replace("{option}", option)
+				.replace("{type}", type_user.get())
+				.replace("{value}", Text.of(value.get()))
 				.sendTo(staff);
 		// La source et le joueur ne sont pas identique
 		} else {
 			EPMessages.USER_CHECK_OPTION_DEFINED_STAFF.sender()
-				.replace("<player>", user.getName())
-				.replace("<option>", option)
-				.replace("<type>", type_user.get())
-				.replace("<value>", Text.of(value.get()))
+				.replace("{player}", user.getName())
+				.replace("{option}", option)
+				.replace("{type}", type_user.get())
+				.replace("{value}", Text.of(value.get()))
 				.sendTo(staff);
 		}
 		return CompletableFuture.completedFuture(true);

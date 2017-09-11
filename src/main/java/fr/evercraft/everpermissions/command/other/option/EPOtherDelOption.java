@@ -73,7 +73,7 @@ public class EPOtherDelOption extends ECommand<EverPermissions> {
 			// Le joueur est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
-					.replace("<other>", args.get(0))
+					.replace("{other}", args.get(0))
 					.sendTo(source);
 			}*/
 		// Nombre d'argument incorrect
@@ -87,15 +87,15 @@ public class EPOtherDelOption extends ECommand<EverPermissions> {
 		// L'option n'a pas été supprimé
 		if (!subject.getSubjectData().setOption(EContextCalculator.EMPTY, option, null)) {
 			EPMessages.OTHER_DEL_OPTION_ERROR.sender()
-				.replace("<subject>", subject.getIdentifier())
-				.replace("<option>", option)
+				.replace("{subject}", subject.getIdentifier())
+				.replace("{option}", option)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
 		
 		EPMessages.OTHER_DEL_OPTION_PLAYER.sender()
-			.replace("<subject>", subject.getIdentifier())
-			.replace("<option>", option)
+			.replace("{subject}", subject.getIdentifier())
+			.replace("{option}", option)
 			.sendTo(staff);
 		return CompletableFuture.completedFuture(true);
 	}*/

@@ -96,7 +96,7 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -105,8 +105,8 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 		// Groupe existant
 		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("<group>", group_name)
-				.replace("<type>", type_group.get())
+				.replace("{group}", group_name)
+				.replace("{type}", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -116,17 +116,17 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 		// Si il y a une valeur
 		if (name == null) {
 			EPMessages.GROUP_CHECK_OPTION_DEFINED.sender()
-				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-				.replace("<option>", option)
-				.replace("<type>", type_group.get())
-				.replace("<value>", Text.of(name))
+				.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+				.replace("{option}", option)
+				.replace("{type}", type_group.get())
+				.replace("{value}", Text.of(name))
 				.sendTo(player);
 		// Il n'y a pas de valeur
 		} else {
 			EPMessages.GROUP_CHECK_OPTION_UNDEFINED.sender()
-				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-				.replace("<option>", option)
-				.replace("<type>", type_group.get())
+				.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+				.replace("{option}", option)
+				.replace("{type}", type_group.get())
 				.sendTo(player);
 		}
 		return CompletableFuture.completedFuture(true);

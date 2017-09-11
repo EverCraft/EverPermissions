@@ -78,8 +78,8 @@ public class EPConfGroups extends EConfig<EverPermissions> {
 
 			options.put("prefix", "&e");
 			options.put("suffix", "");
-			options.put("hover", "&7Balance : &a<BALANCE> <SYMBOL>[RT]&7Ping : &a<PING>&7 ms[RT]&7Connecté depuis : &a<LAST_DATE_PLAYED>");
-			options.put("suggest", "/msg <NAME> ");
+			options.put("hover", "&7Balance : &a{BALANCE} {SYMBOL}[RT]&7Ping : &a{PING}&7 ms[RT]&7Connecté depuis : &a{LAST_DATE_PLAYED}");
+			options.put("suggest", "/msg {NAME} ");
 			
 			addDefault("Default.default", true);
 			addDefault("Default.permissions", permissions);

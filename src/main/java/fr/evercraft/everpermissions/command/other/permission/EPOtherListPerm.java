@@ -70,7 +70,7 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 			// Le joueur est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
-					.replace("<other>", args.get(0))
+					.replace("{other}", args.get(0))
 					.sendTo(source);
 			}*/
 		// Nombre d'argument incorrect
@@ -92,10 +92,10 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 			for (Entry<String, Boolean> permission : permissions.entrySet()) {
 				if (permission.getValue()) {
 					list.add(EPMessages.OTHER_LIST_PERMISSION_PERMISSION_LINE_TRUE.getFormat()
-								.toText("<permission>", permission.getKey()));
+								.toText("{permission}", permission.getKey()));
 				} else {
 					list.add(EPMessages.OTHER_LIST_PERMISSION_PERMISSION_LINE_FALSE.getFormat()
-								.toText("<permission>", permission.getKey()));
+								.toText("{permission}", permission.getKey()));
 				}
 			}
 		}
@@ -107,17 +107,17 @@ public class EPOtherListPerm extends ECommand<EverPermissions> {
 			for (Entry<String, Boolean> permission : permissions.entrySet()) {
 				if (permission.getValue()) {
 					list.add(EPMessages.OTHER_LIST_PERMISSION_TRANSIENT_LINE_TRUE.getFormat()
-								.toText("<permission>", permission.getKey()));
+								.toText("{permission}", permission.getKey()));
 				} else {
 					list.add(EPMessages.OTHER_LIST_PERMISSION_TRANSIENT_LINE_FALSE.getFormat()
-								.toText("<permission>", permission.getKey()));
+								.toText("{permission}", permission.getKey()));
 				}
 			}
 		}
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.OTHER_LIST_PERMISSION_TITLE.getFormat()
-					.toText("<subject>", subject.getIdentifier()), 
+					.toText("{subject}", subject.getIdentifier()), 
 				list, staff);
 		return CompletableFuture.completedFuture(true);
 	}*/

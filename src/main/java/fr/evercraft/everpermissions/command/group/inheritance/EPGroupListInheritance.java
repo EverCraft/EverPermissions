@@ -94,7 +94,7 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -103,8 +103,8 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 		// Groupe existant
 		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("<group>", group_name)
-				.replace("<type>", type_group.get())
+				.replace("{group}", group_name)
+				.replace("{type}", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -118,7 +118,7 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 		} else {
 			list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE.getText());
 			for (SubjectReference inheritance : groups) {
-				list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_LINE.getFormat().toText("<inheritance>", inheritance.resolve().join().getFriendlyIdentifier().orElse(inheritance.getSubjectIdentifier())));
+				list.add(EPMessages.GROUP_LIST_INHERITANCE_INHERITANCE_LINE.getFormat().toText("{inheritance}", inheritance.resolve().join().getFriendlyIdentifier().orElse(inheritance.getSubjectIdentifier())));
 			}
 		}
 		
@@ -127,14 +127,14 @@ public class EPGroupListInheritance extends ECommand<EverPermissions> {
 		if (!groups.isEmpty()) {
 			list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT.getText());
 			for (SubjectReference inheritance : groups) {
-				list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.getFormat().toText("<inheritance>", inheritance.resolve().join().getFriendlyIdentifier().orElse(inheritance.getSubjectIdentifier())));
+				list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.getFormat().toText("{inheritance}", inheritance.resolve().join().getFriendlyIdentifier().orElse(inheritance.getSubjectIdentifier())));
 			}
 		}
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.GROUP_LIST_INHERITANCE_TITLE.getFormat().toText(
-					"<group>", group.get().getFriendlyIdentifier().orElse(group_name),
-					"<type>", type_group.get()), 
+					"{group}", group.get().getFriendlyIdentifier().orElse(group_name),
+					"{type}", type_group.get()), 
 				list, player);
 		return CompletableFuture.completedFuture(true);
 	}

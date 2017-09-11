@@ -97,7 +97,7 @@ public class EPGroupDelPerm extends ECommand<EverPermissions> {
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -106,17 +106,17 @@ public class EPGroupDelPerm extends ECommand<EverPermissions> {
 		// Groupe existant
 		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("<group>", group_name)
-				.replace("<type>", type_group.get())
+				.replace("{group}", group_name)
+				.replace("{type}", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
 		if (group.get().getSubjectData().getPermissions(type_group.get()).get(permission) != null) {
 			EPMessages.GROUP_DEL_PERMISSION_ERROR.sender()
-				.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-				.replace("<permission>", permission)
-				.replace("<type>", type_group.get())
+				.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+				.replace("{permission}", permission)
+				.replace("{type}", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -132,9 +132,9 @@ public class EPGroupDelPerm extends ECommand<EverPermissions> {
 				}
 				
 				EPMessages.GROUP_DEL_PERMISSION_STAFF.sender()
-					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-					.replace("<permission>", permission)
-					.replace("<type>", type_group.get())
+					.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+					.replace("{permission}", permission)
+					.replace("{type}", type_group.get())
 					.sendTo(player);
 				return true;
 			});

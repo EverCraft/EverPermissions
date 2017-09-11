@@ -93,7 +93,7 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// On connait le monde
@@ -106,7 +106,7 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -138,7 +138,7 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 		if (!type_user.isPresent() || !type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -147,8 +147,8 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 		// Groupe existant
 		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("<group>", group_name)
-				.replace("<type>", type_group.get())
+				.replace("{group}", group_name)
+				.replace("{type}", type_group.get())
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -161,15 +161,15 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 			if (oldGroup.get().equals(group.get().asSubjectReference())) {
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_PROMOTE_ERROR_EQUALS.sender()
-						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 				} else {
 					EPMessages.USER_PROMOTE_ERROR_STAFF.sender()
-						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getIdentifier())
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{group}", group.get().getIdentifier())
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 				}
 				return CompletableFuture.completedFuture(false);
@@ -179,17 +179,17 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 			if (oldGroup.isPresent() && oldGroup.get().resolve().join().isChildOf(contexts, group.get().asSubjectReference())) {
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_PROMOTE_ERROR_DEMOTE_EQUALS.sender()
-						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-						.replace("<parent>", oldGroup.get().getSubjectIdentifier())
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("{parent}", oldGroup.get().getSubjectIdentifier())
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 				} else {
 					EPMessages.USER_PROMOTE_ERROR_DEMOTE_STAFF.sender()
-						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-						.replace("<parent>", oldGroup.get().getSubjectIdentifier())
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("{parent}", oldGroup.get().getSubjectIdentifier())
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 				}
 				return CompletableFuture.completedFuture(false);
@@ -208,36 +208,36 @@ public class EPUserPromoteGroup extends ECommand<EverPermissions> {
 				
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_PROMOTE_EQUALS.sender()
-						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 					
 					this.plugin.getService().broadcastMessage(staff, 
 						EPMessages.USER_PROMOTE_BROADCAST_EQUALS.sender()
-							.replace("<staff>", staff.getName())
-							.replace("<player>", user.getName())
-							.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-							.replace("<type>", type_user.get()));
+							.replace("{staff}", staff.getName())
+							.replace("{player}", user.getName())
+							.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+							.replace("{type}", type_user.get()));
 				} else {
 					EPMessages.USER_PROMOTE_STAFF.sender()
-						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 					
 					EPMessages.USER_PROMOTE_PLAYER.sender()
-						.replace("<staff>", staff.getName())
-						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-						.replace("<type>", type_user.get())
+						.replace("{staff}", staff.getName())
+						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("{type}", type_user.get())
 						.sendTo(user);
 			
 					this.plugin.getService().broadcastMessage(staff, user.getUniqueId(), 
 						EPMessages.USER_PROMOTE_BROADCAST_PLAYER.sender()
-							.replace("<staff>", staff.getName())
-							.replace("<player>", user.getName())
-							.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-							.replace("<type>", type_user.get()));
+							.replace("{staff}", staff.getName())
+							.replace("{player}", user.getName())
+							.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+							.replace("{type}", type_user.get()));
 				}
 				return true;
 			});

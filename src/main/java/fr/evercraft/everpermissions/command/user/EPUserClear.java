@@ -75,7 +75,7 @@ public class EPUserClear extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -106,24 +106,24 @@ public class EPUserClear extends ECommand<EverPermissions> {
 		subject.getSubjectData().clearOptions();
 		if (staff.getIdentifier().equals(user.getIdentifier())) {
 			EPMessages.USER_CLEAR_EQUALS.sender()
-				.replace("<player>", user.getName())
+				.replace("{player}", user.getName())
 				.sendTo(staff);
 			this.plugin.getService().broadcastMessage(staff,
 				EPMessages.USER_CLEAR_BROADCAST_EQUALS.sender()
-					.replace("<staff>", staff.getName())
-					.replace("<player>", user.getName()));
+					.replace("{staff}", staff.getName())
+					.replace("{player}", user.getName()));
 		} else {
 			EPMessages.USER_CLEAR_STAFF.sender()
-				.replace("<player>", user.getName())
+				.replace("{player}", user.getName())
 				.sendTo(staff);
 			EPMessages.USER_CLEAR_PLAYER.sender()
-				.replace("<staff>", staff.getName())
-				.replace("<player>", user.getName())
+				.replace("{staff}", staff.getName())
+				.replace("{player}", user.getName())
 				.sendTo(user);
 			this.plugin.getService().broadcastMessage(staff, user.getUniqueId(),
 				EPMessages.USER_CLEAR_BROADCAST_PLAYER.sender()
-					.replace("<staff>", staff.getName())
-					.replace("<player>", user.getName()));
+					.replace("{staff}", staff.getName())
+					.replace("{player}", user.getName()));
 		}
 		return CompletableFuture.completedFuture(true);
 	}

@@ -99,7 +99,7 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -108,8 +108,8 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 		// Groupe existant
 		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("<group>", group_name)
-				.replace("<type>", type_group.get())
+				.replace("{group}", group_name)
+				.replace("{type}", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -126,10 +126,10 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 			for (Entry<String, Boolean> permission : permissions.entrySet()) {
 				if (permission.getValue()) {
 					list.add(EPMessages.GROUP_LIST_PERMISSION_PERMISSION_LINE_TRUE.getFormat()
-							.toText("<permission>", permission.getKey()));
+							.toText("{permission}", permission.getKey()));
 				} else {
 					list.add(EPMessages.GROUP_LIST_PERMISSION_PERMISSION_LINE_FALSE.getFormat()
-							.toText("<permission>", permission.getKey()));
+							.toText("{permission}", permission.getKey()));
 				}
 			}
 		}
@@ -141,18 +141,18 @@ public class EPGroupListPerm extends ECommand<EverPermissions> {
 			for (Entry<String, Boolean> permission : permissions.entrySet()) {
 				if (permission.getValue()) {
 					list.add(EPMessages.GROUP_LIST_PERMISSION_TRANSIENT_LINE_TRUE.getFormat()
-							.toText("<permission>", permission.getKey()));
+							.toText("{permission}", permission.getKey()));
 				} else {
 					list.add(EPMessages.GROUP_LIST_PERMISSION_TRANSIENT_LINE_FALSE.getFormat()
-							.toText("<permission>", permission.getKey()));
+							.toText("{permission}", permission.getKey()));
 				}
 			}
 		}
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.GROUP_LIST_PERMISSION_TITLE.getFormat().toText(
-						"<group>", group.get().getFriendlyIdentifier().orElse(group_name),
-					"<type>", type_group.get()), 
+						"{group}", group.get().getFriendlyIdentifier().orElse(group_name),
+					"{type}", type_group.get()), 
 				list, player);
 		return CompletableFuture.completedFuture(true);
 	}

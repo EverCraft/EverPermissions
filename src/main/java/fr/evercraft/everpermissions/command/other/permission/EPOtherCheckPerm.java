@@ -73,7 +73,7 @@ public class EPOtherCheckPerm extends ECommand<EverPermissions> {
 			// Le joueur est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
-					.replace("<other>", args.get(0))
+					.replace("{other}", args.get(0))
 					.sendTo(source);
 			}*/
 		// Nombre d'argument incorrect
@@ -87,14 +87,14 @@ public class EPOtherCheckPerm extends ECommand<EverPermissions> {
 		// Permission : True
 		if (subject.hasPermission(permission)) {
 			EPMessages.OTHER_CHECK_PERMISSION_TRUE.sender()
-				.replace("<subject>", subject.getIdentifier())
-				.replace("<permission>", permission)
+				.replace("{subject}", subject.getIdentifier())
+				.replace("{permission}", permission)
 				.sendTo(staff);
 		// Permission : False
 		} else {
 			EPMessages.OTHER_CHECK_PERMISSION_FALSE.sender()
-				.replace("<subject>", subject.getIdentifier())
-				.replace("<permission>", permission)
+				.replace("{subject}", subject.getIdentifier())
+				.replace("{permission}", permission)
 				.sendTo(staff);
 		}
 		return CompletableFuture.completedFuture(true);

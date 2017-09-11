@@ -88,7 +88,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// On connais le joueur
@@ -101,7 +101,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -132,7 +132,7 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -140,15 +140,15 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 		if (subject.getSubjectData().getPermissions(type_user.get()).get(permission) != null) {
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_DEL_PERMISSION_ERROR_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{permission}", permission)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			} else {
 				EPMessages.USER_DEL_PERMISSION_ERROR_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<permission>", permission)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{permission}", permission)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			}
 			return CompletableFuture.completedFuture(false);
@@ -166,30 +166,30 @@ public class EPUserDelPerm extends ECommand<EverPermissions> {
 				
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_DEL_PERMISSION_EQUALS.sender()
-						.replace("<player>", user.getName())
-						.replace("<permission>", permission)
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{permission}", permission)
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 					
 					this.plugin.getService().broadcastMessage(staff,
 						EPMessages.USER_DEL_PERMISSION_BROADCAST_EQUALS.sender()
-							.replace("<staff>", staff.getName())
-							.replace("<player>", user.getName())
-							.replace("<permission>", permission)
-							.replace("<type>", type_user.get()));
+							.replace("{staff}", staff.getName())
+							.replace("{player}", user.getName())
+							.replace("{permission}", permission)
+							.replace("{type}", type_user.get()));
 				} else {
 					EPMessages.USER_DEL_PERMISSION_STAFF.sender()
-						.replace("<player>", user.getName())
-						.replace("<permission>", permission)
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{permission}", permission)
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 					
 					this.plugin.getService().broadcastMessage(staff,
 						EPMessages.USER_DEL_PERMISSION_BROADCAST_PLAYER.sender()
-							.replace("<staff>", staff.getName())
-							.replace("<player>", user.getName())
-							.replace("<permission>", permission)
-							.replace("<type>", type_user.get()));
+							.replace("{staff}", staff.getName())
+							.replace("{player}", user.getName())
+							.replace("{permission}", permission)
+							.replace("{type}", type_user.get()));
 				}
 				return true;
 			});

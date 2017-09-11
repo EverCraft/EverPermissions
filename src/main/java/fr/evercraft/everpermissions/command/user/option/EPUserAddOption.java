@@ -90,7 +90,7 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// On connais le monde
@@ -103,7 +103,7 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -134,7 +134,7 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -152,18 +152,18 @@ public class EPUserAddOption extends ECommand<EverPermissions> {
 				// La source et le joueur sont identique
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_ADD_OPTION_EQUALS.sender()
-						.replace("<player>", user.getName())
-						.replace("<option>", option)
-						.replace("<type>", type_user.get())
-						.replace("<value>", Text.of(value))
+						.replace("{player}", user.getName())
+						.replace("{option}", option)
+						.replace("{type}", type_user.get())
+						.replace("{value}", Text.of(value))
 						.sendTo(staff);
 				// La source et le joueur ne sont pas identique
 				} else {
 					EPMessages.USER_ADD_OPTION_STAFF.sender()
-						.replace("<player>", user.getName())
-						.replace("<option>", option)
-						.replace("<type>", type_user.get())
-						.replace("<value>", Text.of(value))
+						.replace("{player}", user.getName())
+						.replace("{option}", option)
+						.replace("{type}", type_user.get())
+						.replace("{value}", Text.of(value))
 						.sendTo(staff);
 				}
 				return true;

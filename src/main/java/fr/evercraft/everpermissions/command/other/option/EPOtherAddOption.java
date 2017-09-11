@@ -75,7 +75,7 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 			// Le subject est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
-					.replace("<other>", args.get(0))
+					.replace("{other}", args.get(0))
 					.sendTo(source);
 			}*/
 		// Nombre d'argument incorrect
@@ -95,9 +95,9 @@ public class EPOtherAddOption extends ECommand<EverPermissions> {
 		}
 		
 		EPMessages.OTHER_ADD_OPTION_PLAYER.sender()
-			.replace("<subject>", subject.getIdentifier())
-			.replace("<option>", option)
-			.replace("<value>", Text.of(value))
+			.replace("{subject}", subject.getIdentifier())
+			.replace("{option}", option)
+			.replace("{value}", Text.of(value))
 			.sendTo(staff);
 		return CompletableFuture.completedFuture(true);
 	}*/

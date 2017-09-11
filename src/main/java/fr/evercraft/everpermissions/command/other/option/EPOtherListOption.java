@@ -70,7 +70,7 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 			// Le joueur est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
-					.replace("<other>", args.get(0))
+					.replace("{other}", args.get(0))
 					.sendTo(source);
 			}*/
 		// Nombre d'argument incorrect
@@ -91,8 +91,8 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 			list.add(EPMessages.OTHER_LIST_OPTION_OPTION.getText());
 			for (Entry<String, String> permission : options.entrySet()) {
 				list.add(EPMessages.OTHER_LIST_OPTION_OPTION_LINE.getFormat().toText(
-							"<option>", permission.getKey(),
-							"<value>", Text.of(permission.getValue())));
+							"{option}", permission.getKey(),
+							"{value}", Text.of(permission.getValue())));
 			}
 		}
 		
@@ -102,14 +102,14 @@ public class EPOtherListOption extends ECommand<EverPermissions> {
 			list.add(EPMessages.OTHER_LIST_OPTION_TRANSIENT.getText());
 			for (Entry<String, String> permission : options.entrySet()) {
 				list.add(EPMessages.OTHER_LIST_OPTION_TRANSIENT_LINE.getFormat().toText(
-							"<option>", permission.getKey(),
-							"<value>", Text.of(permission.getValue())));
+							"{option}", permission.getKey(),
+							"{value}", Text.of(permission.getValue())));
 			}
 		}
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.OTHER_LIST_OPTION_TITLE.getFormat()
-					.toText("<subject>", subject.getIdentifier()), 
+					.toText("{subject}", subject.getIdentifier()), 
 				list, staff);
 		return CompletableFuture.completedFuture(true);
 	}*/

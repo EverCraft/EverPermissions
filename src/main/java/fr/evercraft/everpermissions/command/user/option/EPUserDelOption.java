@@ -88,7 +88,7 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// On connais le monde
@@ -101,7 +101,7 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -132,7 +132,7 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -140,15 +140,15 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 		if (subject.getSubjectData().getOptions(type_user.get()).get(option) == null) {
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_DEL_OPTION_ERROR_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<option>", option)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{option}", option)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			} else {
 				EPMessages.USER_DEL_OPTION_ERROR_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<option>", option)
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{option}", option)
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			}
 		}
@@ -165,15 +165,15 @@ public class EPUserDelOption extends ECommand<EverPermissions> {
 				
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_DEL_OPTION_EQUALS.sender()
-						.replace("<player>", user.getName())
-						.replace("<option>", option)
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{option}", option)
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 				} else {
 					EPMessages.USER_DEL_OPTION_STAFF.sender()
-						.replace("<player>", user.getName())
-						.replace("<option>", option)
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{option}", option)
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 				}
 				return true;

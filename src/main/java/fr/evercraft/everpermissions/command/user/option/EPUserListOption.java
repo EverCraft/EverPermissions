@@ -87,7 +87,7 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// On connait le monde
@@ -100,7 +100,7 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -116,7 +116,7 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -126,7 +126,7 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 		if (!subject.isPresent()) {
 			EAMessages.PLAYER_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<player>", user.getIdentifier())
+				.replace("{player}", user.getIdentifier())
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -140,8 +140,8 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 			list.add(EPMessages.USER_LIST_OPTION_OPTION.getText());
 			for (Entry<String, String> permission : options.entrySet()) {
 				list.add(EPMessages.USER_LIST_OPTION_OPTION_LINE.getFormat().toText(
-							"<option>", permission.getKey(),
-							"<value>", Text.of(permission.getValue())));
+							"{option}", permission.getKey(),
+							"{value}", Text.of(permission.getValue())));
 			}
 		}
 		
@@ -151,15 +151,15 @@ public class EPUserListOption extends ECommand<EverPermissions> {
 			list.add(EPMessages.USER_LIST_OPTION_TRANSIENT.getText());
 			for (Entry<String, String> permission : options.entrySet()) {
 				list.add(EPMessages.USER_LIST_OPTION_TRANSIENT_LINE.getFormat().toText(
-							"<option>", permission.getKey(),
-							"<value>", Text.of(permission.getValue())));
+							"{option}", permission.getKey(),
+							"{value}", Text.of(permission.getValue())));
 			}
 		}
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 			EPMessages.USER_LIST_OPTION_TITLE.getFormat().toText(
-				"<player>", user.getName(),
-				"<type>", type_user.get()), 
+				"{player}", user.getName(),
+				"{type}", type_user.get()), 
 			list, staff);
 		return CompletableFuture.completedFuture(true);
 	}

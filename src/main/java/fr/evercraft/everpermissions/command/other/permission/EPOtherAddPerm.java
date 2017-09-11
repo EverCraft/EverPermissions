@@ -76,7 +76,7 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 			// Le joueur est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
-					.replace("<other>", args.get(0))
+					.replace("{other}", args.get(0))
 					.sendTo(source);
 			}*/
 		// Nombre d'argument incorrect
@@ -91,7 +91,7 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 		// La value n'est pas un boolean
 		if (!value.isPresent()) {
 			EPMessages.ERROR_BOOLEAN.sender()
-				.replace("<boolean>", value_name)
+				.replace("{boolean}", value_name)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -101,14 +101,14 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 			// Permission : True
 			if (value.get()) {
 				EPMessages.OTHER_ADD_PERMISSION_ERROR_TRUE.sender()
-					.replace("<subject>", subject.getIdentifier())
-					.replace("<permission>", permission)
+					.replace("{subject}", subject.getIdentifier())
+					.replace("{permission}", permission)
 					.sendTo(staff);
 			// Permission : False
 			} else {
 				EPMessages.OTHER_ADD_PERMISSION_ERROR_FALSE.sender()
-					.replace("<subject>", subject.getIdentifier())
-					.replace("<permission>", permission)
+					.replace("{subject}", subject.getIdentifier())
+					.replace("{permission}", permission)
 					.sendTo(staff);
 			}
 			return CompletableFuture.completedFuture(false);
@@ -117,14 +117,14 @@ public class EPOtherAddPerm extends ECommand<EverPermissions> {
 		// Permission : True
 		if (value.get()) {
 			EPMessages.OTHER_ADD_PERMISSION_TRUE.sender()
-				.replace("<subject>", subject.getIdentifier())
-				.replace("<permission>", permission)
+				.replace("{subject}", subject.getIdentifier())
+				.replace("{permission}", permission)
 				.sendTo(staff);
 		// Permission : False
 		} else {
 			EPMessages.OTHER_ADD_PERMISSION_FALSE.sender()
-				.replace("<subject>", subject.getIdentifier())
-				.replace("<permission>", permission)
+				.replace("{subject}", subject.getIdentifier())
+				.replace("{permission}", permission)
 				.sendTo(staff);
 		}
 		return CompletableFuture.completedFuture(true);

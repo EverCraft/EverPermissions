@@ -73,7 +73,7 @@ public class EPOtherDelPerm extends ECommand<EverPermissions> {
 			// Le joueur est introuvable
 			} else {
 				EPMessages.OTHER_NOT_FOUND.sender()
-					.replace("<other>", args.get(0))
+					.replace("{other}", args.get(0))
 					.sendTo(source);
 			}*/
 		// Nombre d'argument incorrect
@@ -87,15 +87,15 @@ public class EPOtherDelPerm extends ECommand<EverPermissions> {
 		// La permission n'a pas été supprimé
 		if (!subject.getSubjectData().setPermission(EContextCalculator.EMPTY, permission, Tristate.UNDEFINED)) {
 			EPMessages.OTHER_DEL_PERMISSION_ERROR.sender()
-				.replace("<subject>", subject.getIdentifier())
-				.replace("<permission>", permission)
+				.replace("{subject}", subject.getIdentifier())
+				.replace("{permission}", permission)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
 		
 		EPMessages.OTHER_DEL_PERMISSION_PLAYER.sender()
-			.replace("<subject>", subject.getIdentifier())
-			.replace("<permission>", permission)
+			.replace("{subject}", subject.getIdentifier())
+			.replace("{permission}", permission)
 			.sendTo(staff);
 		return CompletableFuture.completedFuture(true);
 	}*/

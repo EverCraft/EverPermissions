@@ -87,7 +87,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// On connait le monde
@@ -100,7 +100,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// Nombre d'argument incorrect
@@ -131,7 +131,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		if (!type_user.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -141,7 +141,7 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		// Le groupe
 		Optional<SubjectReference> group = subject.getSubjectData().getGroup(type_user.get());
 		if (group.isPresent()) {
-			list.add(EPMessages.USER_LIST_GROUP_GROUP.getFormat().toText("<group>", group.get().resolve().join().getFriendlyIdentifier().orElse(group.get().getSubjectIdentifier())));
+			list.add(EPMessages.USER_LIST_GROUP_GROUP.getFormat().toText("{group}", group.get().resolve().join().getFriendlyIdentifier().orElse(group.get().getSubjectIdentifier())));
 		} else {
 			list.add(EPMessages.USER_LIST_GROUP_GROUP_EMPTY.getText());
 		}
@@ -153,14 +153,14 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		} else {
 			list.add(EPMessages.USER_LIST_GROUP_SUBGROUP.getText());
 			for (SubjectReference sub : groups) {
-				list.add(EPMessages.USER_LIST_GROUP_SUBGROUP_LINE.getFormat().toText("<group>", sub.resolve().join().getFriendlyIdentifier().orElse(sub.getSubjectIdentifier())));
+				list.add(EPMessages.USER_LIST_GROUP_SUBGROUP_LINE.getFormat().toText("{group}", sub.resolve().join().getFriendlyIdentifier().orElse(sub.getSubjectIdentifier())));
 			}
 		}
 		
 		// Le groupe
 		group = subject.getTransientSubjectData().getGroup(type_user.get());
 		if (group.isPresent()) {
-			list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_GROUP.getFormat().toText("<group>", group.get().resolve().join().getFriendlyIdentifier().orElse(group.get().getSubjectIdentifier())));
+			list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_GROUP.getFormat().toText("{group}", group.get().resolve().join().getFriendlyIdentifier().orElse(group.get().getSubjectIdentifier())));
 		}
 		
 		// Les groupes temporaires
@@ -168,14 +168,14 @@ public class EPUserListGroup extends ECommand<EverPermissions> {
 		if (!groups.isEmpty()) {
 			list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_SUBGROUP.getText());
 			for (SubjectReference tempo : groups) {
-				list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_SUBGROUP_LINE.getFormat().toText("<group>", tempo.resolve().join().getFriendlyIdentifier().orElse(tempo.getSubjectIdentifier())));
+				list.add(EPMessages.USER_LIST_GROUP_TRANSIENT_SUBGROUP_LINE.getFormat().toText("{group}", tempo.resolve().join().getFriendlyIdentifier().orElse(tempo.getSubjectIdentifier())));
 			}
 		}
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.USER_LIST_GROUP_TITLE.getFormat().toText(
-					"<player>", user.getName(),
-					"<type>", type_user.get()), 
+					"{player}", user.getName(),
+					"{type}", type_user.get()), 
 				list, staff);
 		return CompletableFuture.completedFuture(true);
 	}

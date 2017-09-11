@@ -89,7 +89,7 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
 					.prefix(EPMessages.PREFIX)
-					.replace("<player>", args.get(0))
+					.replace("{player}", args.get(0))
 					.sendTo(source);
 			}
 		// On connais le monde
@@ -101,7 +101,7 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 			// Le joueur est introuvable
 			} else {
 				EAMessages.PLAYER_NOT_FOUND.sender()
-				.replace("<player>", args.get(0))
+				.replace("{player}", args.get(0))
 					.prefix(EPMessages.PREFIX)
 					.sendTo(source);
 			}
@@ -134,7 +134,7 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 		if (!type_user.isPresent() || !type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
-				.replace("<world>", world_name)
+				.replace("{world}", world_name)
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -143,8 +143,8 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 		// Groupe existant
 		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("<group>", group_name)
-				.replace("<type>", type_group.get())
+				.replace("{group}", group_name)
+				.replace("{type}", type_group.get())
 				.sendTo(staff);
 			return CompletableFuture.completedFuture(false);
 		}
@@ -152,15 +152,15 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 		if (subject.getSubjectData().getSubGroup(type_user.get()).contains(group.get().asSubjectReference())) {
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_ADD_SUBGROUP_ERROR_EQUALS.sender()
-					.replace("<player>", user.getName())
-					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			} else {
 				EPMessages.USER_ADD_SUBGROUP_ERROR_STAFF.sender()
-					.replace("<player>", user.getName())
-					.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-					.replace("<type>", type_user.get())
+					.replace("{player}", user.getName())
+					.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+					.replace("{type}", type_user.get())
 					.sendTo(staff);
 			}
 			return CompletableFuture.completedFuture(false);
@@ -178,36 +178,36 @@ public class EPUserAddSubGroup extends ECommand<EverPermissions> {
 				
 				if (staff.getIdentifier().equals(user.getIdentifier())) {
 					EPMessages.USER_ADD_SUBGROUP_EQUALS.sender()
-						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 					
 					this.plugin.getService().broadcastMessage(staff,
 						EPMessages.USER_ADD_SUBGROUP_BROADCAST_EQUALS.sender()
-							.replace("<staff>", staff.getName())
-							.replace("<player>", user.getName())
-							.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-							.replace("<type>", type_user.get()));
+							.replace("{staff}", staff.getName())
+							.replace("{player}", user.getName())
+							.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+							.replace("{type}", type_user.get()));
 				} else {
 					EPMessages.USER_ADD_SUBGROUP_STAFF.sender()
-						.replace("<player>", user.getName())
-						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-						.replace("<type>", type_user.get())
+						.replace("{player}", user.getName())
+						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("{type}", type_user.get())
 						.sendTo(staff);
 					
 					EPMessages.USER_ADD_SUBGROUP_PLAYER.sender()
-						.replace("<staff>", staff.getName())
-						.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-						.replace("<type>", type_user.get())
+						.replace("{staff}", staff.getName())
+						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+						.replace("{type}", type_user.get())
 						.sendTo(user);
 					
 					this.plugin.getService().broadcastMessage(staff, user.getUniqueId(), 
 						EPMessages.USER_ADD_SUBGROUP_BROADCAST_PLAYER.sender()
-							.replace("<staff>", staff.getName())
-							.replace("<player>", user.getName())
-							.replace("<group>", group.get().getFriendlyIdentifier().orElse(group_name))
-							.replace("<type>", type_user.get()));
+							.replace("{staff}", staff.getName())
+							.replace("{player}", user.getName())
+							.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
+							.replace("{type}", type_user.get()));
 				}
 				return true;
 			});
