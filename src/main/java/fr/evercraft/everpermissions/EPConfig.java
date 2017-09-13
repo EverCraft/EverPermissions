@@ -16,21 +16,26 @@
  */
 package fr.evercraft.everpermissions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.spongepowered.api.world.World;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.reflect.TypeToken;
 
 import fr.evercraft.everapi.plugin.file.EConfig;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class EPConfig extends EConfig<EverPermissions> {
 	
@@ -61,22 +66,42 @@ public class EPConfig extends EConfig<EverPermissions> {
 		addDefault("collections", ImmutableMap.of(),
 							"Configure the collection for each world",
 							"Example : ",
-							"	world=default",
-							"	DIM1=default",
-							"	DIM-1=nether",
+							"	default=[",
+							"	  world,",
+							"     DIM1",
+							"	],",
+							"	type-nether=[",
+							"     DIM-1",
+							"	]",
 							"The worlds 'world' and 'DIM1' will have the same collection but not 'DIM-1'");
 	}
 
 	public Map<String, String> getTypeWorld(String collection) {
 		ImmutableMap.Builder<String, String> worlds = ImmutableMap.builder();
 		for (Entry<Object, ? extends CommentedConfigurationNode> value : this.get("collections." + collection).getChildrenMap().entrySet()) {
-			worlds.put(value.getKey().toString(), value.getValue().getString(EPConfig.DEFAULT));
+			for (CommentedConfigurationNode list : value.getValue().getChildrenList()) {
+				String world = list.getString(null);
+				if (world != null) {
+					worlds.put(world, value.getKey().toString());
+				}
+			}
 		}
 		return worlds.build();
 	}
 	
 	public String getTypeWorld(String collection, String world) {
-		return this.get("collections." + collection + "." + world).getString(EPConfig.DEFAULT);
+		return this.getWorld(collection, world).orElse(EPConfig.DEFAULT);
+	}
+	
+	private Optional<String> getWorld(String collection, String world) {
+		for (Entry<Object, ? extends CommentedConfigurationNode> value : this.get("collections." + collection).getChildrenMap().entrySet()) {
+			for (CommentedConfigurationNode list : value.getValue().getChildrenList()) {
+				if (list.getString("").equals(world)) {
+					return Optional.of(value.getKey().toString());
+				}
+			}
+		}
+		return Optional.empty();
 	}
 	
 	public Set<String> getCollections() {
@@ -86,19 +111,24 @@ public class EPConfig extends EConfig<EverPermissions> {
 
 	
 	public void registerCollection(String collection) {
-		ConfigurationNode config = this.get("collections." + collection);
+		ConfigurationNode config = this.get("collections." + collection).getNode(EPConfig.DEFAULT);
 		boolean save = false;
 		
+		List<String> worlds = new ArrayList<String>();
+		try {
+			worlds.addAll(config.getList(TypeToken.of(String.class)));
+		} catch (ObjectMappingException e) {}
+		
 		for (World world : this.plugin.getGame().getServer().getWorlds()) {
-			ConfigurationNode typeWorld = config.getNode(world.getName());
-			if (typeWorld.isVirtual()) {
-				typeWorld.setValue(EPConfig.DEFAULT);
+			if (this.getTypeWorld(collection, world.getName()).equals(EPConfig.DEFAULT) && !worlds.contains(world.getName())) {
+				worlds.add(world.getName());
 				save = true;
 			}
 		}
 		
+		config.setValue(worlds);
 		if (config.isVirtual()) {
-			config.setValue(ImmutableMap.of());
+			config.setValue(ImmutableList.of());
 			save = true;
 		}
 		
@@ -108,11 +138,18 @@ public class EPConfig extends EConfig<EverPermissions> {
 	public void registerWorld(String world) {
 		boolean save = false;
 		
-		for (Entry<Object, ? extends CommentedConfigurationNode> value : this.get("collections").getChildrenMap().entrySet()) {
-			CommentedConfigurationNode typeWorld = value.getValue().getNode(world);
-			if (typeWorld.isVirtual()) {
-				typeWorld.setValue(EPConfig.DEFAULT);
-				save = true;
+		for (String collection : this.getCollections()) {
+			if (!this.getWorld(collection, world).isPresent()) {
+				CommentedConfigurationNode config = this.get("collections." + collection).getNode(EPConfig.DEFAULT);
+				
+				try {
+					List<String> worlds = new ArrayList<String>();
+					worlds.addAll(config.getList(TypeToken.of(String.class)));
+					worlds.add(world);
+					config.setValue(worlds);
+					
+					save = true;
+				} catch (ObjectMappingException e) {}
 			}
 		}
 		

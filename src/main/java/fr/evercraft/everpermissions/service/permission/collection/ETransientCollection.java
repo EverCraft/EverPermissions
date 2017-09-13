@@ -16,6 +16,7 @@
  */
 package fr.evercraft.everpermissions.service.permission.collection;
 
+import fr.evercraft.everpermissions.EPConfig;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.ETransientSubject;
 
@@ -23,6 +24,7 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.world.World;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -63,5 +65,21 @@ public class ETransientCollection extends ESubjectCollection<ETransientSubject> 
 	@Override
 	public boolean isTransient() {
 		return true;
+	}
+	
+	@Override
+	public void reloadConfig() {
+		// Stop
+		this.worlds.clear();
+		
+		// Start
+		for (World world : this.plugin.getGame().getServer().getWorlds()) {
+			this.worlds.put(EPConfig.DEFAULT, world.getName());
+		}
+	}
+	
+	@Override
+	public void registerWorld(final String world) {
+		this.worlds.put(EPConfig.DEFAULT, world);
 	}
 }
