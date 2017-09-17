@@ -16,116 +16,127 @@
  */
 package fr.evercraft.everpermissions;
 
-import org.spongepowered.api.command.CommandSource;
-
-import com.google.common.base.Preconditions;
-
 import fr.evercraft.everapi.plugin.EnumPermission;
+import fr.evercraft.everapi.plugin.file.EnumMessage;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
 
 public enum EPPermissions implements EnumPermission {	
-	BROADCAST("broadcast"),
+	BROADCAST("broadcast", EPMessages.PERMISSIONS_BROADCAST),
 	
 	// Commands :
-	EVERPERMISSIONS("commands.execute"),
-	HELP("commands.help"),
-	RELOAD("commands.reload"),
-	MIGRATE("commands.migrate"),
+	EVERPERMISSIONS("commands.execute", EPMessages.PERMISSIONS_COMMANDS_EXECUTE),
+	HELP("commands.help", EPMessages.PERMISSIONS_COMMANDS_HELP),
+	RELOAD("commands.reload", EPMessages.PERMISSIONS_COMMANDS_RELOAD),
+	MIGRATE("commands.migrate", EPMessages.PERMISSIONS_COMMANDS_MIGRATE),
 	
 	// Joueur :
-	USER_CLEAR("commands.user.clear"),
+	USER_CLEAR("commands.user.clear", EPMessages.PERMISSIONS_COMMANDS_USER_CLEAR),
 	
 	// Joueur : Groupes
-	USER_ADD_GROUP("commands.user.group.add"),
-	USER_DEL_GROUP("commands.user.group.del"),
+	USER_ADD_GROUP("commands.user.group.add", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_ADD),
+	USER_DEL_GROUP("commands.user.group.remove", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_REMOVE),
 	
-	USER_ADD_SUBGROUP("commands.user.group.addsub"),
-	USER_DEL_SUBGROUP("commands.user.group.delsub"),
+	USER_ADD_SUBGROUP("commands.user.group.addsub", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_ADDSUB),
+	USER_DEL_SUBGROUP("commands.user.group.removesub", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_REMOVESUB),
 	
-	USER_PROMOTE_GROUP("commands.user.group.promote"),
-	USER_DEMOTE_GROUP("commands.user.group.demote"),
-	USER_LIST_GROUP("commands.user.group.list"),
+	USER_PROMOTE_GROUP("commands.user.group.promote", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_PROMOTE),
+	USER_DEMOTE_GROUP("commands.user.group.demote", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_DEMOTE),
+	USER_LIST_GROUP("commands.user.group.list", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_LIST),
 	
 	// Joueur : Permissions
-	USER_ADD_PERMISSION("commands.user.permission.add"),
-	USER_DEL_PERMISSION("commands.user.permission.del"),
+	USER_ADD_PERMISSION("commands.user.permission.add", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_ADD),
+	USER_DEL_PERMISSION("commands.user.permission.remove", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_REMOVE),
 	
-	USER_CHECK_PERMISSION("commands.user.permission.check"),
-	USER_LIST_PERMISSION("commands.user.permission.list"),
+	USER_CHECK_PERMISSION("commands.user.permission.check", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_CHECK),
+	USER_LIST_PERMISSION("commands.user.permission.list", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_LIST),
 	
 	// Joueur : Options
-	USER_ADD_OPTION("commands.user.option.add"),
-	USER_DEL_OPTION("commands.user.option.del"),
+	USER_ADD_OPTION("commands.user.option.add", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_ADD),
+	USER_DEL_OPTION("commands.user.option.remove", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_REMOVE),
 	
-	USER_CHECK_OPTION("commands.user.option.check"),
-	USER_LIST_OPTION("commands.user.option.list"),
+	USER_CHECK_OPTION("commands.user.option.check", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_CHECK),
+	USER_LIST_OPTION("commands.user.option.list", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_LIST),
 	
 	// Groupe : Groupes
-	GROUP_ADD_GROUP("commands.group.group.add"),
-	GROUP_DEL_GROUP("commands.group.group.del"),
+	GROUP_ADD_GROUP("commands.group.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_ADD),
+	GROUP_DEL_GROUP("commands.group.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_REMOVE),
 	
-	GROUP_DEFAULT_GROUP("commands.group.group.default"),
-	GROUP_LIST_GROUP("commands.group.group.list"),
+	GROUP_DEFAULT_GROUP("commands.group.default", EPMessages.PERMISSIONS_COMMANDS_GROUP_DEFAULT),
+	GROUP_LIST_GROUP("commands.group.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_LIST),
 	
 	// Groupe : Inheritance
-	GROUP_ADD_INHERITANCE("commands.group.inheritance.add"),
-	GROUP_DEL_INHERITANCE("commands.group.inheritance.del"),
+	GROUP_ADD_INHERITANCE("commands.group.inheritance.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_ADD),
+	GROUP_DEL_INHERITANCE("commands.group.inheritance.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_REMOVE),
 	
-	GROUP_LIST_INHERITANCE("commands.group.inheritance.list"),
+	GROUP_LIST_INHERITANCE("commands.group.inheritance.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_LIST),
 	
 	// Groupe : Permissions
-	GROUP_ADD_PERMISSION("commands.group.permission.add"),
-	GROUP_DEL_PERMISSION("commands.group.permission.del"),
+	GROUP_ADD_PERMISSION("commands.group.permission.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_ADD),
+	GROUP_DEL_PERMISSION("commands.group.permission.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_REMOVE),
 	
-	GROUP_CHECK_PERMISSION("commands.group.permission.check"),
-	GROUP_LIST_PERMISSION("commands.group.permission.list"),
+	GROUP_CHECK_PERMISSION("commands.group.permission.check", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_CHECK),
+	GROUP_LIST_PERMISSION("commands.group.permission.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_LIST),
 	
 	// Groupe : Options
-	GROUP_ADD_OPTION("commands.group.option.add"),
-	GROUP_DEL_OPTION("group.option.del"),
+	GROUP_ADD_OPTION("commands.group.option.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_ADD),
+	GROUP_DEL_OPTION("commands.group.option.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_REMOVE),
 	
-	GROUP_CHECK_OPTION("group.option.check"),
-	GROUP_LIST_OPTION("group.option.list"),
+	GROUP_CHECK_OPTION("commands.group.option.check", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_CHECK),
+	GROUP_LIST_OPTION("commands.group.option.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_LIST),
 	
 	// Other : Groupes
-	OTHER_ADD_GROUP("commands.other.group.add"),
-	OTHER_DEL_GROUP("commands.other.group.del"),
+	OTHER_ADD_GROUP("commands.other.group.add", EPMessages.PERMISSIONS_COMMANDS_OTHER_GROUP_ADD),
+	OTHER_DEL_GROUP("commands.other.group.remove", EPMessages.PERMISSIONS_COMMANDS_OTHER_GROUP_REMOVE),
 	
-	OTHER_ADD_SUBGROUP("commands.other.group.addsub"),
-	OTHER_DEL_SUBGROUP("commands.other.group.delsub"),
+	OTHER_ADD_SUBGROUP("commands.other.group.addsub", EPMessages.PERMISSIONS_COMMANDS_OTHER_GROUP_ADDSUB),
+	OTHER_DEL_SUBGROUP("commands.other.group.removesub", EPMessages.PERMISSIONS_COMMANDS_OTHER_GROUP_REMOVESUB),
 	
-	OTHER_PROMOTE_GROUP("commands.other.group.promote"),
-	OTHER_DEMOTE_GROUP("commands.other.group.demote"),
-	OTHER_LIST_GROUP("commands.other.group.list"),
+	OTHER_PROMOTE_GROUP("commands.other.group.promote", EPMessages.PERMISSIONS_COMMANDS_OTHER_GROUP_PROMOTE),
+	OTHER_DEMOTE_GROUP("commands.other.group.demote", EPMessages.PERMISSIONS_COMMANDS_OTHER_GROUP_DEMOTE),
+	OTHER_LIST_GROUP("commands.other.group.list", EPMessages.PERMISSIONS_COMMANDS_OTHER_GROUP_LIST),
 	
 	// Other : Permissions
-	OTHER_ADD_PERMISSION("commands.other.permission.add"),
-	OTHER_DEL_PERMISSION("commands.other.permission.del"),
+	OTHER_ADD_PERMISSION("commands.other.permission.add", EPMessages.PERMISSIONS_COMMANDS_OTHER_PERMISSION_ADD),
+	OTHER_DEL_PERMISSION("commands.other.permission.remove", EPMessages.PERMISSIONS_COMMANDS_OTHER_PERMISSION_REMOVE),
 	
-	OTHER_CHECK_PERMISSION("commands.other.permission.check"),
-	OTHER_LIST_PERMISSION("commands.other.permission.list"),
+	OTHER_CHECK_PERMISSION("commands.other.permission.check", EPMessages.PERMISSIONS_COMMANDS_OTHER_PERMISSION_CHECK),
+	OTHER_LIST_PERMISSION("commands.other.permission.list", EPMessages.PERMISSIONS_COMMANDS_OTHER_PERMISSION_LIST),
 	
 	// Other : Options
-	OTHER_ADD_OPTION("commands.other.option.add"),
-	OTHER_DEL_OPTION("commands.other.option.del"),
+	OTHER_ADD_OPTION("commands.other.option.add", EPMessages.PERMISSIONS_COMMANDS_OTHER_OPTION_ADD),
+	OTHER_DEL_OPTION("commands.other.option.remove", EPMessages.PERMISSIONS_COMMANDS_OTHER_OPTION_REMOVE),
 	
-	OTHER_CHECK_OPTION("commands.other.option.check"),
-	OTHER_LIST_OPTION("commands.other.option.list");
+	OTHER_CHECK_OPTION("commands.other.option.check", EPMessages.PERMISSIONS_COMMANDS_OTHER_OPTION_CHECK),
+	OTHER_LIST_OPTION("commands.other.option.list", EPMessages.PERMISSIONS_COMMANDS_OTHER_OPTION_LIST);
 	
-	private final static String prefix = "everpermissions";
+	private static final String PREFIX = "everpermissions";
 	
 	private final String permission;
+	private final EnumMessage message;
+	private final boolean value;
     
-    private EPPermissions(final String permission) {   	
-    	Preconditions.checkNotNull(permission, "La permission '" + this.name() + "' n'est pas définit");
-    	
-    	this.permission = permission;
+    private EPPermissions(final String permission, final EnumMessage message) {
+    	this(permission, message, false);
+    }
+    
+    private EPPermissions(final String permission, final EnumMessage message, final boolean value) {   	    	
+    	this.permission = PREFIX + "." + permission;
+    	this.message = message;
+    	this.value = value;
     }
 
+    @Override
     public String get() {
-		return EPPermissions.prefix + "." + this.permission;
+    	return this.permission;
 	}
-    
-    public boolean has(CommandSource player) {
-    	return player.hasPermission(this.get());
-    }
+
+	@Override
+	public boolean getDefault() {
+		return this.value;
+	}
+
+	@Override
+	public EnumMessage getMessage() {
+		return this.message;
+	}
 }
