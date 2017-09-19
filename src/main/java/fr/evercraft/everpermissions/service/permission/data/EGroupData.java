@@ -205,4 +205,25 @@ public class EGroupData extends ESubjectData {
 			this.write_lock.unlock();
 		}
 	}
+
+	public CompletableFuture<Boolean> clear(final String typeWorld) {
+		return CompletableFuture.supplyAsync(() -> {			
+			if (!this.getSubject().getContainingCollection().getStorage().clear(this, typeWorld)) return false;
+			
+			this.clearExecute(typeWorld);
+			this.onUpdate();
+			return true;
+		}, this.plugin.getThreadAsync());
+	}
+	
+	public void clearExecute(final String typeWorld) {
+		this.write_lock.lock();
+		try {
+			this.parents.remove(typeWorld);
+			this.permissions.remove(typeWorld);
+			this.options.remove(typeWorld);
+		} finally {
+			this.write_lock.unlock();
+		}
+	}
 }

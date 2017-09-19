@@ -44,7 +44,7 @@ public class EPGroupAddInheritance extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_ADD_INHERITANCE.get());
+		return source.hasPermission(EPPermissions.GROUP_INHERITANCE_ADD.get());
 	}
 
 	public Text description(final CommandSource source) {

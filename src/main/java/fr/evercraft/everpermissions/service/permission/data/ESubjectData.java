@@ -106,6 +106,7 @@ public abstract class ESubjectData implements SubjectData {
 	}
 	
 	public void onUpdate() {
+		this.subject.clearCache();
 		ESpongeEventFactory.createSubjectDataUpdate(this, Cause.source(this.plugin).build());
 	}
 	

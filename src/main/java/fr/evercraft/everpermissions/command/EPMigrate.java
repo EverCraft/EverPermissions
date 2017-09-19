@@ -32,9 +32,9 @@ import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
-public class EPTransfert extends ECommand<EverPermissions> {
+public class EPMigrate extends ECommand<EverPermissions> {
 	
-	public EPTransfert(final EverPermissions plugin) {
+	public EPMigrate(final EverPermissions plugin) {
         super(plugin, "permtransfer", "mantransfer");
     }
 

@@ -188,12 +188,14 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 	
 	public boolean load(Collection<ESubject> subjects) {
 		for (ESubject subject : subjects) {
-			if (!this.load(subject)) {
-				System.err.println("erreur load : " + subject);
-				return false;
-			}
+			if (!this.load(subject)) return false;
 		}
 		return true;
+	}
+	
+	public boolean clear(ESubjectData subject) {
+		this.getNode().removeChild(subject.getIdentifier());
+		return this.save(true);
 	}
 	
 	/*

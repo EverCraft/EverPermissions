@@ -14,33 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with EverPermissions.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.evercraft.everpermissions;
+package fr.evercraft.everpermissions.command.group;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import fr.evercraft.everapi.plugin.command.EParentCommand;
+import fr.evercraft.everapi.plugin.command.EParentSubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.EPPermissions;
+import fr.evercraft.everpermissions.EverPermissions;
 
-public class EPCommand extends EParentCommand<EverPermissions> {
+public class EPGroup extends EParentSubCommand<EverPermissions> {
 	
-	public static final String MARKER_WORLD = "-w";
-	
-	public EPCommand(final EverPermissions plugin) {
-		super(plugin, "everpermissions", "permissions", "perms", "perm");
+	public EPGroup(final EverPermissions plugin, final EParentCommand<EverPermissions> command) {
+		super(plugin, command, "group");
     }
 	
 	@Override
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.EVERPERMISSIONS.get());
+		return source.hasPermission(EPPermissions.GROUP_EXECUTE.get());
 	}
 
 	@Override
 	public Text description(final CommandSource source) {
-		return EPMessages.DESCRIPTION.getText();
+		return EPMessages.GROUP_DESCRIPTION.getText();
 	}
 
 	@Override
 	public boolean testPermissionHelp(final CommandSource source) {
-		return source.hasPermission(EPPermissions.HELP.get());
+		return true;
 	}
 }

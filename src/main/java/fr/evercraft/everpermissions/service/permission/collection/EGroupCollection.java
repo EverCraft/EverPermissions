@@ -174,4 +174,10 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 	public boolean isTransient() {
 		return false;
 	}
+
+	public Optional<String> getAll(String world) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

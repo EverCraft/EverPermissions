@@ -17,12 +17,13 @@
 package fr.evercraft.everpermissions.service.permission.subject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
@@ -31,8 +32,14 @@ import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 import com.google.common.base.Preconditions;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableSet;
 
+import fr.evercraft.everpermissions.EPConfig;
 import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 import fr.evercraft.everpermissions.service.permission.data.EUserData;
 
@@ -40,11 +47,36 @@ public class EUserSubject extends ESubject {
 	private final EUserData data;
 	private final EUserData transientData;
 	
+	// Cache
+	protected String cacheWorld;
+	protected final LoadingCache<String, Tristate> cachePermissions;
+	protected final LoadingCache<String, Optional<String>> cacheOptions;
+	
     public EUserSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<?> collection) {
     	super(plugin, identifier, collection);
 
     	this.data = new EUserData(this.plugin, this, false);
         this.transientData = new EUserData(this.plugin, this, true);
+        
+        // Cache
+ 		this.cachePermissions = CacheBuilder.newBuilder()
+ 			    .maximumSize(16)
+ 			    .expireAfterAccess(10, TimeUnit.MINUTES)
+ 			    .build(new CacheLoader<String, Tristate>() {
+					@Override
+					public Tristate load(String permission) throws Exception {
+						return EUserSubject.this.getPermissionValue(permission);
+					}
+ 			    });
+ 		this.cacheOptions = CacheBuilder.newBuilder()
+ 			    .maximumSize(16)
+ 			    .expireAfterAccess(10, TimeUnit.MINUTES)
+ 			    .build(new CacheLoader<String, Optional<String>>() {
+					@Override
+					public Optional<String> load(String option) throws Exception {
+						return EUserSubject.this.getOption(option);
+					}
+ 			    });
     }
     
     public void reload() {
@@ -102,17 +134,38 @@ public class EUserSubject extends ESubject {
 	public Set<Context> getActiveContexts() {
     	Set<Context> contexts = new HashSet<>();
     	this.plugin.getService().getContextCalculator().accumulateContexts(this, contexts);
-        return Collections.unmodifiableSet(contexts);
+        return ImmutableSet.copyOf(contexts);
 	}
     
     /*
      * Permission
      */
-	
+    
     public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {
-    	// TODO Cache
+    	Preconditions.checkNotNull(contexts, "contexts");
+    	Preconditions.checkNotNull(permission, "permission");
     	
-		String typeWorldUser = this.plugin.getService().getContextCalculator().getUser(contexts);
+    	Optional<String> world = EContextCalculator.getWorld(contexts);
+    	if (this.cacheWorld == null || !this.cacheWorld.equals(world.orElse(""))) {
+    		this.clearCache();
+    		this.cacheWorld = world.orElse("");
+    	}
+    	
+    	try {
+			Tristate value = this.cachePermissions.get(permission);
+			this.verbose(world, permission, value);
+			return value;
+		} catch (ExecutionException e) {
+			Tristate value = this.getPermissionValue(permission);
+			this.verbose(world, permission, value);
+			return value;
+		}
+    }
+	
+    public Tristate getPermissionValue(final String permission) {
+    	Set<Context> contexts = EContextCalculator.of(this.cacheWorld);
+    	String typeWorldUser = this.collection.getTypeWorld(this.cacheWorld).orElse(EPConfig.DEFAULT);
+    	
 		// TempoData : Permissions
 		Tristate value = this.transientData.getNodeTree(typeWorldUser).getTristate(permission);
 		if (!value.equals(Tristate.UNDEFINED)) {
@@ -186,7 +239,26 @@ public class EUserSubject extends ESubject {
     
     @Override
     public Optional<String> getOption(final Set<Context> contexts, final String option) {
-    	String typeWorldUser = this.plugin.getService().getContextCalculator().getUser(contexts);
+    	Preconditions.checkNotNull(contexts, "contexts");
+    	Preconditions.checkNotNull(option, "option");
+    	
+    	String world = EContextCalculator.getWorld(contexts).orElse("");
+    	if (this.cacheWorld == null || !this.cacheWorld.equals(world)) {
+    		this.clearCache();
+    		this.cacheWorld = world;
+    	}
+    	
+    	try {
+			return this.cacheOptions.get(option);
+		} catch (ExecutionException e) {
+			return this.getOption(option);
+		}
+    }
+    
+    public Optional<String> getOption(final String option) {    	
+    	Set<Context> contexts = EContextCalculator.of(this.cacheWorld);
+    	String typeWorldUser = this.collection.getTypeWorld(this.cacheWorld).orElse(EPConfig.DEFAULT);
+    	
 		// TempoData : Permissions
     	String value = this.transientData.getOptions(typeWorldUser).get(option);
 		if (value != null) {
@@ -251,6 +323,17 @@ public class EUserSubject extends ESubject {
     	}
     	this.plugin.getELogger().debug("Undefined : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='EMPTY')");
         return Optional.empty();
+    }
+    
+    public void clearCache() {
+    	this.write_lock.lock();
+		try {
+	    	this.cacheWorld = null;
+	    	this.cachePermissions.invalidateAll();
+	    	this.cacheOptions.invalidateAll();
+		} finally {
+			this.write_lock.unlock();
+		}
     }
 	
 	/*

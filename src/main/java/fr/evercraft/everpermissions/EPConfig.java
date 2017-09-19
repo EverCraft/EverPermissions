@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.world.World;
 
 import com.google.common.collect.ImmutableList;
@@ -111,6 +112,8 @@ public class EPConfig extends EConfig<EverPermissions> {
 
 	
 	public void registerCollection(String collection) {
+		if (collection.equals(PermissionService.SUBJECTS_DEFAULT)) return;
+		
 		ConfigurationNode config = this.get("collections." + collection).getNode(EPConfig.DEFAULT);
 		boolean save = false;
 		

@@ -22,12 +22,16 @@ import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollec
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.service.context.Context;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -42,6 +46,8 @@ public abstract class ESubject implements Subject {
 	protected final String identifier;
 	protected String name;
 	
+	protected final Map<String, Set<String>> verboses;
+	
 	// MultiThreading
 	private final ReadWriteLock lock;
 	protected final Lock write_lock;
@@ -52,6 +58,7 @@ public abstract class ESubject implements Subject {
 		
 		this.identifier = identifier;
 		this.collection = collection;
+		this.verboses = new HashMap<String, Set<String>>();
 		
 		// MultiThreading
 		this.lock = new ReentrantReadWriteLock();
@@ -159,5 +166,56 @@ public abstract class ESubject implements Subject {
 		} finally {
 			this.write_lock.unlock();
 		}
+	}
+
+	public void clearCache() {}
+	
+	/*
+	 * Verbose
+	 */
+	
+	public void addVerbose(CommandSource source, Set<String> permission) {
+		this.write_lock.lock();
+		try {
+			this.verboses.put(source.getIdentifier(), ImmutableSet.copyOf(permission));
+		} finally {
+			this.write_lock.unlock();
+		}
+	}
+	
+	public Optional<Set<String>> getVerbose(CommandSource source) {
+		this.read_lock.lock();
+		try {
+			return Optional.ofNullable(this.verboses.get(source.getIdentifier()));
+		} finally {
+			this.read_lock.unlock();
+		}
+	}
+	
+	public void removeVerbose(CommandSource source) {
+		this.write_lock.lock();
+		try {
+			this.verboses.remove(source.getIdentifier());
+		} finally {
+			this.write_lock.unlock();
+		}
+	}
+	
+	public ImmutableMap<String, Set<String>> getVerboses() {
+		this.read_lock.lock();
+		try {
+			return ImmutableMap.copyOf(this.verboses);
+		} finally {
+			this.read_lock.unlock();
+		}
+	}
+	
+	public void verbose(Optional<String> world, String permission, Tristate value) {
+		
+	}
+	
+	public void verbose(Optional<String> world, String option, Optional<String> value) {
+		// TODO Auto-generated method stub
+		
 	}
 }

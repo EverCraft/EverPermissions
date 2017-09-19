@@ -44,7 +44,7 @@ public class EPGroupDefaultGroup extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_DEFAULT_GROUP.get());
+		return source.hasPermission(EPPermissions.GROUP_DEFAULT.get());
 	}
 
 	public Text description(final CommandSource source) {

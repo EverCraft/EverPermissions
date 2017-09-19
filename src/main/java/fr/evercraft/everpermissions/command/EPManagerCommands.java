@@ -23,6 +23,12 @@ import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.command.disable.EPDeop;
 import fr.evercraft.everpermissions.command.disable.EPOp;
+import fr.evercraft.everpermissions.command.group.EPGroup;
+import fr.evercraft.everpermissions.command.group.EPGroupCreate;
+import fr.evercraft.everpermissions.command.group.EPGroupDefault;
+import fr.evercraft.everpermissions.command.group.EPGroupList;
+import fr.evercraft.everpermissions.command.group.EPGroupRemove;
+import fr.evercraft.everpermissions.command.group.EPGroupRename;
 import fr.evercraft.everpermissions.command.group.group.*;
 import fr.evercraft.everpermissions.command.group.inheritance.*;
 import fr.evercraft.everpermissions.command.group.option.*;
@@ -52,12 +58,21 @@ public class EPManagerCommands extends TreeMap<String, ECommand<EverPermissions>
 		EPCommand manager_command = new EPCommand(this.plugin);
 		manager_command.add(new EPReload(this.plugin, manager_command));
 		
+		// Group :
+		EPGroup manager_group = new EPGroup(this.plugin, manager_command);
+		manager_group.add(new EPGroupCreate(this.plugin, manager_group));
+		manager_group.add(new EPGroupRemove(this.plugin, manager_group));
+		manager_group.add(new EPGroupDefault(this.plugin, manager_group));
+		manager_group.add(new EPGroupList(this.plugin, manager_group));
+		manager_group.add(new EPGroupRename(this.plugin, manager_group));
+		manager_command.add(manager_group);
+		
 		// Commands : Disable
 		register(new EPDeop(this.plugin));
 		register(new EPOp(this.plugin));
 		
 		// Commands :		
-		register(new EPTransfert(this.plugin));
+		register(new EPMigrate(this.plugin));
 		
 		// User : 
 		register(new EPUserClear(this.plugin));

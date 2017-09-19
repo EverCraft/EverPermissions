@@ -43,7 +43,7 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_ADD_GROUP.get());
+		return source.hasPermission(EPPermissions.GROUP_ADD.get());
 	}
 
 	public Text description(final CommandSource source) {

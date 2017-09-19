@@ -127,6 +127,10 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		return Optional.ofNullable(this.worlds.get(world));
 	}
 	
+	public Set<String> getTypeWorlds() {
+		return this.worlds.keySet();
+	}
+	
 	public boolean load() {
 		return true;
 	}
@@ -198,7 +202,8 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	
 	@Override
 	public void suggestUnload(String identifier) {
-		this.identifierSubjects.remove(identifier);
+		T subject = this.identifierSubjects.remove(identifier);
+		subject.getFriendlyIdentifier().ifPresent(name -> this.nameSubjects.remove(name.toLowerCase()));
 	}
 
 	@Override
@@ -295,5 +300,8 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 
 	public ICollectionStorage getStorage() {
 		return this.storage;
+	}
+
+	public void clearCache() {
 	}
 }

@@ -58,17 +58,18 @@ public enum EPPermissions implements EnumPermission {
 	USER_LIST_OPTION("commands.user.option.list", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_LIST),
 	
 	// Groupe : Groupes
-	GROUP_ADD_GROUP("commands.group.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_ADD),
-	GROUP_DEL_GROUP("commands.group.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_REMOVE),
-	
-	GROUP_DEFAULT_GROUP("commands.group.default", EPMessages.PERMISSIONS_COMMANDS_GROUP_DEFAULT),
-	GROUP_LIST_GROUP("commands.group.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_LIST),
+	GROUP_EXECUTE("commands.group.execute", EPMessages.PERMISSIONS_COMMANDS_GROUP_EXECUTE),
+	GROUP_ADD("commands.group.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_ADD),
+	GROUP_REMOVE("commands.group.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_REMOVE),
+	GROUP_DEFAULT("commands.group.default", EPMessages.PERMISSIONS_COMMANDS_GROUP_DEFAULT),
+	GROUP_LIST("commands.group.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_LIST),
+	GROUP_RENAME("commands.group.rename", EPMessages.PERMISSIONS_COMMANDS_GROUP_RENAME),
 	
 	// Groupe : Inheritance
-	GROUP_ADD_INHERITANCE("commands.group.inheritance.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_ADD),
-	GROUP_DEL_INHERITANCE("commands.group.inheritance.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_REMOVE),
-	
-	GROUP_LIST_INHERITANCE("commands.group.inheritance.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_LIST),
+	GROUP_INHERITANCE_EXECUTE("commands.group.inheritance.execute", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_EXECUTE),
+	GROUP_INHERITANCE_INFO("commands.group.inheritance.info", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_INFO),
+	GROUP_INHERITANCE_ADD("commands.group.inheritance.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_ADD),
+	GROUP_INHERITANCE_REMOVE("commands.group.inheritance.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_REMOVE),
 	
 	// Groupe : Permissions
 	GROUP_ADD_PERMISSION("commands.group.permission.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_ADD),

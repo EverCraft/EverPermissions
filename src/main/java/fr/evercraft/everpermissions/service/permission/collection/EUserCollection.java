@@ -67,4 +67,10 @@ public class EUserCollection extends ESubjectCollection<EUserSubject> {
 	public boolean isTransient() {
 		return false;
 	}
+	
+	public void clearCache() {
+		for (EUserSubject subject : this.identifierSubjects.values()) {
+			subject.clearCache();
+		}
+	}
 }

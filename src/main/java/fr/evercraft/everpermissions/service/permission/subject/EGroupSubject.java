@@ -17,6 +17,7 @@
 package fr.evercraft.everpermissions.service.permission.subject;
 
 import fr.evercraft.everpermissions.EverPermissions;
+import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 import fr.evercraft.everpermissions.service.permission.data.EGroupData;
 
@@ -59,6 +60,10 @@ public class EGroupSubject extends ESubject {
      * Accesseurs
      */
     
+	public String getName() {
+		return this.getFriendlyIdentifier().orElse(this.getIdentifier());
+	}
+    
     @Override
 	public EGroupData getSubjectData() {
 		return this.data;
@@ -78,14 +83,18 @@ public class EGroupSubject extends ESubject {
      * Permissions
      */
 	
+	@Override
 	public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {  		
-		// TODO Cache
-		
+		Tristate value = this.getPermissionExecute(contexts, permission);
+		this.verbose(EContextCalculator.getWorld(contexts), permission, value);
+		return value;
+	}
+	
+	private Tristate getPermissionExecute(final Set<Context> contexts, final String permission) {  		
 		String typeWorldGroup = this.plugin.getService().getContextCalculator().getGroup(contexts);
 		// TempoData : Permissions
 		Tristate value = this.transientData.getNodeTree(typeWorldGroup).getTristate(permission);
 		if (!value.equals(Tristate.UNDEFINED)) {
-			this.plugin.getELogger().debug("TransientSubjectData 'Permissions' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
 			return value;
 		}
     	
@@ -93,7 +102,6 @@ public class EGroupSubject extends ESubject {
     	for (SubjectReference parent : this.transientData.getParents(typeWorldGroup)) {
     		value = parent.resolve().join().getPermissionValue(contexts, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
-    			this.plugin.getELogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
@@ -101,7 +109,6 @@ public class EGroupSubject extends ESubject {
     	// SubjectData : Permissions
     	value = this.data.getNodeTree(typeWorldGroup).getTristate(permission);
 		if (!value.equals(Tristate.UNDEFINED)) {
-			this.plugin.getELogger().debug("SubjectData 'Permissions' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
 			return value;
 		}
     	
@@ -109,25 +116,27 @@ public class EGroupSubject extends ESubject {
     	for (SubjectReference parent : this.data.getParents(typeWorldGroup)) {
     		value = parent.resolve().join().getPermissionValue(contexts, permission);
     		if (!value.equals(Tristate.UNDEFINED)) {
-    			this.plugin.getELogger().debug("SubjectData 'Parent' : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='" + value.name() + "')");
     			return value;
     		}
     	}
-    	this.plugin.getELogger().debug("Undefined : (identifier='" + this.identifier + "';collection='" + this.collection + "';permission='" + permission + "';value='UNDEFINED')");
         return Tristate.UNDEFINED;
     }
 	
 	/*
      * Options
      */
-	
 	@Override
     public Optional<String> getOption(final Set<Context> contexts, final String option) {
+		Optional<String> value = this.getOptionExecute(contexts, option);
+		this.verbose(EContextCalculator.getWorld(contexts), option, value);
+		return value;
+	}
+
+	private Optional<String> getOptionExecute(final Set<Context> contexts, final String option) {
 		String typeWorldGroup = this.plugin.getService().getContextCalculator().getGroup(contexts);
 		// TempoData : Permissions
     	String value = this.transientData.getOptions(typeWorldGroup).get(option);
 		if (value != null) {
-			this.plugin.getELogger().debug("TransientSubjectData 'Options' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
 			return Optional.of(value);
 		}
     	
@@ -135,7 +144,6 @@ public class EGroupSubject extends ESubject {
     	for (SubjectReference parent : this.transientData.getParents(typeWorldGroup)) {
     		value = parent.resolve().join().getOption(contexts, option).orElse(null);
     		if (value != null) {
-    			this.plugin.getELogger().debug("TransientSubjectData 'Parents' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
     			return Optional.of(value);
     		}
     	}
@@ -143,7 +151,6 @@ public class EGroupSubject extends ESubject {
     	// SubjectData : Permissions
     	value = this.data.getOptions(typeWorldGroup).get(option);
 		if (value != null) {
-			this.plugin.getELogger().debug("SubjectData 'Options' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
 			return Optional.of(value);
 		}
     	
@@ -151,11 +158,9 @@ public class EGroupSubject extends ESubject {
     	for (SubjectReference parent : this.data.getParents(typeWorldGroup)) {
     		value = parent.resolve().join().getOption(contexts, option).orElse(null);
     		if (value != null) {
-    			this.plugin.getELogger().debug("SubjectData 'Parent' : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='" + value + "')");
     			return Optional.of(value);
     		}
     	}
-    	this.plugin.getELogger().debug("Undefined : (identifier='" + this.identifier + "';collection='" + this.collection + "';option='" + option + "';value='EMPTY')");
         return Optional.empty();
     }
 
@@ -233,25 +238,34 @@ public class EGroupSubject extends ESubject {
 			this.write_lock.unlock();
 		}
 	}
-	
-	public void clear(final String typeWorld) {
-		this.write_lock.lock();
-		try {
-			this.data.clearParentsExecute(typeWorld);
-			this.data.clearOptionsExecute(typeWorld);
-			this.data.clearPermissionsExecute(typeWorld);
+
+	public CompletableFuture<Boolean> clear(String typeWorld) {
+		return this.data.clear(typeWorld).thenCompose(result -> {
+			if (!result) return CompletableFuture.completedFuture(false);
+			return this.transientData.clear(typeWorld);
+		}).thenApply(result -> {
+			if (!result) return false;
 			
-			this.transientData.clearParents(typeWorld);
-			this.transientData.clearOptions(typeWorld);
-			this.transientData.clearPermissions(typeWorld);
-		
-			this.typeWorlds.remove(typeWorld);
+			this.write_lock.lock();
+			try {
+				this.typeWorlds.remove(typeWorld);
+				
+				if (this.typeWorlds.isEmpty()) {
+					this.collection.suggestUnload(this.identifier);
+				}
+			} finally {
+				this.write_lock.unlock();
+			}
+			return true;
+		});
+	}
+	
+	public void clearCache() {
+    	this.write_lock.lock();
+		try {
+	    	this.plugin.getService().clearCache();
 		} finally {
 			this.write_lock.unlock();
 		}
-	}
-
-	public CompletableFuture<Boolean> remove(String typeWorld) {
-		return null;
-	}
+    }
 }

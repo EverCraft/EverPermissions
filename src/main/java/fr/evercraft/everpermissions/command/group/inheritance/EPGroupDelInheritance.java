@@ -44,7 +44,7 @@ public class EPGroupDelInheritance extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_DEL_INHERITANCE.get());
+		return source.hasPermission(EPPermissions.GROUP_INHERITANCE_REMOVE.get());
 	}
 
 	public Text description(final CommandSource source) {

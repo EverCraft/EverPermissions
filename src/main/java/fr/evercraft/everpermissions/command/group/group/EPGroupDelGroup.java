@@ -43,11 +43,11 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_DEL_GROUP.get());
+		return source.hasPermission(EPPermissions.GROUP_REMOVE.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_DEL_GROUP_DESCRIPTION.getText();
+		return EPMessages.GROUP_REMOVE_GROUP_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
@@ -108,7 +108,7 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 		}
 		
 		// Le groupe n'a pas été supprimé
-		return group.get().remove(type_group.get())
+		return group.get().clear(type_group.get())
 			.exceptionally(e -> false)
 			.thenApply(result -> {
 				if (!result) {
@@ -118,7 +118,7 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 					return false;
 				}
 				
-				EPMessages.GROUP_DEL_GROUP_STAFF.sender()
+				EPMessages.GROUP_REMOVE_GROUP_STAFF.sender()
 					.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("{type}", type_group.get());
 				return true;

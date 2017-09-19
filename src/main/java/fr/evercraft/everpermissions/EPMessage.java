@@ -222,12 +222,18 @@ public class EPMessage extends EMessage<EverPermissions> {
 		USER_LIST_OPTION_TRANSIENT_LINE(			"        &7&l●  &7{option} : &7'{value}&7'"),
 		
 		// Group : Group
+		GROUP_DESCRIPTION(							"Gestion des groupes"),
+		
 		GROUP_ADD_GROUP_DESCRIPTION(				"Ajoute un groupe à un monde"),
 		GROUP_ADD_GROUP_STAFF(						"&7Vous avez créé le groupe &6{group} &7dans les mondes de type &6{type}&7."),
 		GROUP_ADD_GROUP_ERROR(						"&cIl existe déjà un groupe &6{group} &cdans les mondes de type &6{type}&c."),
 		
-		GROUP_DEL_GROUP_DESCRIPTION(				"Supprime un groupe d'un monde"),
-		GROUP_DEL_GROUP_STAFF(						"&7Vous avez supprimé le groupe &6{group} &7dans les mondes de type &6{type}&7."),
+		GROUP_REMOVE_GROUP_DESCRIPTION(				"Supprime un groupe d'un monde"),
+		GROUP_REMOVE_GROUP_STAFF(					"&7Vous avez supprimé le groupe &6{group} &7dans les mondes de type &6{type}&7."),
+		
+		GROUP_RENAME_GROUP_DESCRIPTION(				"Renomme un groupe"),
+		GROUP_RENAME_GROUP_STAFF(					"&7Vous avez renommé le groupe &6{oldName} &7en &6{newName}&7."),
+		GROUP_RENAME_GROUP_EQUALS(					"&cErreur : Le groupe &6{group} &cporte déjà ce nom."),
 		
 		GROUP_DEFAULT_GROUP_DESCRIPTION(			"Définit un groupe par défaut"),
 		GROUP_DEFAULT_GROUP_TRUE(					"&7Le groupe &6{group} &7est désormais le groupe par défaut &7dans les mondes de type &6{type}&7."),
@@ -378,13 +384,16 @@ public class EPMessage extends EMessage<EverPermissions> {
 		PERMISSIONS_COMMANDS_USER_OPTION_REMOVE(""),
 		PERMISSIONS_COMMANDS_USER_OPTION_CHECK(""),
 		PERMISSIONS_COMMANDS_USER_OPTION_LIST(""),
+		PERMISSIONS_COMMANDS_GROUP_EXECUTE(""),
 		PERMISSIONS_COMMANDS_GROUP_ADD(""),
 		PERMISSIONS_COMMANDS_GROUP_REMOVE(""),
 		PERMISSIONS_COMMANDS_GROUP_DEFAULT(""),
 		PERMISSIONS_COMMANDS_GROUP_LIST(""),
+		PERMISSIONS_COMMANDS_GROUP_RENAME(""),
+		PERMISSIONS_COMMANDS_GROUP_INHERITANCE_EXECUTE(""),
+		PERMISSIONS_COMMANDS_GROUP_INHERITANCE_INFO(""),
 		PERMISSIONS_COMMANDS_GROUP_INHERITANCE_ADD(""),
 		PERMISSIONS_COMMANDS_GROUP_INHERITANCE_REMOVE(""),
-		PERMISSIONS_COMMANDS_GROUP_INHERITANCE_LIST(""),
 		PERMISSIONS_COMMANDS_GROUP_PERMISSION_ADD(""),
 		PERMISSIONS_COMMANDS_GROUP_PERMISSION_REMOVE(""),
 		PERMISSIONS_COMMANDS_GROUP_PERMISSION_CHECK(""),
@@ -465,5 +474,10 @@ public class EPMessage extends EMessage<EverPermissions> {
 			this.message = message.build();
 			this.builder = message;
 		}
+	}
+	
+	@Override
+	public EnumMessage getPrefix() {
+		return EPMessages.PREFIX;
 	}
 }

@@ -133,7 +133,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     	PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT `name` " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersProfiles() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? ;";
 		try {
 			preparedStatement = connection.prepareStatement(query);
 			preparedStatement.setString(1, this.collection);
@@ -160,7 +160,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     	PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT *" 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? ;";
 		try {
 			preparedStatement = connection.prepareStatement(query);
 			preparedStatement.setString(1, this.collection);
@@ -187,7 +187,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT *" 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersOptions() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? ;";
 		try {
 			preparedStatement = connection.prepareStatement(query);
 			preparedStatement.setString(1, subject.getIdentifier());
@@ -213,7 +213,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT *" 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? "
+						+ "WHERE `collection` = ? AND `identifier` = ? "
 						+ "ORDER BY `priority` ASC;";
 		try {
 			preparedStatement = connection.prepareStatement(query);
@@ -248,12 +248,59 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	    }
 	}
 	
+	@Override
+	public boolean clear(ESubjectData subject) {
+		Connection connection = null;
+		try {
+			connection = this.plugin.getDataBases().getConnection();
+			
+			connection.setAutoCommit(false);
+			this.clearPermissions(connection, subject);
+			this.clearOptions(connection, subject);
+			this.clearParents(connection, subject);
+			this.clearProfils(connection, subject);
+			connection.commit();
+			
+			return true;
+		} catch (ServerDisableException e) {
+			e.execute();
+		} catch (SQLException e) {
+			try { connection.rollback();} catch (SQLException e1) {}
+		} finally {
+			try {if (connection != null) connection.close();} catch (SQLException e) {}
+	    }
+		return false;
+	}
+
+	@Override
+	public boolean clear(ESubjectData subject, String typeWorld) {
+		Connection connection = null;
+		try {
+			connection = this.plugin.getDataBases().getConnection();
+			
+			connection.setAutoCommit(false);
+			this.clearPermissions(connection, subject, typeWorld);
+			this.clearOptions(connection, subject, typeWorld);
+			this.clearParents(connection, subject, typeWorld);
+			connection.commit();
+			
+			return true;
+		} catch (ServerDisableException e) {
+			e.execute();
+		} catch (SQLException e) {
+			try { connection.rollback();} catch (SQLException e1) {}
+		} finally {
+			try {if (connection != null) connection.close();} catch (SQLException e) {}
+	    }
+		return false;
+	}
+	
 	public boolean setFriendlyIdentifier(final ESubject subject, final @Nullable String name) {
 		Connection connection = null;
     	PreparedStatement preparedStatement = null;
     	String query = 	  "UPDATE `" + this.plugin.getDataBases().getTableUsersProfiles() + "` "
 						+ "SET `name` = ? "
-						+ "WHERE `collection` = ? AND `uuid` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? ;";
 		try {
 			connection = this.plugin.getDataBases().getConnection();
 			preparedStatement = connection.prepareStatement(query);
@@ -278,7 +325,26 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	    }
 		return false;
 	}
-    
+
+	public boolean clearProfils(final Connection connection, final ESubjectData subject) throws SQLException {
+    	PreparedStatement preparedStatement = null;
+    	String query = 	  "DELETE "
+    					+ "FROM `" + this.plugin.getDataBases().getTableUsersProfiles() + "` "
+						+ "WHERE `collection` = ? AND `identifier` = ? ;";
+		try {
+			preparedStatement = connection.prepareStatement(query);
+			preparedStatement.setString(1, this.collection);
+			preparedStatement.setString(2, subject.getIdentifier());
+			preparedStatement.execute();
+			return true;
+		} catch (SQLException e) {
+        	this.plugin.getELogger().warn(" : " + e.getMessage());
+        	throw e;
+		} finally {
+			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
+	    }
+	}
+	
     /*
      * Permissions
      */
@@ -292,7 +358,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
         	if (value.equals(Tristate.UNDEFINED)) {
         		String query = 	  "DELETE " 
 			    				+ "FROM `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
-			    				+ "WHERE `collection` = ? AND `uuid` = ? AND `world` = ? AND `permission` = ? ;";
+			    				+ "WHERE `collection` = ? AND `identifier` = ? AND `world` = ? AND `permission` = ? ;";
 				preparedStatement = connection.prepareStatement(query);
 				preparedStatement.setString(1, this.collection);
 				preparedStatement.setString(2, subject.getIdentifier());
@@ -319,7 +385,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
         	} else {
         		String query = 	  "UPDATE `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
         						+ "SET boolean = ? "
-        						+ "WHERE `collection` = ? AND `uuid` = ? AND `world` = ? AND `permission` = ? ;";
+        						+ "WHERE `collection` = ? AND `identifier` = ? AND `world` = ? AND `permission` = ? ;";
 				preparedStatement = connection.prepareStatement(query);
 				preparedStatement.setBoolean(1, value.asBoolean());
 				preparedStatement.setString(2, this.collection);
@@ -350,12 +416,25 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     
     public boolean clearPermissions(final ESubjectData subject, final String typeWorld) {
     	Connection connection = null;
+		try {
+			connection = this.plugin.getDataBases().getConnection();
+			this.clearPermissions(connection, subject, typeWorld);
+			return true;
+		} catch (ServerDisableException e) {
+			e.execute();
+		} catch (SQLException e) {
+		} finally {
+			try {if (connection != null) connection.close();} catch (SQLException e) {}
+	    }
+		return false;
+    }
+    
+    public boolean clearPermissions(final Connection connection, final ESubjectData subject, final String typeWorld) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? AND `world` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? AND `world` = ? ;";
     	try {
-    		connection = this.plugin.getDataBases().getConnection();
     		preparedStatement = connection.prepareStatement(query);
     		preparedStatement.setString(1, this.collection);
 			preparedStatement.setString(2, subject.getIdentifier());
@@ -367,25 +446,33 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 			return true;
     	} catch (SQLException e) {
     		this.plugin.getELogger().warn("Error permissions deletions : " + e.getMessage());
-		} catch (ServerDisableException e) {
-			e.execute();
+    		throw e;
 		} finally {
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-				if (connection != null) connection.close();
-			} catch (SQLException e) {}
+			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
-    	return false;
     }
     
     public boolean clearPermissions(final ESubjectData subject) {
     	Connection connection = null;
+		try {
+			connection = this.plugin.getDataBases().getConnection();
+			this.clearPermissions(connection, subject);
+			return true;
+		} catch (ServerDisableException e) {
+			e.execute();
+		} catch (SQLException e) {
+		} finally {
+			try {if (connection != null) connection.close();} catch (SQLException e) {}
+	    }
+		return false;
+    }
+    
+    public boolean clearPermissions(final Connection connection, final ESubjectData subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? ;";
     	try {
-    		connection = this.plugin.getDataBases().getConnection();
     		preparedStatement = connection.prepareStatement(query);
     		preparedStatement.setString(1, this.collection);
 			preparedStatement.setString(2, subject.getIdentifier());
@@ -395,15 +482,10 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 			return true;
     	} catch (SQLException e) {
     		this.plugin.getELogger().warn("Error permissions deletions : " + e.getMessage());
-		} catch (ServerDisableException e) {
-			e.execute();
-		} finally {
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-				if (connection != null) connection.close();
-			} catch (SQLException e) {}
+    		throw e;
+    	} finally {
+			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
-    	return false;
     }
     
     /*
@@ -418,7 +500,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
         	if (value == null) {
         		String query = 	  "DELETE " 
 			    				+ "FROM `" + this.plugin.getDataBases().getTableUsersOptions() + "` "
-			    				+ "WHERE `collection` = ? AND `uuid` = ? AND `world` = ? AND `option` = ? ;";
+			    				+ "WHERE `collection` = ? AND `identifier` = ? AND `world` = ? AND `option` = ? ;";
 				preparedStatement = connection.prepareStatement(query);
 				preparedStatement.setString(1, this.collection);
 				preparedStatement.setString(2, subject.getIdentifier());
@@ -447,7 +529,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
         	} else {
         		String query = 	  "UPDATE `" + this.plugin.getDataBases().getTableUsersOptions() + "` "
         						+ "SET `value` = ? "
-        						+ "WHERE `collection` = ? AND `uuid` = ? AND `world` = ? AND `option` = ? ;";
+        						+ "WHERE `collection` = ? AND `identifier` = ? AND `world` = ? AND `option` = ? ;";
 				preparedStatement = connection.prepareStatement(query);
 				preparedStatement.setString(1, value);
 				preparedStatement.setString(2, this.collection);
@@ -478,12 +560,25 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 
     public boolean clearOptions(final ESubjectData subject, final String typeWorld) {
     	Connection connection = null;
+		try {
+			connection = this.plugin.getDataBases().getConnection();
+			this.clearOptions(connection, subject, typeWorld);
+			return true;
+		} catch (ServerDisableException e) {
+			e.execute();
+		} catch (SQLException e) {
+		} finally {
+			try {if (connection != null) connection.close();} catch (SQLException e) {}
+	    }
+		return false;
+    }
+    
+    public boolean clearOptions(final Connection connection, final ESubjectData subject, final String typeWorld) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersOptions() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? AND `world` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? AND `world` = ? ;";
     	try {
-    		connection = this.plugin.getDataBases().getConnection();
 			preparedStatement = connection.prepareStatement(query);
 			preparedStatement.setString(1, this.collection);
 			preparedStatement.setString(2, subject.getIdentifier());
@@ -495,25 +590,33 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 			return true;
     	} catch (SQLException e) {
     		this.plugin.getELogger().warn("Error options deletions : " + e.getMessage());
-		} catch (ServerDisableException e) {
-			e.execute();
-		} finally {
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-				if (connection != null) connection.close();
-			} catch (SQLException e) {}
+    		throw e;
+    	} finally {
+			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
-    	return false;
     }
     
     public boolean clearOptions(final ESubjectData subject) {
     	Connection connection = null;
+		try {
+			connection = this.plugin.getDataBases().getConnection();
+			this.clearOptions(connection, subject);
+			return true;
+		} catch (ServerDisableException e) {
+			e.execute();
+		} catch (SQLException e) {
+		} finally {
+			try {if (connection != null) connection.close();} catch (SQLException e) {}
+	    }
+		return false;
+    }
+    
+    public boolean clearOptions(final Connection connection, final ESubjectData subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersOptions() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? ;";
     	try {
-    		connection = this.plugin.getDataBases().getConnection();
 			preparedStatement = connection.prepareStatement(query);
 			preparedStatement.setString(1, this.collection);
 			preparedStatement.setString(2, subject.getIdentifier());
@@ -523,15 +626,10 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 			return true;
     	} catch (SQLException e) {
     		this.plugin.getELogger().warn("Error options deletions : " + e.getMessage());
-		} catch (ServerDisableException e) {
-			e.execute();
-		} finally {
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-				if (connection != null) connection.close();
-			} catch (SQLException e) {}
+    		throw e;
+    	} finally {
+			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
-    	return false;
     }
 
     /*
@@ -587,7 +685,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     		} else {
     			String query = 	  "UPDATE `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
 								+ "SET `group` = ? "
-								+ "WHERE `collection` = ? AND `uuid` = ? AND `world` = ? AND `priority` = ? ;";
+								+ "WHERE `collection` = ? AND `identifier` = ? AND `world` = ? AND `priority` = ? ;";
 				preparedStatement = connection.prepareStatement(query);
 				preparedStatement.setString(1, parent.getSubjectIdentifier());
 				preparedStatement.setString(2, this.collection);
@@ -619,7 +717,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? AND `world` = ? AND `group` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? AND `world` = ? AND `group` = ? ;";
     	try {
     		connection = this.plugin.getDataBases().getConnection();
 			preparedStatement = connection.prepareStatement(query);
@@ -649,12 +747,25 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     
     public boolean clearParents(final ESubjectData subject, final String typeWorld) {
     	Connection connection = null;
+		try {
+			connection = this.plugin.getDataBases().getConnection();
+			this.clearParents(connection, subject, typeWorld);
+			return true;
+		} catch (ServerDisableException e) {
+			e.execute();
+		} catch (SQLException e) {
+		} finally {
+			try {if (connection != null) connection.close();} catch (SQLException e) {}
+	    }
+		return false;
+    }
+    
+    public boolean clearParents(final Connection connection, final ESubjectData subject, final String typeWorld) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? AND `world` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? AND `world` = ? ;";
     	try {
-    		connection = this.plugin.getDataBases().getConnection();
 			preparedStatement = connection.prepareStatement(query);
 			preparedStatement.setString(1, this.collection);
 			preparedStatement.setString(2, subject.getIdentifier());
@@ -667,25 +778,33 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 			return true;
     	} catch (SQLException e) {
     		this.plugin.getELogger().warn("Error groups deletions : " + e.getMessage());
-		} catch (ServerDisableException e) {
-			e.execute();
-		} finally {
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-				if (connection != null) connection.close();
-			} catch (SQLException e) {}
+    		throw e;
+    	} finally {
+			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
-    	return false;
     }
 
     public boolean clearParents(final ESubjectData subject) {
     	Connection connection = null;
+		try {
+			connection = this.plugin.getDataBases().getConnection();
+			this.clearParents(connection, subject);
+			return true;
+		} catch (ServerDisableException e) {
+			e.execute();
+		} catch (SQLException e) {
+		} finally {
+			try {if (connection != null) connection.close();} catch (SQLException e) {}
+	    }
+		return false;
+    }
+    
+    public boolean clearParents(final Connection connection, final ESubjectData subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ?;";
+						+ "WHERE `collection` = ? AND `identifier` = ?;";
     	try {
-    		connection = this.plugin.getDataBases().getConnection();
 			preparedStatement = connection.prepareStatement(query);
 			preparedStatement.setString(1, this.collection);
 			preparedStatement.setString(2, subject.getIdentifier());
@@ -696,24 +815,23 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 			return true;
     	} catch (SQLException e) {
     		this.plugin.getELogger().warn("Error groups deletions : " + e.getMessage());
-		} catch (ServerDisableException e) {
-			e.execute();
-		} finally {
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-				if (connection != null) connection.close();
-			} catch (SQLException e) {}
+    		throw e;
+    	} finally {
+			try {if (preparedStatement != null) preparedStatement.close();} catch (SQLException e) {}
 	    }
-    	return false;
     }
 
+    /*
+     * Autre
+     */
+    
 	@Override
 	public boolean hasSubject(String identifier) {
 		Connection connection = null;
     	PreparedStatement preparedStatement = null;
     	String query = 	  "SELECT `name` " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersProfiles() + "` "
-						+ "WHERE `collection` = ? AND `uuid` = ? ;";
+						+ "WHERE `collection` = ? AND `identifier` = ? ;";
     	try {
     		connection = this.plugin.getDataBases().getConnection();
     		preparedStatement = connection.prepareStatement(query);
@@ -742,7 +860,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		
 		Connection connection = null;
     	PreparedStatement preparedStatement = null;
-    	String query = 	  "SELECT `uuid` " 
+    	String query = 	  "SELECT `identifier` " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersProfiles() + "` "
 						+ "WHERE `collection` = ? ;";
     	try {
@@ -772,7 +890,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		
 		Connection connection = null;
     	PreparedStatement preparedStatement = null;
-    	String query = 	  "SELECT `uuid`, `boolean` " 
+    	String query = 	  "SELECT `identifier`, `boolean` " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
 						+ "WHERE `collection` = ? AND `world` = ? AND `permission` = ? ;";
     	try {

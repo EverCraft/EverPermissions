@@ -25,6 +25,7 @@ import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.EPermissionDescription;
+import fr.evercraft.everpermissions.service.permission.collection.ECommandBlockCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EGroupCollection;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 import fr.evercraft.everpermissions.service.permission.collection.ETransientCollection;
@@ -90,7 +91,7 @@ public class EPermissionService implements PermissionService {
 		this.groupCollection = new EGroupCollection(this.plugin);
 		this.userCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_USER);
 		this.systemCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_SYSTEM);
-		this.commandBlockCollection = new EUserCollection(this.plugin, PermissionService.SUBJECTS_COMMAND_BLOCK);
+		this.commandBlockCollection = new ECommandBlockCollection(this.plugin, PermissionService.SUBJECTS_COMMAND_BLOCK);
 		
 		this.subjectCollections = new ConcurrentHashMap<String, ESubjectCollection<?>>();
 		this.subjectCollections.put(PermissionService.SUBJECTS_USER.toLowerCase(), this.userCollection);
@@ -286,6 +287,12 @@ public class EPermissionService implements PermissionService {
 		
 		for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
 			collection.registerWorld(nameWorld);
+		}
+	}
+
+	public void clearCache() {
+		for (ESubjectCollection<?> collection : this.subjectCollections.values()) {
+			collection.clearCache();
 		}
 	}
 }

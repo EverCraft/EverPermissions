@@ -41,6 +41,10 @@ public interface ICollectionStorage {
     
     public boolean load(Collection<ESubject> subjects);
     
+    public boolean clear(ESubjectData subject);
+    
+    public boolean clear(ESubjectData subject, String typeWorld);
+    
     public boolean setFriendlyIdentifier(ESubject subject, @Nullable String name);
     
     public boolean setDefault(EGroupSubject subject, String typeWorld, boolean value);

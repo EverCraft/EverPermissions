@@ -85,6 +85,22 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 		}
 		return true;
 	}
+	
+	@Override
+	public boolean clear(ESubjectData subject) {
+		for (EConfigSubjectStorage storage : this.storages.values()) {
+			if (!storage.clear(subject)) return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean clear(ESubjectData subject, String typeWorld) {
+		EConfigSubjectStorage storage = this.storages.get(typeWorld);
+		if (storage == null) return false;
+		
+		return storage.clear(subject);
+	}
 
 	@Override
 	public boolean setFriendlyIdentifier(ESubject subject, String name) {
