@@ -55,7 +55,7 @@ public class EPGroupRename extends ESubCommand<EverPermissions> {
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_REMOVE_GROUP_DESCRIPTION.getText();
+		return EPMessages.GROUP_REMOVE_DESCRIPTION.getText();
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
@@ -114,7 +114,7 @@ public class EPGroupRename extends ESubCommand<EverPermissions> {
 		
 		Optional<String> oldName = group.get().getFriendlyIdentifier();
 		if (oldName.isPresent() && oldName.get().equals(newGroupName)) {
-			EPMessages.GROUP_RENAME_GROUP_EQUALS.sender()
+			EPMessages.GROUP_RENAME_EQUALS.sender()
 			.replace("{group}", group.get().getFriendlyIdentifier().orElse(oldGroupName))
 			.sendTo(player);
 		}
@@ -129,7 +129,7 @@ public class EPGroupRename extends ESubCommand<EverPermissions> {
 						.sendTo(player);
 					return false;
 				}
-				EPMessages.GROUP_RENAME_GROUP_STAFF.sender()
+				EPMessages.GROUP_RENAME_STAFF.sender()
 					.replace("{oldName}", oldName.orElse(oldGroupName))
 					.replace("{newName}", newGroupName)
 					.sendTo(player);

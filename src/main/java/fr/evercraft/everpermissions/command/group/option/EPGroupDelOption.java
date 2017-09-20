@@ -43,11 +43,11 @@ public class EPGroupDelOption extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_DEL_OPTION.get());
+		return source.hasPermission(EPPermissions.GROUP_OPTION_REMOVE.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_DEL_OPTION_DESCRIPTION.getText();
+		return EPMessages.GROUP_OPTION_REMOVE_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
@@ -111,7 +111,7 @@ public class EPGroupDelOption extends ECommand<EverPermissions> {
 		}
 		
 		if (group.get().getSubjectData().getOptions(type_group.get()).get(option) == null) {
-			EPMessages.GROUP_DEL_OPTION_ERROR.sender()
+			EPMessages.GROUP_OPTION_REMOVE_ERROR.sender()
 				.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("{option}", option)
 				.replace("{type}", type_group.get())
@@ -130,7 +130,7 @@ public class EPGroupDelOption extends ECommand<EverPermissions> {
 					return false;
 				}
 				
-				EPMessages.GROUP_DEL_OPTION_STAFF.sender()
+				EPMessages.GROUP_OPTION_REMOVE_STAFF.sender()
 				.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("{option}", option)
 				.replace("{type}", type_group.get())

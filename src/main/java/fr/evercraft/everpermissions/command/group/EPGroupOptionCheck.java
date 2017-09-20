@@ -16,16 +16,15 @@
  */
 package fr.evercraft.everpermissions.command.group;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -36,31 +35,42 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
-public class EPGroupList extends ESubCommand<EverPermissions> {
+public class EPGroupOptionCheck extends ESubCommand<EverPermissions> {
 	
 	private final Args.Builder pattern;
-	private final EPGroup parent;
 	
-	public EPGroupList(final EverPermissions plugin, final EPGroup parent) {
-        super(plugin, parent, "list");
+	public EPGroupOptionCheck(final EverPermissions plugin, final EPGroupOption parent) {
+        super(plugin, parent, "check");
         
-        this.parent = parent;
         this.pattern = Args.builder()
         		.value(EPCommand.MARKER_WORLD, 
     					(source, args) -> this.plugin.getService().getGroupSubjects().getTypeWorlds(),
-    					(source, args) -> args.getArgs().size() <= 1);
+    					(source, args) -> args.getArgs().size() <= 1)
+    			.arg((source, args) -> {
+    				String world = args.getValue(EPCommand.MARKER_WORLD).orElse(null);
+    				if (world == null) {
+						if (source instanceof Locatable) {
+							world = ((Locatable) source).getWorld().getName();
+						} else {
+							world = this.plugin.getGame().getServer().getDefaultWorldName();
+						}
+    				}
+    				return this.getAllGroups(world);
+    			})
+    			.arg((source, args) -> this.getAllOptions());
     }
 	
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_LIST.get());
+		return source.hasPermission(EPPermissions.GROUP_OPTION_REMOVE.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_LIST_DESCRIPTION.getText();
+		return EPMessages.GROUP_OPTION_REMOVE_DESCRIPTION.getText();
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
@@ -68,7 +78,9 @@ public class EPGroupList extends ESubCommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/" + this.getName() + " [" + EPCommand.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]")
+		return Text.builder("/" + this.getName() + " [" + EPCommand.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
+												 + " <" + EAMessages.ARGS_GROUP.getString() + ">"
+												 + " <" + EAMessages.ARGS_OPTION.getString() + ">")
 					.onClick(TextActions.suggestCommand("/" + this.getName() + " "))
 					.color(TextColors.RED)
 					.build();
@@ -76,28 +88,29 @@ public class EPGroupList extends ESubCommand<EverPermissions> {
 	
 	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> argsList) {
 		Args args = this.pattern.build(argsList);
+		List<String> argsString = args.getArgs();
 		
-		if (!args.getArgs().isEmpty()) {
+		if (argsString.size() != 2) {
 			source.sendMessage(this.help(source));
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Optional<String> world = args.getValue(EPCommand.MARKER_WORLD);
-		if (world.isPresent()) {
-			return this.command(source, world.get());
-		} else {
+		String world = args.getValue(EPCommand.MARKER_WORLD).orElse(null);
+		if (world == null) {
 			if (source instanceof Locatable) {
-				return this.command(source, ((Locatable) source).getWorld().getName());
+				world = ((Locatable) source).getWorld().getName();
 			} else {
-				return this.command(source, this.plugin.getGame().getServer().getDefaultWorldName());
+				world = this.plugin.getGame().getServer().getDefaultWorldName();
 			}
 		}
+		
+		return this.command(source, argsString.get(0), argsString.get(1), world);
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String worldName) {
-		Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String option, final String worldName) {
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
 		// Monde introuvable
-		if (!typeGroup.isPresent()) {
+		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
 				.replace("{world}", worldName)
@@ -105,38 +118,34 @@ public class EPGroupList extends ESubCommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		List<Text> list = new ArrayList<Text>();
-		Set<EGroupSubject> groups = this.plugin.getService().getGroupSubjects().getGroups(typeGroup.get());
-		
-		// Aucun groupe
-		if (groups.isEmpty()) {
-			list.add(EPMessages.GROUP_LIST_EMPTY.getText());
-		// Les groupes
-		} else {
-			// Le groupe par défaut
-			this.plugin.getService().getGroupSubjects().getDefaultGroup(typeGroup.get()).ifPresent(subject -> {
-				list.add(EPMessages.GROUP_LIST_DEFAULT.getFormat()
-						.toText("{group}", this.parent.getButtonInfo(subject.getName(), worldName)));
-			});
-			
-			// La liste des groupes
-			list.add(EPMessages.GROUP_LIST_NAME.getText());
-			
-			TreeMap<String, Text> groupsText = new TreeMap<String, Text>();
-			for (EGroupSubject group : groups) {
-				groupsText.put(group.getName(), EPMessages.GROUP_LIST_LINE.getFormat()
-						.toText("{group}", this.parent.getButtonInfo(group.getName(), worldName)));
-			}
-			list.addAll(groupsText.values());
+		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
+		// Groupe existant
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
+			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
+				.replace("{group}", groupName)
+				.replace("{type}", type_group.get())
+				.sendTo(player);
+			return CompletableFuture.completedFuture(false);
 		}
 		
-		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
-				EPMessages.GROUP_LIST_TITLE.getFormat()
-					.toText("{type}", typeGroup.get())
-					.toBuilder()
-					.onClick(TextActions.runCommand("/" + this.getName() + " " + EPCommand.MARKER_WORLD + " \"" + worldName + "\""))
-					.build(), 
-				list, player);
+		Set<Context> contexts = EContextCalculator.of(worldName);
+		String value = group.get().getSubjectData().getOptions(contexts).get(option);
+		// Si il y a une valeur
+		if (value != null) {
+			EPMessages.GROUP_OPTION_CHECK_DEFINED.sender()
+				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+				.replace("{option}", option)
+				.replace("{type}", type_group.get())
+				.replace("{value}", Text.of(value))
+				.sendTo(player);
+		// Il n'y a pas de valeur
+		} else {
+			EPMessages.GROUP_OPTION_CHECK_UNDEFINED.sender()
+				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+				.replace("{option}", option)
+				.replace("{type}", type_group.get())
+				.sendTo(player);
+		}
 		return CompletableFuture.completedFuture(true);
 	}
 }

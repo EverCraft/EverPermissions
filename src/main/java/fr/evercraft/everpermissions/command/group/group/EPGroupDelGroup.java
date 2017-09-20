@@ -47,7 +47,7 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_REMOVE_GROUP_DESCRIPTION.getText();
+		return EPMessages.GROUP_REMOVE_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
@@ -118,7 +118,7 @@ public class EPGroupDelGroup extends ECommand<EverPermissions> {
 					return false;
 				}
 				
-				EPMessages.GROUP_REMOVE_GROUP_STAFF.sender()
+				EPMessages.GROUP_REMOVE_STAFF.sender()
 					.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("{type}", type_group.get());
 				return true;

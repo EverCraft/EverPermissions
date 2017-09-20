@@ -64,26 +64,28 @@ public enum EPPermissions implements EnumPermission {
 	GROUP_DEFAULT("commands.group.default", EPMessages.PERMISSIONS_COMMANDS_GROUP_DEFAULT),
 	GROUP_LIST("commands.group.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_LIST),
 	GROUP_RENAME("commands.group.rename", EPMessages.PERMISSIONS_COMMANDS_GROUP_RENAME),
+	GROUP_INFO("commands.group.info", EPMessages.PERMISSIONS_COMMANDS_GROUP_INFO),
+	GROUP_VERBOSE("commands.group.verbose", EPMessages.PERMISSIONS_COMMANDS_GROUP_VERBOSE),
 	
 	// Groupe : Inheritance
 	GROUP_INHERITANCE_EXECUTE("commands.group.inheritance.execute", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_EXECUTE),
-	GROUP_INHERITANCE_INFO("commands.group.inheritance.info", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_INFO),
 	GROUP_INHERITANCE_ADD("commands.group.inheritance.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_ADD),
 	GROUP_INHERITANCE_REMOVE("commands.group.inheritance.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_REMOVE),
+	GROUP_INHERITANCE_INFO("commands.group.inheritance.info", EPMessages.PERMISSIONS_COMMANDS_GROUP_INHERITANCE_INFO),
 	
 	// Groupe : Permissions
-	GROUP_ADD_PERMISSION("commands.group.permission.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_ADD),
-	GROUP_DEL_PERMISSION("commands.group.permission.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_REMOVE),
-	
-	GROUP_CHECK_PERMISSION("commands.group.permission.check", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_CHECK),
-	GROUP_LIST_PERMISSION("commands.group.permission.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_LIST),
+	GROUP_PERMISSION_EXECUTE("commands.group.permission.execute", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_ADD),
+	GROUP_PERMISSION_ADD("commands.group.permission.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_ADD),
+	GROUP_PERMISSION_REMOVE("commands.group.permission.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_REMOVE),
+	GROUP_PERMISSION_CHECK("commands.group.permission.check", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_CHECK),
+	GROUP_PERMISSION_INFO("commands.group.permission.info", EPMessages.PERMISSIONS_COMMANDS_GROUP_PERMISSION_INFO),
 	
 	// Groupe : Options
-	GROUP_ADD_OPTION("commands.group.option.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_ADD),
-	GROUP_DEL_OPTION("commands.group.option.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_REMOVE),
-	
-	GROUP_CHECK_OPTION("commands.group.option.check", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_CHECK),
-	GROUP_LIST_OPTION("commands.group.option.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_LIST),
+	GROUP_OPTION_EXECUTE("commands.group.option.execute", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_EXECUTE),
+	GROUP_OPTION_ADD("commands.group.option.add", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_ADD),
+	GROUP_OPTION_REMOVE("commands.group.option.remove", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_REMOVE),
+	GROUP_OPTION_CHECK("commands.group.option.check", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_CHECK),
+	GROUP_OPTION_INFO("commands.group.option.info", EPMessages.PERMISSIONS_COMMANDS_GROUP_OPTION_INFO),
 	
 	// Other : Groupes
 	OTHER_ADD_GROUP("commands.other.group.add", EPMessages.PERMISSIONS_COMMANDS_OTHER_GROUP_ADD),

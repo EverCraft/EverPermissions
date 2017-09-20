@@ -58,7 +58,7 @@ public class EPGroupCreate extends ESubCommand<EverPermissions> {
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_ADD_GROUP_DESCRIPTION.getText();
+		return EPMessages.GROUP_ADD_DESCRIPTION.getText();
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
@@ -108,7 +108,7 @@ public class EPGroupCreate extends ESubCommand<EverPermissions> {
 		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
 		// Groupe existant
 		if (group.isPresent() && group.get().hasTypeWorld(typeGroup.get())) {
-			EPMessages.GROUP_ADD_GROUP_ERROR.sender()
+			EPMessages.GROUP_ADD_ERROR.sender()
 				.replace("{group}", groupName)
 				.replace("{type}", typeGroup.get())
 				.sendTo(player);
@@ -125,7 +125,7 @@ public class EPGroupCreate extends ESubCommand<EverPermissions> {
 					return false;
 				}
 				
-				EPMessages.GROUP_ADD_GROUP_STAFF.sender()
+				EPMessages.GROUP_ADD_STAFF.sender()
 					.replace("{group}", groupName)
 					.replace("{type}", typeGroup.get())
 					.sendTo(player);

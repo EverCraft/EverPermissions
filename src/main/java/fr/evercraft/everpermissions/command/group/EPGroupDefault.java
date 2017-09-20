@@ -69,7 +69,7 @@ public class EPGroupDefault extends ESubCommand<EverPermissions> {
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_DEFAULT_GROUP_DESCRIPTION.getText();
+		return EPMessages.GROUP_DEFAULT_DESCRIPTION.getText();
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
@@ -131,7 +131,7 @@ public class EPGroupDefault extends ESubCommand<EverPermissions> {
 		Optional<Boolean> value = UtilsBoolean.parseBoolean(valueName);
 		// La value n'est pas un boolean
 		if (!value.isPresent()) {
-			EPMessages.GROUP_DEFAULT_GROUP_ERROR_BOOLEAN.sendTo(player);
+			EPMessages.GROUP_DEFAULT_ERROR_BOOLEAN.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
@@ -139,7 +139,7 @@ public class EPGroupDefault extends ESubCommand<EverPermissions> {
 		if (oldDefault.isPresent()) {
 			// C'est déjà le groupe par défaut
 			if (value.get() && oldDefault.get().equals(group.get())) {
-				EPMessages.GROUP_DEFAULT_GROUP_ERROR_EQUALS.sender()
+				EPMessages.GROUP_DEFAULT_ERROR_EQUALS.sender()
 					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
 					.replace("{type}", typeGroup.get())
 					.sendTo(player);
@@ -147,14 +147,14 @@ public class EPGroupDefault extends ESubCommand<EverPermissions> {
 			
 			// Le groupe n'a pas un groupe par défaut
 			} else if (!value.get() && !oldDefault.get().equals(group.get())) {
-				EPMessages.GROUP_DEFAULT_GROUP_ERROR_FALSE.sender()
+				EPMessages.GROUP_DEFAULT_ERROR_FALSE.sender()
 					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
 					.replace("{type}", typeGroup.get())
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
 			
 			} else if (value.get()) {
-				EPMessages.GROUP_DEFAULT_GROUP_ERROR_TRUE.sender()
+				EPMessages.GROUP_DEFAULT_ERROR_TRUE.sender()
 					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
 					.replace("{type}", typeGroup.get())
 					.sendTo(player);
@@ -163,7 +163,7 @@ public class EPGroupDefault extends ESubCommand<EverPermissions> {
 			
 		// Il n'y a pas de groupe par défaut
 		} else if (!value.get()) {
-			EPMessages.GROUP_DEFAULT_GROUP_ERROR_FALSE.sender()
+			EPMessages.GROUP_DEFAULT_ERROR_FALSE.sender()
 				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
 				.replace("{type}", typeGroup.get())
 				.sendTo(player);
@@ -181,12 +181,12 @@ public class EPGroupDefault extends ESubCommand<EverPermissions> {
 				}
 				
 				if (value.get()) {
-					EPMessages.GROUP_DEFAULT_GROUP_TRUE.sender()
+					EPMessages.GROUP_DEFAULT_TRUE.sender()
 						.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
 						.replace("{type}", typeGroup.get())
 						.sendTo(player);
 				} else {
-					EPMessages.GROUP_DEFAULT_GROUP_FALSE.sender()
+					EPMessages.GROUP_DEFAULT_FALSE.sender()
 						.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
 						.replace("{type}", typeGroup.get())
 						.sendTo(player);

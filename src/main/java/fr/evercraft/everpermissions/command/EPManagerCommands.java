@@ -21,14 +21,8 @@ import java.util.TreeMap;
 import fr.evercraft.everapi.plugin.command.ECommand;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.command.disable.EPDeop;
-import fr.evercraft.everpermissions.command.disable.EPOp;
-import fr.evercraft.everpermissions.command.group.EPGroup;
-import fr.evercraft.everpermissions.command.group.EPGroupCreate;
-import fr.evercraft.everpermissions.command.group.EPGroupDefault;
-import fr.evercraft.everpermissions.command.group.EPGroupList;
-import fr.evercraft.everpermissions.command.group.EPGroupRemove;
-import fr.evercraft.everpermissions.command.group.EPGroupRename;
+import fr.evercraft.everpermissions.command.disable.*;
+import fr.evercraft.everpermissions.command.group.*;
 import fr.evercraft.everpermissions.command.group.group.*;
 import fr.evercraft.everpermissions.command.group.inheritance.*;
 import fr.evercraft.everpermissions.command.group.option.*;
@@ -60,12 +54,29 @@ public class EPManagerCommands extends TreeMap<String, ECommand<EverPermissions>
 		
 		// Group :
 		EPGroup manager_group = new EPGroup(this.plugin, manager_command);
+		manager_command.add(manager_group);
+		
 		manager_group.add(new EPGroupCreate(this.plugin, manager_group));
 		manager_group.add(new EPGroupRemove(this.plugin, manager_group));
 		manager_group.add(new EPGroupDefault(this.plugin, manager_group));
 		manager_group.add(new EPGroupList(this.plugin, manager_group));
 		manager_group.add(new EPGroupRename(this.plugin, manager_group));
-		manager_command.add(manager_group);
+		manager_group.add(new EPGroupInfo(this.plugin, manager_group));
+		manager_group.add(new EPGroupVerbose(this.plugin, manager_group));
+		
+		EPGroupPermission manager_group_permission = new EPGroupPermission(this.plugin, manager_group);
+		manager_group.add(manager_group_permission);
+		
+		manager_group_permission.add(new EPGroupPermissionAdd(this.plugin, manager_group_permission));
+		manager_group_permission.add(new EPGroupPermissionRemove(this.plugin, manager_group_permission));
+		manager_group_permission.add(new EPGroupPermissionCheck(this.plugin, manager_group_permission));
+		
+		EPGroupOption manager_group_option = new EPGroupOption(this.plugin, manager_group);
+		manager_group.add(manager_group_option);
+		
+		manager_group_option.add(new EPGroupOptionAdd(this.plugin, manager_group_option));
+		manager_group_option.add(new EPGroupOptionRemove(this.plugin, manager_group_option));
+		manager_group_option.add(new EPGroupOptionCheck(this.plugin, manager_group_option));
 		
 		// Commands : Disable
 		register(new EPDeop(this.plugin));

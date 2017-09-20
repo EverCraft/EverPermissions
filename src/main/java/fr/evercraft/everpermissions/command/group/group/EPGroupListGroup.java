@@ -48,7 +48,7 @@ public class EPGroupListGroup extends ECommand<EverPermissions> {
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_LIST_GROUP_DESCRIPTION.getText();
+		return EPMessages.GROUP_LIST_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
@@ -101,26 +101,26 @@ public class EPGroupListGroup extends ECommand<EverPermissions> {
 		
 		// Aucun groupe
 		if (groups.isEmpty()) {
-			list.add(EPMessages.GROUP_LIST_GROUP_EMPTY.getText());
+			list.add(EPMessages.GROUP_LIST_EMPTY.getText());
 		// Les groupes
 		} else {
 			// Le groupe par défaut
 			Optional<EGroupSubject> subject = this.plugin.getService().getGroupSubjects().getDefaultGroup(type_group.get());
 			if (subject.isPresent()) {
-				list.add(EPMessages.GROUP_LIST_GROUP_DEFAULT.getFormat()
+				list.add(EPMessages.GROUP_LIST_DEFAULT.getFormat()
 						.toText("{group}", subject.get().getFriendlyIdentifier().orElse(subject.get().getIdentifier())));
 			}
 			
 			// La liste des groupes
-			list.add(EPMessages.GROUP_LIST_GROUP_NAME.getText());
+			list.add(EPMessages.GROUP_LIST_NAME.getText());
 			for (EGroupSubject group : groups) {
-				list.add(EPMessages.GROUP_LIST_GROUP_LINE.getFormat()
+				list.add(EPMessages.GROUP_LIST_LINE.getFormat()
 						.toText("{group}", group.getFriendlyIdentifier().orElse(group.getIdentifier())));
 			}
 		}
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
-				EPMessages.GROUP_LIST_GROUP_TITLE.getFormat()
+				EPMessages.GROUP_LIST_TITLE.getFormat()
 					.toText("{type}", type_group.get()), 
 				list, player);
 		return CompletableFuture.completedFuture(true);

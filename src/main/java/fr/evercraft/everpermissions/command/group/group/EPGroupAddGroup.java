@@ -47,7 +47,7 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_ADD_GROUP_DESCRIPTION.getText();
+		return EPMessages.GROUP_ADD_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
@@ -100,7 +100,7 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(group_name);
 		// Groupe existant
 		if (group.isPresent() && group.get().hasTypeWorld(type_group.get())) {
-			EPMessages.GROUP_ADD_GROUP_ERROR.sender()
+			EPMessages.GROUP_ADD_ERROR.sender()
 				.replace("{group}", group_name)
 				.replace("{type}", type_group.get())
 				.sendTo(player);
@@ -117,7 +117,7 @@ public class EPGroupAddGroup extends ECommand<EverPermissions> {
 					return false;
 				}
 				
-				EPMessages.GROUP_ADD_GROUP_STAFF.sender()
+				EPMessages.GROUP_ADD_STAFF.sender()
 					.replace("{group}", group_name)
 					.replace("{type}", type_group.get())
 					.sendTo(player);

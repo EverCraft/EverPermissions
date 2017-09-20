@@ -162,7 +162,9 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		final T subject = this.add(identifier);
 		this.identifierSubjects.put(subject.getIdentifier().toLowerCase(), subject);
 		subject.getFriendlyIdentifier().ifPresent(name -> this.nameSubjects.put(name.toLowerCase(), subject));
-		this.storage.load(subject);
+		if (!this.isTransient()) {
+			this.storage.load(subject);
+		}
 		return CompletableFuture.completedFuture(subject);
 	}
 	

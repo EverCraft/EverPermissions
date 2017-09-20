@@ -43,11 +43,11 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_CHECK_OPTION.get());
+		return source.hasPermission(EPPermissions.GROUP_OPTION_CHECK.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_CHECK_OPTION_DESCRIPTION.getText();
+		return EPMessages.GROUP_OPTION_CHECK_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
@@ -115,7 +115,7 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 		String name = group.get().getSubjectData().getOptions(type_group.get()).get(option);
 		// Si il y a une valeur
 		if (name == null) {
-			EPMessages.GROUP_CHECK_OPTION_DEFINED.sender()
+			EPMessages.GROUP_OPTION_CHECK_DEFINED.sender()
 				.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("{option}", option)
 				.replace("{type}", type_group.get())
@@ -123,7 +123,7 @@ public class EPGroupCheckOption extends ECommand<EverPermissions> {
 				.sendTo(player);
 		// Il n'y a pas de valeur
 		} else {
-			EPMessages.GROUP_CHECK_OPTION_UNDEFINED.sender()
+			EPMessages.GROUP_OPTION_CHECK_UNDEFINED.sender()
 				.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 				.replace("{option}", option)
 				.replace("{type}", type_group.get())

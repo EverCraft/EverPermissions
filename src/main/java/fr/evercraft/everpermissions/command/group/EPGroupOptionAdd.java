@@ -16,6 +16,7 @@
  */
 package fr.evercraft.everpermissions.command.group;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -37,12 +38,12 @@ import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
-public class EPGroupRemove extends ESubCommand<EverPermissions> {
+public class EPGroupOptionAdd extends ESubCommand<EverPermissions> {
 	
 	private final Args.Builder pattern;
 	
-	public EPGroupRemove(final EverPermissions plugin, final EPGroup command) {
-        super(plugin, command, "remove");
+	public EPGroupOptionAdd(final EverPermissions plugin, final EPGroupOption manager_group_option) {
+        super(plugin, manager_group_option, "add");
         
         this.pattern = Args.builder()
         		.value(EPCommand.MARKER_WORLD, 
@@ -58,15 +59,17 @@ public class EPGroupRemove extends ESubCommand<EverPermissions> {
 						}
     				}
     				return this.getAllGroups(world);
-    			});
+    			})
+    			.arg((source, args) -> this.getAllOptions())
+    			.arg((source, args) -> Arrays.asList("value..."));
     }
 	
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_REMOVE.get());
+		return source.hasPermission(EPPermissions.GROUP_OPTION_ADD.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_REMOVE_DESCRIPTION.getText();
+		return EPMessages.GROUP_OPTION_ADD_DESCRIPTION.getText();
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
@@ -75,7 +78,9 @@ public class EPGroupRemove extends ESubCommand<EverPermissions> {
 
 	public Text help(final CommandSource source) {
 		return Text.builder("/" + this.getName() + " [" + EPCommand.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
-												 + " <" + EAMessages.ARGS_GROUP.getString() + ">")
+												 + " <" + EAMessages.ARGS_GROUP.getString() + ">"
+												 + " <" + EAMessages.ARGS_OPTION.getString() + ">"
+												 + " <" + EAMessages.ARGS_VALUE.getString() + ">")
 					.onClick(TextActions.suggestCommand("/" + this.getName() + " "))
 					.color(TextColors.RED)
 					.build();
@@ -85,27 +90,27 @@ public class EPGroupRemove extends ESubCommand<EverPermissions> {
 		Args args = this.pattern.build(argsList);
 		List<String> argsString = args.getArgs();
 		
-		if (argsString.size() != 1) {
+		if (argsString.size() != 3) {
 			source.sendMessage(this.help(source));
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Optional<String> world = args.getValue(EPCommand.MARKER_WORLD);
-		if (world.isPresent()) {
-			return this.command(source, argsString.get(0), world.get());
-		} else {
+		String world = args.getValue(EPCommand.MARKER_WORLD).orElse(null);
+		if (world == null) {
 			if (source instanceof Locatable) {
-				return this.command(source, argsString.get(0), ((Locatable) source).getWorld().getName());
+				world = ((Locatable) source).getWorld().getName();
 			} else {
-				return this.command(source, argsString.get(0), this.plugin.getGame().getServer().getDefaultWorldName());
+				world = this.plugin.getGame().getServer().getDefaultWorldName();
 			}
 		}
+		
+		return this.command(source, argsString.get(0), argsString.get(1), argsString.get(2), world);
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String worldName) {
-		Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String option, final String value, final String worldName) {
+		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
 		// Monde introuvable
-		if (!typeGroup.isPresent()) {
+		if (!type_group.isPresent()) {
 			EAMessages.WORLD_NOT_FOUND.sender()
 				.prefix(EPMessages.PREFIX)
 				.replace("{world}", worldName)
@@ -114,30 +119,43 @@ public class EPGroupRemove extends ESubCommand<EverPermissions> {
 		}
 		
 		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
-		// Groupe introuvable
-		if (!group.isPresent() || !group.get().hasTypeWorld(typeGroup.get())) {
+		// Groupe existant
+		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
 			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-				.replace("{type}", typeGroup.get())
+				.replace("{group}", groupName)
+				.replace("{type}", type_group.get())
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		// Le groupe n'a pas été supprimé
-		return group.get().clear(typeGroup.get())
-			.exceptionally(e -> false)
-			.thenApply(result -> {
-				if (!result) {
-					EAMessages.COMMAND_ERROR.sender()
-						.prefix(EPMessages.PREFIX)
+		String oldValue = group.get().getSubjectData().getOptions(type_group.get()).get(option);
+		if (oldValue != null && oldValue.equals(value)) {
+			EPMessages.GROUP_OPTION_ADD_ERROR.sender()
+				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+				.replace("{option}", option)
+				.replace("{type}", type_group.get())
+				.replace("{value}", Text.of(value))
+				.sendTo(player);
+			return CompletableFuture.completedFuture(false);
+		}
+		
+		return group.get().getSubjectData().setOption(type_group.get(), option, value)
+				.exceptionally(e -> false)
+				.thenApply(result -> {
+					if (!result) {
+						EAMessages.COMMAND_ERROR.sender()
+							.prefix(EPMessages.PREFIX)
+							.sendTo(player);
+						return false;
+					}
+					
+					EPMessages.GROUP_OPTION_ADD_STAFF.sender()
+						.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+						.replace("{option}", option)
+						.replace("{type}", type_group.get())
+						.replace("{value}", Text.of(value))
 						.sendTo(player);
-					return false;
-				}
-				EPMessages.GROUP_REMOVE_STAFF.sender()
-					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-					.replace("{type}", typeGroup.get())
-					.sendTo(player);
-				return true;
-			});
+					return true;
+				});
 	}
 }

@@ -45,11 +45,11 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_ADD_PERMISSION.get());
+		return source.hasPermission(EPPermissions.GROUP_PERMISSION_ADD.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_ADD_PERMISSION_DESCRIPTION.getText();
+		return EPMessages.GROUP_PERMISSION_ADD_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
@@ -128,14 +128,14 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 		Boolean oldValue = group.get().getSubjectData().getPermissions(type_group.get()).get(permission);
 		if (oldValue != null) {
 			if (oldValue && value.get()) {
-				EPMessages.GROUP_ADD_PERMISSION_ERROR_TRUE.sender()
+				EPMessages.GROUP_PERMISSION_ADD_ERROR_TRUE.sender()
 					.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("{permission}", permission)
 					.replace("{type}", type_group.get())
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
 			} else if (!oldValue && !value.get()) {
-				EPMessages.GROUP_ADD_PERMISSION_ERROR_FALSE.sender()
+				EPMessages.GROUP_PERMISSION_ADD_ERROR_FALSE.sender()
 					.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("{permission}", permission)
 					.replace("{type}", type_group.get())
@@ -157,14 +157,14 @@ public class EPGroupAddPerm extends ECommand<EverPermissions> {
 				
 				// Permission : True
 				if (value.get()) {
-					EPMessages.GROUP_ADD_PERMISSION_TRUE.sender()
+					EPMessages.GROUP_PERMISSION_ADD_TRUE.sender()
 						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("{permission}", permission)
 						.replace("{type}", type_group.get())
 						.sendTo(player);
 				// Permission : False
 				} else {
-					EPMessages.GROUP_ADD_PERMISSION_FALSE.sender()
+					EPMessages.GROUP_PERMISSION_ADD_FALSE.sender()
 						.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 						.replace("{permission}", permission)
 						.replace("{type}", type_group.get())

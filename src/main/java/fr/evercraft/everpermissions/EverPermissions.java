@@ -88,6 +88,10 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 		return this.messages;
 	}
 	
+	public EPPermissions[] getPermissions() {
+		return EPPermissions.values();
+	}
+	
 	public EPDataBases getDataBases() {
 		return this.database;
 	}

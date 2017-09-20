@@ -46,7 +46,7 @@ public class EPGroupListOption extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_LIST_OPTION.get());
+		return source.hasPermission(EPPermissions.GROUP_OPTION_INFO.get());
 	}
 
 	public Text description(final CommandSource source) {

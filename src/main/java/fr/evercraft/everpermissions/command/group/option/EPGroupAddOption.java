@@ -43,11 +43,11 @@ public class EPGroupAddOption extends ECommand<EverPermissions> {
     }
 
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_ADD_OPTION.get());
+		return source.hasPermission(EPPermissions.GROUP_OPTION_ADD.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_ADD_OPTION_DESCRIPTION.getText();
+		return EPMessages.GROUP_OPTION_ADD_DESCRIPTION.getText();
 	}
 
 	public Text help(final CommandSource source) {
@@ -124,7 +124,7 @@ public class EPGroupAddOption extends ECommand<EverPermissions> {
 					return false;
 				}
 				
-				EPMessages.GROUP_ADD_OPTION_STAFF.sender()
+				EPMessages.GROUP_OPTION_ADD_STAFF.sender()
 					.replace("{group}", group.get().getFriendlyIdentifier().orElse(group_name))
 					.replace("{option}", option)
 					.replace("{type}", type_group.get())

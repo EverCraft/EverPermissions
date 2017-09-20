@@ -345,7 +345,7 @@ public abstract class ESubjectData implements SubjectData {
 			
 			if (!this.getSubject().getContainingCollection().getStorage().setOption(this, typeWorld, key, value, insert)) return false;
 			
-			this.setOptionExecute(typeWorld, key, oldValue);
+			this.setOptionExecute(typeWorld, key, value);
 			this.onUpdate();
 			return true;
 		}, this.plugin.getThreadAsync());
@@ -354,19 +354,22 @@ public abstract class ESubjectData implements SubjectData {
 	public void setOptionExecute(final String typeWorld, final String key, final String value) {
 		this.write_lock.lock();
 		try {
-			Map<String, String> origMap = this.options.get(typeWorld);
-			if (origMap == null) {						
-				this.options.put(typeWorld, ImmutableMap.of(key.toLowerCase(), value));
-			} else {
-				// Si on supprime l'option
-				Map<String, String> newMap = new HashMap<String, String>(origMap);
-				if (value == null) {
-					newMap.remove(key);
-				} else {
-					newMap.put(key, value);
-				}
-				this.options.put(typeWorld, ImmutableMap.copyOf(newMap));
+			Map<String, String> options = this.options.get(typeWorld);
+			if (options == null) {
+				options = new HashMap<String, String>();
 			}
+			
+			// Si on supprime l'option
+			if (value == null) {
+				options.remove(key);
+				
+				if (options.isEmpty()) {
+					this.options.remove(typeWorld);
+				}
+			} else {
+				options.put(key, value);
+			}
+			this.options.put(typeWorld, options);
 		} finally {
 			this.write_lock.unlock();
 		}
