@@ -284,14 +284,16 @@ public class EPMessage extends EMessage<EverPermissions> {
 		GROUP_INFO_OPTION_TRANSIENT_LINE(			"        &7&l●  &7{option} : &7'{value}&7'"),
 		
 		// Group : Inheritance
-		GROUP_ADD_INHERITANCE_DESCRIPTION(			"Ajoute une inhéritance à un groupe"),
-		GROUP_ADD_INHERITANCE_STAFF(				"&7Vous avez ajouté l'inhéritance &6{inheritance} &7au groupe &6{group} &7dans les mondes de type &6{type}&7."),
-		GROUP_ADD_INHERITANCE_ERROR_HAVE(			"&cLe groupe &6{group} &cpossède déjà l'inhéritance &6{inheritance} &cdans les mondes de type &6{type}&c."),
-		GROUP_ADD_INHERITANCE_ERROR_EQUALS(			"&cL'inhéritance &6{inheritance} &cne peut pas être ajouté au groupe &6{group}&c."),
+		GROUP_INHERITANCE_DESCRIPTION(				"Gestion des inhéritances d'un groupe"),
 		
-		GROUP_DEL_INHERITANCE_DESCRIPTION(			"Supprime une inhéritance d'un groupe"),
-		GROUP_DEL_INHERITANCE_STAFF(				"&7Vous avez supprimé l'inhéritance &6{inheritance} &7au groupe &6{group} &7dans les mondes de type &6{type}&7."),
-		GROUP_DEL_INHERITANCE_ERROR(				"&cLe groupe &6{group} &cne possède pas l'inhéritance &6{inheritance} &cdans les mondes de type &6{type}&c."),
+		GROUP_INHERITANCE_ADD_DESCRIPTION(			"Ajoute une inhéritance à un groupe"),
+		GROUP_INHERITANCE_ADD_STAFF(				"&7Vous avez ajouté l'inhéritance &6{inheritance} &7au groupe &6{group} &7dans les mondes de type &6{type}&7."),
+		GROUP_INHERITANCE_ADD_ERROR_HAVE(			"&cLe groupe &6{group} &cpossède déjà l'inhéritance &6{inheritance} &cdans les mondes de type &6{type}&c."),
+		GROUP_INHERITANCE_ADD_ERROR_EQUALS(			"&cL'inhéritance &6{inheritance} &cne peut pas être ajouté au groupe &6{group}&c."),
+		
+		GROUP_INHERITANCE_REMOVE_DESCRIPTION(		"Supprime une inhéritance d'un groupe"),
+		GROUP_INHERITANCE_REMOVE_STAFF(				"&7Vous avez supprimé l'inhéritance &6{inheritance} &7au groupe &6{group} &7dans les mondes de type &6{type}&7."),
+		GROUP_INHERITANCE_REMOVE_ERROR(				"&cLe groupe &6{group} &cne possède pas l'inhéritance &6{inheritance} &cdans les mondes de type &6{type}&c."),
 		
 		GROUP_LIST_INHERITANCE_DESCRIPTION(			"Affiche la liste des inhéritances d'un groupe"),
 		GROUP_LIST_INHERITANCE_TITLE(				"&aLes inhéritances du groupe &6{group} &a: &6{type}"),

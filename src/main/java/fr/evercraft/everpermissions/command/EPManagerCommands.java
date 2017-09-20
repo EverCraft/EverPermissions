@@ -23,10 +23,6 @@ import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.command.disable.*;
 import fr.evercraft.everpermissions.command.group.*;
-import fr.evercraft.everpermissions.command.group.group.*;
-import fr.evercraft.everpermissions.command.group.inheritance.*;
-import fr.evercraft.everpermissions.command.group.option.*;
-import fr.evercraft.everpermissions.command.group.permission.*;
 import fr.evercraft.everpermissions.command.other.option.*;
 import fr.evercraft.everpermissions.command.other.permission.*;
 import fr.evercraft.everpermissions.command.sub.EPReload;
@@ -78,6 +74,12 @@ public class EPManagerCommands extends TreeMap<String, ECommand<EverPermissions>
 		manager_group_option.add(new EPGroupOptionRemove(this.plugin, manager_group_option));
 		manager_group_option.add(new EPGroupOptionCheck(this.plugin, manager_group_option));
 		
+		EPGroupInheritance manager_group_inheritance = new EPGroupInheritance(this.plugin, manager_group);
+		manager_group.add(manager_group_inheritance);
+		
+		manager_group_inheritance.add(new EPGroupInheritanceAdd(this.plugin, manager_group_inheritance));
+		manager_group_inheritance.add(new EPGroupInheritanceRemove(this.plugin, manager_group_inheritance));
+		
 		// Commands : Disable
 		register(new EPDeop(this.plugin));
 		register(new EPOp(this.plugin));
@@ -113,33 +115,6 @@ public class EPManagerCommands extends TreeMap<String, ECommand<EverPermissions>
 		
 		register(new EPUserCheckOption(this.plugin));
 		register(new EPUserListOption(this.plugin));
-		
-		// Group : Group
-		register(new EPGroupAddGroup(this.plugin));
-		register(new EPGroupDelGroup(this.plugin));
-		
-		register(new EPGroupDefaultGroup(this.plugin));
-		register(new EPGroupListGroup(this.plugin));
-		
-		// Group : Inheritance
-		register(new EPGroupAddInheritance(this.plugin));
-		register(new EPGroupDelInheritance(this.plugin));
-		
-		register(new EPGroupListInheritance(this.plugin));
-		
-		// Group : Permission
-		register(new EPGroupAddPerm(this.plugin));
-		register(new EPGroupDelPerm(this.plugin));
-		
-		register(new EPGroupCheckPerm(this.plugin));
-		register(new EPGroupListPerm(this.plugin));
-		
-		// Group : Option
-		register(new EPGroupAddOption(this.plugin));
-		register(new EPGroupDelOption(this.plugin));
-		
-		register(new EPGroupCheckOption(this.plugin));
-		register(new EPGroupListOption(this.plugin));
 		
 		// Other : Permission
 		register(new EPOtherAddPerm(this.plugin));
