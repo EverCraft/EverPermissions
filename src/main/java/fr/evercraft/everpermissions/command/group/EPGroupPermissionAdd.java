@@ -28,13 +28,11 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.world.Locatable;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
-import fr.evercraft.everapi.java.UtilsBoolean;
+import fr.evercraft.everapi.exception.message.EMessageException;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
-import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -48,20 +46,10 @@ public class EPGroupPermissionAdd extends ESubCommand<EverPermissions> {
         super(plugin, parent, "add");
         
         this.pattern = Args.builder()
-        		.value(EPCommand.MARKER_WORLD, 
+        		.value(Args.MARKER_WORLD, 
     					(source, args) -> this.plugin.getService().getGroupSubjects().getTypeWorlds(),
     					(source, args) -> args.getArgs().size() <= 1)
-    			.arg((source, args) -> {
-    				String world = args.getValue(EPCommand.MARKER_WORLD).orElse(null);
-    				if (world == null) {
-						if (source instanceof Locatable) {
-							world = ((Locatable) source).getWorld().getName();
-						} else {
-							world = this.plugin.getGame().getServer().getDefaultWorldName();
-						}
-    				}
-    				return this.getAllGroups(world);
-    			})
+        		.arg((source, args) -> this.getAllGroups(args.getWorld().getName()))
     			.arg((source, args) -> this.getAllPermissions())
     			.arg((source, args) -> Arrays.asList("true", "false"));
     }
@@ -75,11 +63,11 @@ public class EPGroupPermissionAdd extends ESubCommand<EverPermissions> {
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
-		return this.pattern.suggest(source, args);
+		return this.pattern.suggest(this.plugin, source, args);
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/" + this.getName() + " [" + EPCommand.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
+		return Text.builder("/" + this.getName() + " [" + Args.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
 												 + " <" + EAMessages.ARGS_GROUP.getString() + ">"
 												 + " <" + EAMessages.ARGS_PERMISSION.getString() + ">"
 												 + " <true|false>")
@@ -88,8 +76,8 @@ public class EPGroupPermissionAdd extends ESubCommand<EverPermissions> {
 					.build();
 	}
 	
-	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> argsList) {
-		Args args = this.pattern.build(argsList);
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> argsList) throws EMessageException {
+		Args args = this.pattern.build(this.plugin, source, argsList);
 		List<String> argsString = args.getArgs();
 		
 		if (argsString.size() != 3) {
@@ -97,25 +85,7 @@ public class EPGroupPermissionAdd extends ESubCommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		String world = args.getValue(EPCommand.MARKER_WORLD).orElse(null);
-		if (world == null) {
-			if (source instanceof Locatable) {
-				world = ((Locatable) source).getWorld().getName();
-			} else {
-				world = this.plugin.getGame().getServer().getDefaultWorldName();
-			}
-		}
-		
-		Optional<Boolean> value = UtilsBoolean.parseBoolean(argsString.get(2));
-		// La value n'est pas un boolean
-		if (!value.isPresent()) {
-			EPMessages.ERROR_BOOLEAN.sender()
-				.replace("{boolean}", argsString.get(2))
-				.sendTo(source);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		return this.command(source, argsString.get(0), argsString.get(1), value.get(), world);
+		return this.command(source, argsString.get(0), argsString.get(1), args.getArg(2, Args.BOOLEAN).get(), args.getWorld().getName());
 	}
 
 	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String permission, final boolean value, final String worldName) {

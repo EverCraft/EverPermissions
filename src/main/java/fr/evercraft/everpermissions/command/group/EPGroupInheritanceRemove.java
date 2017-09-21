@@ -28,12 +28,11 @@ import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.world.Locatable;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
+import fr.evercraft.everapi.exception.message.EMessageException;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
-import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -47,35 +46,17 @@ public class EPGroupInheritanceRemove extends ESubCommand<EverPermissions> {
         super(plugin, parent, "remove");
         
         this.pattern = Args.builder()
-        		.value(EPCommand.MARKER_WORLD, 
+        		.value(Args.MARKER_WORLD, 
     					(source, args) -> this.plugin.getService().getGroupSubjects().getTypeWorlds(),
     					(source, args) -> args.getArgs().size() <= 1)
+        		.arg((source, args) -> this.getAllGroups(args.getWorld().getName()))
     			.arg((source, args) -> {
-    				String world = args.getValue(EPCommand.MARKER_WORLD).orElse(null);
-    				if (world == null) {
-						if (source instanceof Locatable) {
-							world = ((Locatable) source).getWorld().getName();
-						} else {
-							world = this.plugin.getGame().getServer().getDefaultWorldName();
-						}
-    				}
-    				return this.getAllGroups(world);
-    			})
-    			.arg((source, args) -> {
-    				String world = args.getValue(EPCommand.MARKER_WORLD).orElse(null);
-    				if (world == null) {
-						if (source instanceof Locatable) {
-							world = ((Locatable) source).getWorld().getName();
-						} else {
-							world = this.plugin.getGame().getServer().getDefaultWorldName();
-						}
-    				}
-    				
-    				Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(world);
-    				if (!typeGroup.isPresent()) return this.getAllGroups(world);
+					String worldName = args.getWorld().getName();
+					Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
+    				if (!typeGroup.isPresent()) return this.getAllGroups(worldName);
 
     				Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(args.getArg(0).orElse(""));
-    				if (!group.isPresent()) return this.getAllGroups(world);
+    				if (!group.isPresent()) return this.getAllGroups(worldName);
     				
     				return group.get().getSubjectData().getParents(typeGroup.get()).stream()
     						.map(subject -> subject.resolve().join().getFriendlyIdentifier().orElse(subject.getSubjectIdentifier()))
@@ -92,11 +73,11 @@ public class EPGroupInheritanceRemove extends ESubCommand<EverPermissions> {
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
-		return this.pattern.suggest(source, args);
+		return this.pattern.suggest(this.plugin, source, args);
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/" + this.getName() + " [" + EPCommand.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
+		return Text.builder("/" + this.getName() + " [" + Args.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
 												 + " <" + EAMessages.ARGS_GROUP.getString() + ">"
 												 + " <" + EAMessages.ARGS_INHERITANCE.getString() + ">")
 					.onClick(TextActions.suggestCommand("/" + this.getName() + " "))
@@ -104,8 +85,8 @@ public class EPGroupInheritanceRemove extends ESubCommand<EverPermissions> {
 					.build();
 	}
 	
-	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> argsList) {
-		Args args = this.pattern.build(argsList);
+	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> argsList) throws EMessageException {
+		Args args = this.pattern.build(this.plugin, source, argsList);
 		List<String> argsString = args.getArgs();
 		
 		if (argsString.size() != 2) {
@@ -113,16 +94,7 @@ public class EPGroupInheritanceRemove extends ESubCommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		String world = args.getValue(EPCommand.MARKER_WORLD).orElse(null);
-		if (world == null) {
-			if (source instanceof Locatable) {
-				world = ((Locatable) source).getWorld().getName();
-			} else {
-				world = this.plugin.getGame().getServer().getDefaultWorldName();
-			}
-		}
-		
-		return this.command(source, argsString.get(0), argsString.get(1), world);
+		return this.command(source, argsString.get(0), argsString.get(1), args.getWorld().getName());
 	}
 
 	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String inheritanceName, final String worldName) {

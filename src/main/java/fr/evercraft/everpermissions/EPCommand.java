@@ -23,8 +23,6 @@ import fr.evercraft.everpermissions.EPMessage.EPMessages;
 
 public class EPCommand extends EParentCommand<EverPermissions> {
 	
-	public static final String MARKER_WORLD = "-w";
-	
 	public EPCommand(final EverPermissions plugin) {
 		super(plugin, "perms", "everpermissions", "permissions", "perm");
     }

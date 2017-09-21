@@ -32,7 +32,6 @@ import org.spongepowered.api.world.Locatable;
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
-import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -59,11 +58,11 @@ public class EPGroupRename extends ESubCommand<EverPermissions> {
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
-		return this.pattern.suggest(source, args);
+		return this.pattern.suggest(this.plugin, source, args);
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/" + this.getName() + " [" + EPCommand.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
+		return Text.builder("/" + this.getName() + " [" + Args.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
 												 + " <" + EAMessages.ARGS_GROUP.getString() + ">")
 					.onClick(TextActions.suggestCommand("/" + this.getName() + " "))
 					.color(TextColors.RED)
@@ -71,7 +70,7 @@ public class EPGroupRename extends ESubCommand<EverPermissions> {
 	}
 	
 	public CompletableFuture<Boolean> execute(final CommandSource source, final List<String> argsList) {
-		Args args = this.pattern.build(argsList);
+		Args args = this.pattern.build(this.plugin, source, argsList);
 		List<String> argsString = args.getArgs();
 		
 		if (argsString.size() != 2) {
@@ -79,16 +78,7 @@ public class EPGroupRename extends ESubCommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Optional<String> world = args.getValue(EPCommand.MARKER_WORLD);
-		if (world.isPresent()) {
-			return this.command(source, argsString.get(0), argsString.get(1), world.get());
-		} else {
-			if (source instanceof Locatable) {
-				return this.command(source, argsString.get(0), argsString.get(1), ((Locatable) source).getWorld().getName());
-			} else {
-				return this.command(source, argsString.get(0), argsString.get(1), this.plugin.getGame().getServer().getDefaultWorldName());
-			}
-		}
+		return this.command(source, argsString.get(0), argsString.get(1), ((Locatable) source).getWorld().getName());
 	}
 
 	private CompletableFuture<Boolean> command(final CommandSource player, final String oldGroupName, final String newGroupName, final String worldName) {
