@@ -26,7 +26,9 @@ import fr.evercraft.everpermissions.command.group.*;
 import fr.evercraft.everpermissions.command.other.option.*;
 import fr.evercraft.everpermissions.command.other.permission.*;
 import fr.evercraft.everpermissions.command.sub.EPReload;
+import fr.evercraft.everpermissions.command.user.EPUser;
 import fr.evercraft.everpermissions.command.user.EPUserClear;
+import fr.evercraft.everpermissions.command.user.EPUserInfo;
 import fr.evercraft.everpermissions.command.user.group.*;
 import fr.evercraft.everpermissions.command.user.option.*;
 import fr.evercraft.everpermissions.command.user.permission.*;
@@ -79,6 +81,12 @@ public class EPManagerCommands extends TreeMap<String, ECommand<EverPermissions>
 		
 		manager_group_inheritance.add(new EPGroupInheritanceAdd(this.plugin, manager_group_inheritance));
 		manager_group_inheritance.add(new EPGroupInheritanceRemove(this.plugin, manager_group_inheritance));
+		
+		// User :
+		EPUser manager_user = new EPUser(this.plugin, manager_command);
+		manager_command.add(manager_user);
+		
+		manager_user.add(new EPUserInfo(this.plugin, manager_user));
 		
 		// Commands : Disable
 		register(new EPDeop(this.plugin));

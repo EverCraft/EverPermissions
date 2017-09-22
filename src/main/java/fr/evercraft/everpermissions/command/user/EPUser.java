@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with EverPermissions.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.evercraft.everpermissions.command.group;
+package fr.evercraft.everpermissions.command.user;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
@@ -29,41 +29,25 @@ import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
-public class EPGroup extends EParentSubCommand<EverPermissions> {
+public class EPUser extends EParentSubCommand<EverPermissions> {
 	
-	public EPGroup(final EverPermissions plugin, final EParentCommand<EverPermissions> command) {
-		super(plugin, command, "group");
+	public EPUser(final EverPermissions plugin, final EParentCommand<EverPermissions> command) {
+		super(plugin, command, "user");
     }
 	
 	@Override
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_EXECUTE.get());
+		return source.hasPermission(EPPermissions.USER_EXECUTE.get());
 	}
 
 	@Override
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_DESCRIPTION.getText();
+		return EPMessages.USER_DESCRIPTION.getText();
 	}
 
 	@Override
 	public boolean testPermissionHelp(final CommandSource source) {
 		return true;
-	}
-	
-	public Text getButtonRename(final String groupName, final String worldName) {
-		return EChat.of(groupName).toBuilder()
-				.onClick(TextActions.suggestCommand("/" + this.getName() + " rename " + Args.MARKER_WORLD + " " + worldName  + " " + groupName))
-				.onShiftClick(TextActions.insertText(groupName))
-				.onHover(TextActions.showText(EAMessages.HOVER_COPY.getText()))
-				.build();
-	}
-	
-	public Text getButtonDefault(final String groupName, final Text valueText, final Boolean value, final String worldName) {
-		return valueText.toBuilder()
-				.onClick(TextActions.suggestCommand("/" + this.getName() + " default " + Args.MARKER_WORLD + " " + worldName  + " " + groupName + " " + value))
-				.onShiftClick(TextActions.insertText(value.toString()))
-				.onHover(TextActions.showText(EAMessages.HOVER_COPY.getText()))
-				.build();
 	}
 	
 	public Text getButtonPermissionKey(final String groupName, final String permission, final Boolean value, final String worldName) {
@@ -100,7 +84,7 @@ public class EPGroup extends EParentSubCommand<EverPermissions> {
 	
 	public Text getButtonInfo(final String name, final String worldName) {
 		return EChat.of(name).toBuilder()
-				.onClick(TextActions.runCommand("/" + this.getName() + " info " + Args.MARKER_WORLD + " \"" + worldName  + "\" \"" + name + "\""))
+				.onClick(TextActions.runCommand("/" + this.getParentName() + " group info " + Args.MARKER_WORLD + " \"" + worldName  + "\" \"" + name + "\""))
 				.onShiftClick(TextActions.insertText(name))
 				.onHover(TextActions.showText(EAMessages.MORE_INFORMATION.getText()))
 				.build();

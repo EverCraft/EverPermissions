@@ -170,9 +170,9 @@ public class EPGroupInfo extends ESubCommand<EverPermissions> {
 	private void addInheritancesTransient(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
 		List<SubjectReference> groups = group.getTransientSubjectData().getParents(typeGroup);
 		if (!groups.isEmpty()) {
-			list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT.getText());
+			list.add(EPMessages.GROUP_INFO_INHERITANCE_TRANSIENT.getText());
 			for (SubjectReference inheritance : groups) {
-				list.add(EPMessages.GROUP_LIST_INHERITANCE_TRANSIENT_LINE.getFormat()
+				list.add(EPMessages.GROUP_INFO_INHERITANCE_TRANSIENT_LINE.getFormat()
 						.toText("{inheritance}", this.parent.getButtonInfo(inheritance.resolve().join().getFriendlyIdentifier().orElse(inheritance.getSubjectIdentifier()), worldName)));
 			}
 		}

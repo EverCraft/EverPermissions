@@ -30,6 +30,8 @@ public enum EPPermissions implements EnumPermission {
 	MIGRATE("commands.migrate", EPMessages.PERMISSIONS_COMMANDS_MIGRATE),
 	
 	// Joueur :
+	USER_EXECUTE("commands.user.execute", EPMessages.PERMISSIONS_COMMANDS_USER_EXECUTE),
+	USER_INFO("commands.user.info", EPMessages.PERMISSIONS_COMMANDS_USER_INFO),
 	USER_CLEAR("commands.user.clear", EPMessages.PERMISSIONS_COMMANDS_USER_CLEAR),
 	
 	// Joueur : Groupes

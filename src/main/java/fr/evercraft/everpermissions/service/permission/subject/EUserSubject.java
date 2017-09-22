@@ -93,6 +93,9 @@ public class EUserSubject extends ESubject {
     }
     
     public Optional<SubjectReference> getGroup(final Set<Context> contexts) {
+    	Optional<SubjectReference> group = this.transientData.getGroup(contexts);
+    	if (group.isPresent()) return group;
+    	
         return this.data.getGroup(contexts);
     }
     
