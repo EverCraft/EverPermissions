@@ -27,7 +27,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.world.Locatable;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.command.Args;
@@ -62,8 +61,7 @@ public class EPGroupRename extends ESubCommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/" + this.getName() + " [" + Args.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
-												 + " <" + EAMessages.ARGS_GROUP.getString() + ">")
+		return Text.builder("/" + this.getName() + " <" + EAMessages.ARGS_GROUP.getString() + ">")
 					.onClick(TextActions.suggestCommand("/" + this.getName() + " "))
 					.color(TextColors.RED)
 					.build();
@@ -78,39 +76,37 @@ public class EPGroupRename extends ESubCommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		return this.command(source, argsString.get(0), argsString.get(1), ((Locatable) source).getWorld().getName());
+		return this.command(source, argsString.get(0), argsString.get(1));
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String oldGroupName, final String newGroupName, final String worldName) {
-		Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!typeGroup.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(oldGroupName);
+	private CompletableFuture<Boolean> command(final CommandSource player, final String oldGroupName, final String newGroupName) {		
+		Optional<EGroupSubject> oldGroup = this.plugin.getService().getGroupSubjects().get(oldGroupName);
 		// Groupe introuvable
-		if (!group.isPresent() || !group.get().hasTypeWorld(typeGroup.get())) {
-			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", group.get().getFriendlyIdentifier().orElse(oldGroupName))
-				.replace("{type}", typeGroup.get())
+		if (!oldGroup.isPresent()) {
+			EAMessages.GROUP_NOT_FOUND.sender()
+				.replace("{group}", oldGroup.get().getFriendlyIdentifier().orElse(oldGroupName))
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Optional<String> oldName = group.get().getFriendlyIdentifier();
+		Optional<EGroupSubject> newGroup = this.plugin.getService().getGroupSubjects().get(newGroupName);
+		// Groupe introuvable
+		if (newGroup.isPresent()) {
+			EPMessages.GROUP_RENAME_ERROR.sender()
+				.replace("{group}", newGroup.get().getFriendlyIdentifier().orElse(newGroupName))
+				.sendTo(player);
+			return CompletableFuture.completedFuture(false);
+		}
+		
+		Optional<String> oldName = oldGroup.get().getFriendlyIdentifier();
 		if (oldName.isPresent() && oldName.get().equals(newGroupName)) {
 			EPMessages.GROUP_RENAME_EQUALS.sender()
-			.replace("{group}", group.get().getFriendlyIdentifier().orElse(oldGroupName))
+			.replace("{group}", oldGroup.get().getFriendlyIdentifier().orElse(oldGroupName))
 			.sendTo(player);
 		}
 		
 		// Le groupe n'a pas été supprimé
-		return group.get().setFriendlyIdentifier(newGroupName)
+		return oldGroup.get().setFriendlyIdentifier(newGroupName)
 			.exceptionally(e -> false)
 			.thenApply(result -> {
 				if (!result) {

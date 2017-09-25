@@ -30,11 +30,11 @@ import org.spongepowered.api.text.format.TextColors;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.exception.message.EMessageException;
-import fr.evercraft.everapi.java.UtilsBoolean;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -83,74 +83,49 @@ public class EPGroupDefault extends ESubCommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		return this.command(source, argsString.get(0), argsString.get(1), args.getWorld().getName());
+		return this.command(source, argsString.get(0), args.getArg(1, Args.BOOLEAN).orElse(false), args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String valueName, final String worldName) {
-		Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!typeGroup.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final boolean value, final String worldName) throws EMessageException {
+		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
+		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
 		
-		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
-		// Groupe introuvable
-		if (!group.isPresent() || !group.get().hasTypeWorld(typeGroup.get())) {
-			System.out.println("GROUP_NOT_FOUND_WORLD");
-			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", groupName)
-				.replace("{type}", typeGroup.get())
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Optional<Boolean> value = UtilsBoolean.parseBoolean(valueName);
-		// La value n'est pas un boolean
-		if (!value.isPresent()) {
-			EPMessages.GROUP_DEFAULT_ERROR_BOOLEAN.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Optional<EGroupSubject> oldDefault = this.plugin.getService().getGroupSubjects().getDefaultGroup(typeGroup.get());
+		Optional<EGroupSubject> oldDefault = this.plugin.getService().getGroupSubjects().getDefaultGroup(typeGroup);
 		if (oldDefault.isPresent()) {
 			// C'est déjà le groupe par défaut
-			if (value.get() && oldDefault.get().equals(group.get())) {
+			if (value && oldDefault.get().equals(group)) {
 				EPMessages.GROUP_DEFAULT_ERROR_EQUALS.sender()
-					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-					.replace("{type}", typeGroup.get())
+					.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
+					.replace("{type}", typeGroup)
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
 			
 			// Le groupe n'a pas un groupe par défaut
-			} else if (!value.get() && !oldDefault.get().equals(group.get())) {
+			} else if (!value && !oldDefault.get().equals(group)) {
 				EPMessages.GROUP_DEFAULT_ERROR_FALSE.sender()
-					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-					.replace("{type}", typeGroup.get())
+					.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
+					.replace("{type}", typeGroup)
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
 			
-			} else if (value.get()) {
+			} else if (value) {
 				EPMessages.GROUP_DEFAULT_ERROR_TRUE.sender()
-					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-					.replace("{type}", typeGroup.get())
+					.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
+					.replace("{type}", typeGroup)
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
 			}
 			
 		// Il n'y a pas de groupe par défaut
-		} else if (!value.get()) {
+		} else if (!value) {
 			EPMessages.GROUP_DEFAULT_ERROR_FALSE.sender()
-				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-				.replace("{type}", typeGroup.get())
+				.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
+				.replace("{type}", typeGroup)
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		return group.get().setDefault(typeGroup.get(), value.get())
+		return group.setDefault(typeGroup, value)
 			.exceptionally(e -> false)
 			.thenApply(result -> {
 				if (!result) {
@@ -160,15 +135,15 @@ public class EPGroupDefault extends ESubCommand<EverPermissions> {
 					return false;
 				}
 				
-				if (value.get()) {
+				if (value) {
 					EPMessages.GROUP_DEFAULT_TRUE.sender()
-						.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-						.replace("{type}", typeGroup.get())
+						.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
+						.replace("{type}", typeGroup)
 						.sendTo(player);
 				} else {
 					EPMessages.GROUP_DEFAULT_FALSE.sender()
-						.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-						.replace("{type}", typeGroup.get())
+						.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
+						.replace("{type}", typeGroup)
 						.sendTo(player);
 				}
 				return true;

@@ -19,7 +19,6 @@ package fr.evercraft.everpermissions.command.group;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
@@ -38,6 +37,7 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -89,42 +89,25 @@ public class EPGroupInfo extends ESubCommand<EverPermissions> {
 		return this.command(source, argsString.get(0), args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String worldName) {
-		Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!typeGroup.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
-		// Groupe introuvable
-		if (!group.isPresent() || !group.get().hasTypeWorld(typeGroup.get())) {
-			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-				.replace("{type}", typeGroup.get())
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String worldName) throws EMessageException {
+		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
+		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
 		
 		List<Text> list = new ArrayList<Text>();
-		this.addIdentifier(list, group.get());
-		this.addName(list, group.get(), worldName);
-		this.addDefault(list, group.get(), worldName, typeGroup.get());
-		this.addInheritances(list, group.get(), worldName, typeGroup.get());
-		this.addPermissions(list, group.get(), worldName, typeGroup.get());
-		this.addOptions(list, group.get(), worldName, typeGroup.get());
-		this.addInheritancesTransient(list, group.get(), worldName, typeGroup.get());
-		this.addPermissionsTransient(list, group.get(), worldName, typeGroup.get());
-		this.addOptionsTransient(list, group.get(), worldName, typeGroup.get());
+		this.addIdentifier(list, group);
+		this.addName(list, group, worldName);
+		this.addDefault(list, group, worldName, typeGroup);
+		this.addInheritances(list, group, worldName, typeGroup);
+		this.addPermissions(list, group, worldName, typeGroup);
+		this.addOptions(list, group, worldName, typeGroup);
+		this.addInheritancesTransient(list, group, worldName, typeGroup);
+		this.addPermissionsTransient(list, group, worldName, typeGroup);
+		this.addOptionsTransient(list, group, worldName, typeGroup);
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.GROUP_INFO_TITLE.getFormat().toText(
-					"{group}", group.get().getName(),
-					"{type}", typeGroup.get())
+					"{group}", group.getName(),
+					"{type}", typeGroup)
 				.toBuilder()
 				.onClick(TextActions.runCommand("/" + this.getName() + " " + Args.MARKER_WORLD + " \"" + worldName  + "\" \"" + groupName + "\""))
 				.build(), 
@@ -153,7 +136,7 @@ public class EPGroupInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des inheritances
-	private void addInheritances(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
+	public void addInheritances(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
 		List<SubjectReference> groups = group.getSubjectData().getParents(typeGroup);
 		if (groups.isEmpty()) {
 			list.add(EPMessages.GROUP_INFO_INHERITANCE_EMPTY.getText());
@@ -167,7 +150,7 @@ public class EPGroupInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des inheritances temporaires
-	private void addInheritancesTransient(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
+	public void addInheritancesTransient(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
 		List<SubjectReference> groups = group.getTransientSubjectData().getParents(typeGroup);
 		if (!groups.isEmpty()) {
 			list.add(EPMessages.GROUP_INFO_INHERITANCE_TRANSIENT.getText());
@@ -179,7 +162,7 @@ public class EPGroupInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des permissions
-	private void addPermissions(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
+	public void addPermissions(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
 		TreeMap<String, Boolean> permissions = new TreeMap<String, Boolean>(group.getSubjectData().getPermissions(typeGroup));
 		if (permissions.isEmpty()) {
 			list.add(EPMessages.GROUP_INFO_PERMISSION_EMPTY.getText());
@@ -200,7 +183,7 @@ public class EPGroupInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des permissions temporaires
-	private void addPermissionsTransient(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
+	public void addPermissionsTransient(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
 		TreeMap<String, Boolean> permissions = new TreeMap<String, Boolean>(group.getTransientSubjectData().getPermissions(typeGroup));
 		if (!permissions.isEmpty()) {
 			list.add(EPMessages.GROUP_INFO_PERMISSION_TRANSIENT.getText());
@@ -219,7 +202,7 @@ public class EPGroupInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des options
-	private void addOptions(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
+	public void addOptions(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
 		TreeMap<String, String> options = new TreeMap<String, String>(group.getSubjectData().getOptions(typeGroup));
 		if (options.isEmpty()) {
 			list.add(EPMessages.GROUP_INFO_OPTION_EMPTY.getText());
@@ -234,7 +217,7 @@ public class EPGroupInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des options temporaires
-	private void addOptionsTransient(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
+	public void addOptionsTransient(List<Text> list, EGroupSubject group, String worldName, String typeGroup) {
 		TreeMap<String, String> options = new TreeMap<String, String>(group.getTransientSubjectData().getOptions(typeGroup));
 		if (!options.isEmpty()) {
 			list.add(EPMessages.GROUP_INFO_OPTION_TRANSIENT.getText());

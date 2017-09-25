@@ -35,6 +35,7 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -94,37 +95,20 @@ public class EPGroupPermissionRemove extends ESubCommand<EverPermissions> {
 		return this.command(source, argsString.get(0), argsString.get(1), args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String permission, final String worldName) {
-		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!type_group.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String permission, final String worldName) throws EMessageException {
+		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
+		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
 		
-		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
-		// Groupe existant
-		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
-			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", groupName)
-				.replace("{type}", type_group.get())
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		if (group.get().getSubjectData().getPermissions(type_group.get()).get(permission) == null) {
+		if (group.getSubjectData().getPermissions(typeGroup).get(permission) == null) {
 			EPMessages.GROUP_PERMISSION_REMOVE_ERROR.sender()
-				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+				.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
 				.replace("{permission}", permission)
-				.replace("{type}", type_group.get())
+				.replace("{type}", typeGroup)
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		return group.get().getSubjectData().setPermission(type_group.get(), permission, Tristate.UNDEFINED)
+		return group.getSubjectData().setPermission(typeGroup, permission, Tristate.UNDEFINED)
 			.exceptionally(e -> false)
 			.thenApply(result -> {
 				if (!result) {
@@ -135,9 +119,9 @@ public class EPGroupPermissionRemove extends ESubCommand<EverPermissions> {
 				}
 				
 				EPMessages.GROUP_PERMISSION_REMOVE_STAFF.sender()
-					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+					.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
 					.replace("{permission}", permission)
-					.replace("{type}", type_group.get())
+					.replace("{type}", typeGroup)
 					.sendTo(player);
 				return true;
 			});

@@ -18,7 +18,6 @@ package fr.evercraft.everpermissions.command.group;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -36,6 +35,7 @@ import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.EContextCalculator;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -87,43 +87,26 @@ public class EPGroupOptionCheck extends ESubCommand<EverPermissions> {
 		return this.command(source, argsString.get(0), argsString.get(1), args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String option, final String worldName) {
-		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!type_group.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
-		// Groupe existant
-		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
-			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", groupName)
-				.replace("{type}", type_group.get())
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String option, final String worldName) throws EMessageException {
+		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
+		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
 		
 		Set<Context> contexts = EContextCalculator.of(worldName);
-		String value = group.get().getSubjectData().getOptions(contexts).get(option);
+		String value = group.getSubjectData().getOptions(contexts).get(option);
 		// Si il y a une valeur
 		if (value != null) {
 			EPMessages.GROUP_OPTION_CHECK_DEFINED.sender()
-				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+				.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
 				.replace("{option}", option)
-				.replace("{type}", type_group.get())
+				.replace("{type}", typeGroup)
 				.replace("{value}", Text.of(value))
 				.sendTo(player);
 		// Il n'y a pas de valeur
 		} else {
 			EPMessages.GROUP_OPTION_CHECK_UNDEFINED.sender()
-				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+				.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
 				.replace("{option}", option)
-				.replace("{type}", type_group.get())
+				.replace("{type}", typeGroup)
 				.sendTo(player);
 		}
 		return CompletableFuture.completedFuture(true);

@@ -16,9 +16,9 @@
  */
 package fr.evercraft.everpermissions.command.group;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
@@ -37,35 +37,28 @@ import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
-public class EPGroupOptionRemove extends ESubCommand<EverPermissions> {
+public class EPGroupInheritanceInfo extends ESubCommand<EverPermissions> {
 	
 	private final Args.Builder pattern;
+	private final EPGroupInheritance parent;
 	
-	public EPGroupOptionRemove(final EverPermissions plugin, final EPGroupOption parent) {
-        super(plugin, parent, "remove");
+	public EPGroupInheritanceInfo(final EverPermissions plugin, final EPGroupInheritance parent) {
+        super(plugin, parent, "info");
         
+        this.parent = parent;
         this.pattern = Args.builder()
         		.value(Args.MARKER_WORLD, 
     					(source, args) -> this.plugin.getService().getGroupSubjects().getTypeWorlds(),
     					(source, args) -> args.getArgs().size() <= 1)
-        		.arg((source, args) -> this.getAllGroups(args.getWorld().getName()))
-    			.arg((source, args) -> {
-    				Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(args.getWorld().getName());
-    				if (!typeGroup.isPresent()) return this.getAllOptions();
-
-    				Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(args.getArg(0).orElse(""));
-    				if (!group.isPresent()) return this.getAllOptions();
-    				
-    				return group.get().getSubjectData().getOptions(typeGroup.get()).keySet();
-    			});
+        		.arg((source, args) -> this.getAllGroups(args.getWorld().getName()));
     }
 	
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_OPTION_REMOVE.get());
+		return source.hasPermission(EPPermissions.GROUP_INHERITANCE_INFO.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_OPTION_REMOVE_DESCRIPTION.getText();
+		return EPMessages.GROUP_INHERITANCE_INFO_DESCRIPTION.getText();
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
@@ -74,8 +67,7 @@ public class EPGroupOptionRemove extends ESubCommand<EverPermissions> {
 
 	public Text help(final CommandSource source) {
 		return Text.builder("/" + this.getName() + " [" + Args.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
-												 + " <" + EAMessages.ARGS_GROUP.getString() + ">"
-												 + " <" + EAMessages.ARGS_OPTION.getString() + ">")
+												 + " <" + EAMessages.ARGS_GROUP.getString() + ">")
 					.onClick(TextActions.suggestCommand("/" + this.getName() + " "))
 					.color(TextColors.RED)
 					.build();
@@ -85,44 +77,30 @@ public class EPGroupOptionRemove extends ESubCommand<EverPermissions> {
 		Args args = this.pattern.build(this.plugin, source, argsList);
 		List<String> argsString = args.getArgs();
 		
-		if (argsString.size() != 2) {
+		if (argsString.size() != 1) {
 			source.sendMessage(this.help(source));
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		return this.command(source, argsString.get(0), argsString.get(1), args.getWorld().getName());
+		return this.command(source, argsString.get(0), args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String option, final String worldName) throws EMessageException {
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String worldName) throws EMessageException {
 		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
 		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
 		
-		if (group.getSubjectData().getOptions(typeGroup).get(option) == null) {
-			EPMessages.GROUP_OPTION_REMOVE_ERROR.sender()
-				.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
-				.replace("{option}", option)
-				.replace("{type}", typeGroup)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
+		List<Text> list = new ArrayList<Text>();
+		this.parent.getParent().getInfo().addInheritances(list, group, worldName, typeGroup);
+		this.parent.getParent().getInfo().addInheritancesTransient(list, group, worldName, typeGroup);
 		
-		// L'option n'a pas été supprimé
-		return group.getSubjectData().setOption(typeGroup, option, null)
-			.exceptionally(e -> false)
-			.thenApply(result -> {
-				if (!result) {
-					EAMessages.COMMAND_ERROR.sender()
-						.prefix(EPMessages.PREFIX)
-						.sendTo(player);
-					return false;
-				}
-				
-				EPMessages.GROUP_OPTION_REMOVE_STAFF.sender()
-				.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
-				.replace("{option}", option)
-				.replace("{type}", typeGroup)
-				.sendTo(player);
-				return true;
-			});
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
+				EPMessages.GROUP_INHERITANCE_INFO_TITLE.getFormat().toText(
+					"{group}", group.getName(),
+					"{type}", typeGroup)
+				.toBuilder()
+				.onClick(TextActions.runCommand("/" + this.getName() + " " + Args.MARKER_WORLD + " \"" + worldName  + "\" \"" + groupName + "\""))
+				.build(), 
+				list, player);
+		return CompletableFuture.completedFuture(true);
 	}
 }

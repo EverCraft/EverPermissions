@@ -19,7 +19,6 @@ package fr.evercraft.everpermissions.command.group;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 
-import fr.evercraft.everapi.plugin.command.EParentCommand;
 import fr.evercraft.everapi.plugin.command.EParentSubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -27,8 +26,17 @@ import fr.evercraft.everpermissions.EverPermissions;
 
 public class EPGroupPermission extends EParentSubCommand<EverPermissions> {
 	
-	public EPGroupPermission(final EverPermissions plugin, final EParentCommand<EverPermissions> command) {
-		super(plugin, command, "permission");
+	private final EPGroup parent;
+
+	public EPGroupPermission(final EverPermissions plugin, final EPGroup parent) {
+		super(plugin, parent, "permission");
+		
+		this.parent = parent;
+		
+		new EPGroupPermissionAdd(this.plugin, this);
+		new EPGroupPermissionRemove(this.plugin, this);
+		new EPGroupPermissionCheck(this.plugin, this);
+		new EPGroupPermissionInfo(this.plugin, this);
     }
 	
 	@Override
@@ -44,5 +52,9 @@ public class EPGroupPermission extends EParentSubCommand<EverPermissions> {
 	@Override
 	public boolean testPermissionHelp(final CommandSource source) {
 		return true;
+	}
+
+	public EPGroup getParent() {
+		return this.parent;
 	}
 }

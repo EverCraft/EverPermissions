@@ -18,7 +18,6 @@ package fr.evercraft.everpermissions.command.group;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -35,6 +34,7 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -90,55 +90,29 @@ public class EPGroupInheritanceAdd extends ESubCommand<EverPermissions> {
 		return this.command(source, argsString.get(0), argsString.get(1), args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String inheritanceName, final String worldName) {
-		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!type_group.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
-		// Groupe existant
-		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
-			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", groupName)
-				.replace("{type}", type_group.get())
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Optional<EGroupSubject> inheritance = this.plugin.getService().getGroupSubjects().get(inheritanceName);
-		// Groupe existant
-		if (!inheritance.isPresent() || !inheritance.get().hasTypeWorld(type_group.get())) {
-			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", inheritanceName)
-				.replace("{type}", type_group.get())
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		SubjectReference inheritanceReference = inheritance.get().asSubjectReference();
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String inheritanceName, final String worldName) throws EMessageException {
+		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
+		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
+		EGroupSubject inheritance = EPCommand.getGroup(player, this.plugin.getService(), inheritanceName, typeGroup);
+		SubjectReference inheritanceReference = inheritance.asSubjectReference();
 		
 		// Le groupe et l'inheritance sont égale
-		if (group.get().equals(inheritance.get())) {
+		if (group.equals(inheritance)) {
 			EPMessages.GROUP_INHERITANCE_ADD_ERROR_EQUALS.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		if (group.get().getParents(type_group.get()).contains(inheritanceReference)) {
+		if (group.getParents(typeGroup).contains(inheritanceReference)) {
 			EPMessages.GROUP_INHERITANCE_ADD_ERROR_HAVE.sender()
-				.replace("{inheritance}", inheritance.get().getFriendlyIdentifier().orElse(inheritanceName))
-				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-				.replace("{type}", type_group.get())
+				.replace("{inheritance}", inheritance.getFriendlyIdentifier().orElse(inheritanceName))
+				.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
+				.replace("{type}", typeGroup)
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
 		// L'inheritance n'a pas été ajouté
-		return group.get().getSubjectData().addParent(type_group.get(), inheritanceReference)
+		return group.getSubjectData().addParent(typeGroup, inheritanceReference)
 			.exceptionally(e -> false)
 			.thenApply(result -> {
 				if (!result) {
@@ -149,9 +123,9 @@ public class EPGroupInheritanceAdd extends ESubCommand<EverPermissions> {
 				}
 				
 				EPMessages.GROUP_INHERITANCE_ADD_STAFF.sender()
-					.replace("{inheritance}", inheritance.get().getFriendlyIdentifier().orElse(inheritanceName))
-					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-					.replace("{type}", type_group.get())
+					.replace("{inheritance}", inheritance.getFriendlyIdentifier().orElse(inheritanceName))
+					.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
+					.replace("{type}", typeGroup)
 					.sendTo(player);
 				return true;
 			});

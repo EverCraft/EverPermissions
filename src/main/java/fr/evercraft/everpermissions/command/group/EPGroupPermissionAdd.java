@@ -19,7 +19,6 @@ package fr.evercraft.everpermissions.command.group;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
@@ -35,6 +34,7 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -88,48 +88,31 @@ public class EPGroupPermissionAdd extends ESubCommand<EverPermissions> {
 		return this.command(source, argsString.get(0), argsString.get(1), args.getArg(2, Args.BOOLEAN).get(), args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String permission, final boolean value, final String worldName) {
-		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!type_group.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String permission, final boolean value, final String worldName) throws EMessageException {
+		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
+		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
 		
-		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
-		// Groupe existant
-		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
-			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", groupName)
-				.replace("{type}", type_group.get())
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Boolean oldValue = group.get().getSubjectData().getPermissions(type_group.get()).get(permission);
+		Boolean oldValue = group.getSubjectData().getPermissions(typeGroup).get(permission);
 		if (oldValue != null) {
 			if (oldValue && value) {
 				EPMessages.GROUP_PERMISSION_ADD_ERROR_TRUE.sender()
-					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+					.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
 					.replace("{permission}", permission)
-					.replace("{type}", type_group.get())
+					.replace("{type}", typeGroup)
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
 			} else if (!oldValue && !value) {
 				EPMessages.GROUP_PERMISSION_ADD_ERROR_FALSE.sender()
-					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+					.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
 					.replace("{permission}", permission)
-					.replace("{type}", type_group.get())
+					.replace("{type}", typeGroup)
 					.sendTo(player);
 				return CompletableFuture.completedFuture(false);
 			}
 		}
 		
 		// La permission n'a pas été ajouté
-		return group.get().getSubjectData().setPermission(type_group.get(), permission, Tristate.fromBoolean(value))
+		return group.getSubjectData().setPermission(typeGroup, permission, Tristate.fromBoolean(value))
 			.exceptionally(e -> false)
 			.thenApply(result -> {
 				if (!result) {
@@ -142,16 +125,16 @@ public class EPGroupPermissionAdd extends ESubCommand<EverPermissions> {
 				// Permission : True
 				if (value) {
 					EPMessages.GROUP_PERMISSION_ADD_TRUE.sender()
-						.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+						.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
 						.replace("{permission}", permission)
-						.replace("{type}", type_group.get())
+						.replace("{type}", typeGroup)
 						.sendTo(player);
 				// Permission : False
 				} else {
 					EPMessages.GROUP_PERMISSION_ADD_FALSE.sender()
-						.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+						.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
 						.replace("{permission}", permission)
-						.replace("{type}", type_group.get())
+						.replace("{type}", typeGroup)
 						.sendTo(player);
 				}
 				return true;

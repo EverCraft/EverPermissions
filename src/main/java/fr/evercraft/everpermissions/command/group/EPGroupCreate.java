@@ -33,6 +33,7 @@ import fr.evercraft.everapi.exception.message.EMessageException;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.EParentCommand;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
+import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -84,28 +85,20 @@ public class EPGroupCreate extends ESubCommand<EverPermissions> {
 		return this.command(source, argsString.get(0), args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String worldName) {
-		Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!typeGroup.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String worldName) throws EMessageException {
+		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
 		
 		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
 		// Groupe existant
-		if (group.isPresent() && group.get().hasTypeWorld(typeGroup.get())) {
+		if (group.isPresent() && group.get().hasTypeWorld(typeGroup)) {
 			EPMessages.GROUP_ADD_ERROR.sender()
 				.replace("{group}", groupName)
-				.replace("{type}", typeGroup.get())
+				.replace("{type}", typeGroup)
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		return this.plugin.getService().getGroupSubjects().register(groupName, typeGroup.get())
+		return this.plugin.getService().getGroupSubjects().register(groupName, typeGroup)
 			.exceptionally(result -> false)
 			.thenApply(result -> {
 				if (!result) {
@@ -117,7 +110,7 @@ public class EPGroupCreate extends ESubCommand<EverPermissions> {
 				
 				EPMessages.GROUP_ADD_STAFF.sender()
 					.replace("{group}", groupName)
-					.replace("{type}", typeGroup.get())
+					.replace("{type}", typeGroup)
 					.sendTo(player);
 				return true;
 			});

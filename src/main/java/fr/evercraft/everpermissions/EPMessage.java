@@ -267,6 +267,7 @@ public class EPMessage extends EMessage<EverPermissions> {
 		GROUP_RENAME_DESCRIPTION(					"Renomme un groupe"),
 		GROUP_RENAME_STAFF(							"&7Vous avez renommé le groupe &6{oldName} &7en &6{newName}&7."),
 		GROUP_RENAME_EQUALS(						"&cErreur : Le groupe &6{group} &cporte déjà ce nom."),
+		GROUP_RENAME_ERROR(							"&cErreur : Il y a déjà un groupe avec le nom &6{group}&c."),
 		
 		GROUP_DEFAULT_DESCRIPTION(					"Définit un groupe par défaut"),
 		GROUP_DEFAULT_TRUE(							"&7Le groupe &6{group} &7est désormais le groupe par défaut &7dans les mondes de type &6{type}&7."),
@@ -274,7 +275,6 @@ public class EPMessage extends EMessage<EverPermissions> {
 		GROUP_DEFAULT_ERROR_TRUE(					"&cIl existe déjà un groupe par défaut &cdans les mondes de type &6{type}&c."),
 		GROUP_DEFAULT_ERROR_FALSE(					"&cLe groupe &6{group} &cn'est pas le groupe défaut &cdans les mondes de type &6{type}&c."),
 		GROUP_DEFAULT_ERROR_EQUALS(					"&cLe groupe &6{group} &cest déjà la groupe par défaut &cdans les mondes de type &6{type}&c."),
-		GROUP_DEFAULT_ERROR_BOOLEAN(				"&cErreur : La valeur 'default' ne peut-être que &6&lTrue &cou &6&lFalse"),
 		
 		GROUP_LIST_DESCRIPTION(						"Affiche la liste des groupes d'un monde"),
 		GROUP_LIST_TITLE(							"&aLes groupes de type &6{type}"),
@@ -322,13 +322,8 @@ public class EPMessage extends EMessage<EverPermissions> {
 		GROUP_INHERITANCE_REMOVE_STAFF(				"&7Vous avez supprimé l'inhéritance &6{inheritance} &7au groupe &6{group} &7dans les mondes de type &6{type}&7."),
 		GROUP_INHERITANCE_REMOVE_ERROR(				"&cLe groupe &6{group} &cne possède pas l'inhéritance &6{inheritance} &cdans les mondes de type &6{type}&c."),
 		
-		GROUP_LIST_INHERITANCE_DESCRIPTION(			"Affiche la liste des inhéritances d'un groupe"),
-		GROUP_LIST_INHERITANCE_TITLE(				"&aLes inhéritances du groupe &6{group} &a: &6{type}"),
-		GROUP_LIST_INHERITANCE_INHERITANCE(			"    &6&l➤  Les inhéritances : "),
-		GROUP_LIST_INHERITANCE_INHERITANCE_LINE(	"        &7&l●  &7{inheritance}"),
-		GROUP_LIST_INHERITANCE_INHERITANCE_EMPTY(	"    &6&l➤  Inhéritance : &7Aucune"),
-		GROUP_LIST_INHERITANCE_TRANSIENT(			"    &6&l➤  Les inhéritances temporaires : "),
-		GROUP_LIST_INHERITANCE_TRANSIENT_LINE(		"        &7&l●  &7{inheritance}"),
+		GROUP_INHERITANCE_INFO_DESCRIPTION(			"Affiche la liste des inhéritances d'un groupe"),
+		GROUP_INHERITANCE_INFO_TITLE(				"&aLes inhéritances du groupe &6{group} &a: &6{type}"),
 		
 		// Group : Permission
 		GROUP_PERMISSION_DESCRIPTION(				"Gestion des permissions d'un groupe"),
@@ -348,15 +343,8 @@ public class EPMessage extends EMessage<EverPermissions> {
 		GROUP_PERMISSION_CHECK_FALSE(				"&7Le groupe &6{group} &7ne possède pas la permission '&6{permission}&7' dans les mondes de type &6{type}&7."),
 		GROUP_PERMISSION_CHECK_UNDEFINED(			"&7Le groupe &6{group} &7ne possède pas la permission '&6{permission}&7' dans les mondes de type &6{type}&7."),
 		
-		GROUP_LIST_PERMISSION_DESCRIPTION(			"Affiche la liste des permissions d'un groupe"),
-		GROUP_LIST_PERMISSION_TITLE(				"&aLes permissions du groupe &6{group} &a: &6{type}"),
-		GROUP_LIST_PERMISSION_PERMISSION(			"    &6&l➤  Permissions : "),
-		GROUP_LIST_PERMISSION_PERMISSION_LINE_TRUE(	"        &7&l●  &7{permission} : True"),
-		GROUP_LIST_PERMISSION_PERMISSION_LINE_FALSE("        &7&l●  &7{permission} : False"),
-		GROUP_LIST_PERMISSION_PERMISSION_EMPTY(		"    &6&l➤ Permissions : &7Aucune"),
-		GROUP_LIST_PERMISSION_TRANSIENT(			"    &6&l➤ Permissions temporaires : "),
-		GROUP_LIST_PERMISSION_TRANSIENT_LINE_TRUE(	"        &7&l●  &7{permission} : True"),
-		GROUP_LIST_PERMISSION_TRANSIENT_LINE_FALSE(	"        &7&l●  &7{permission} : False"),
+		GROUP_PERMISSION_INFO_DESCRIPTION(			"Affiche la liste des permissions d'un groupe"),
+		GROUP_PERMISSION_INFO_TITLE(				"&aLes permissions du groupe &6{group} &a: &6{type}"),
 		
 		// Group : Option
 		GROUP_OPTION_DESCRIPTION(					"Gestion des options d'un groupe"),
@@ -373,13 +361,8 @@ public class EPMessage extends EMessage<EverPermissions> {
 		GROUP_OPTION_CHECK_DEFINED(					"&7Le groupe &6{group} &7possède l'option '&6{option}&7' avec la valeur '&6{value}&7' dans les mondes de type &6{type}&7."),
 		GROUP_OPTION_CHECK_UNDEFINED(				"&7Le groupe &6{group} &7ne possède pas l'option '&6{option}&7' dans les mondes de type &6{type}&7."),
 		
-		GROUP_LIST_OPTION_DESCRIPTION(				"Affiche la liste des options d'un groupe"),
-		GROUP_LIST_OPTION_TITLE(					"&aLes options de &6{group} &a: &6{type}"),
-		GROUP_LIST_OPTION_OPTION(					"    &6&l➤  Options : "),
-		GROUP_LIST_OPTION_OPTION_LINE(				"        &7&l●  &7{option} : &7'{value}&7'"),
-		GROUP_LIST_OPTION_OPTION_EMPTY(				"    &6&l➤ Options : &7Aucune"),
-		GROUP_LIST_OPTION_TRANSIENT(				"    &6&l➤ Options temporaires : "),
-		GROUP_LIST_OPTION_TRANSIENT_LINE(			"        &7&l●  &7{option} : &7'{value}&7'"),
+		GROUP_OPTION_INFO_DESCRIPTION(				"Affiche la liste des options d'un groupe"),
+		GROUP_OPTION_INFO_TITLE(					"&aLes options de &6{group} &a: &6{type}"),
 		
 		// Other
 		OTHER_NOT_FOUND(							"&cErreur : Ce subject n'existe pas."),

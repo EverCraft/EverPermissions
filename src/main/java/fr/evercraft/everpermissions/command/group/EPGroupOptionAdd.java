@@ -19,7 +19,6 @@ package fr.evercraft.everpermissions.command.group;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
@@ -34,6 +33,7 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -87,39 +87,22 @@ public class EPGroupOptionAdd extends ESubCommand<EverPermissions> {
 		return this.command(source, argsString.get(0), argsString.get(1), argsString.get(2), args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String option, final String value, final String worldName) {
-		Optional<String> type_group = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!type_group.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String option, final String value, final String worldName) throws EMessageException {
+		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
+		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
 		
-		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
-		// Groupe existant
-		if (!group.isPresent() || !group.get().hasTypeWorld(type_group.get())) {
-			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", groupName)
-				.replace("{type}", type_group.get())
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		String oldValue = group.get().getSubjectData().getOptions(type_group.get()).get(option);
+		String oldValue = group.getSubjectData().getOptions(typeGroup).get(option);
 		if (oldValue != null && oldValue.equals(value)) {
 			EPMessages.GROUP_OPTION_ADD_ERROR.sender()
-				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+				.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
 				.replace("{option}", option)
-				.replace("{type}", type_group.get())
+				.replace("{type}", typeGroup)
 				.replace("{value}", Text.of(value))
 				.sendTo(player);
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		return group.get().getSubjectData().setOption(type_group.get(), option, value)
+		return group.getSubjectData().setOption(typeGroup, option, value)
 				.exceptionally(e -> false)
 				.thenApply(result -> {
 					if (!result) {
@@ -130,9 +113,9 @@ public class EPGroupOptionAdd extends ESubCommand<EverPermissions> {
 					}
 					
 					EPMessages.GROUP_OPTION_ADD_STAFF.sender()
-						.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
+						.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
 						.replace("{option}", option)
-						.replace("{type}", type_group.get())
+						.replace("{type}", typeGroup)
 						.replace("{value}", Text.of(value))
 						.sendTo(player);
 					return true;

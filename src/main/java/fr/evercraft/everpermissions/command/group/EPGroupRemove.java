@@ -18,7 +18,6 @@ package fr.evercraft.everpermissions.command.group;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
@@ -33,6 +32,7 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -82,29 +82,12 @@ public class EPGroupRemove extends ESubCommand<EverPermissions> {
 		return this.command(source, argsString.get(0), args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String worldName) {
-		Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!typeGroup.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
-		// Groupe introuvable
-		if (!group.isPresent() || !group.get().hasTypeWorld(typeGroup.get())) {
-			EPMessages.GROUP_NOT_FOUND_WORLD.sender()
-				.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-				.replace("{type}", typeGroup.get())
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
+	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String worldName) throws EMessageException {
+		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
+		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
 		
 		// Le groupe n'a pas été supprimé
-		return group.get().clear(typeGroup.get())
+		return group.clear(typeGroup)
 			.exceptionally(e -> false)
 			.thenApply(result -> {
 				if (!result) {
@@ -114,8 +97,8 @@ public class EPGroupRemove extends ESubCommand<EverPermissions> {
 					return false;
 				}
 				EPMessages.GROUP_REMOVE_STAFF.sender()
-					.replace("{group}", group.get().getFriendlyIdentifier().orElse(groupName))
-					.replace("{type}", typeGroup.get())
+					.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
+					.replace("{type}", typeGroup)
 					.sendTo(player);
 				return true;
 			});

@@ -24,7 +24,6 @@ import fr.evercraft.everapi.EverAPI;
 import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.EPlugin;
-import fr.evercraft.everpermissions.command.EPManagerCommands;
 import fr.evercraft.everpermissions.service.EPermissionService;
 
 @Plugin(id = "everpermissions", 
@@ -40,8 +39,6 @@ import fr.evercraft.everpermissions.service.EPermissionService;
 public class EverPermissions extends EPlugin<EverPermissions> {
 	private EPConfig config;
 	private EPMessage messages;
-	
-	private EPManagerCommands managerCommands;
 	
 	private EPermissionService service;
 	private EPDataBases database;
@@ -60,7 +57,7 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 	
 	@Override
 	public void onCompleteEnable() {
-		this.managerCommands = new EPManagerCommands(this);
+		new EPCommand(this);
 		
 		this.getGame().getEventManager().registerListeners(this, new EPListener(this));
 	}
@@ -98,9 +95,5 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 
 	public EPermissionService getService() {
 		return this.service;
-	}
-
-	public EPManagerCommands getManagerCommands() {
-		return this.managerCommands;
 	}
 }

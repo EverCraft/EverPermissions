@@ -31,9 +31,27 @@ import fr.evercraft.everpermissions.EverPermissions;
 
 public class EPGroup extends EParentSubCommand<EverPermissions> {
 	
+	private final EPGroupInfo info;
+	
 	public EPGroup(final EverPermissions plugin, final EParentCommand<EverPermissions> command) {
 		super(plugin, command, "group");
+		
+		this.info = new EPGroupInfo(this.plugin, this);
+		new EPGroupCreate(this.plugin, this);
+		new EPGroupRemove(this.plugin, this);
+		new EPGroupDefault(this.plugin, this);
+		new EPGroupList(this.plugin, this);
+		new EPGroupRename(this.plugin, this);
+		new EPGroupVerbose(this.plugin, this);
+		
+		new EPGroupPermission(this.plugin, this);
+		new EPGroupOption(this.plugin, this);
+		new EPGroupInheritance(this.plugin, this);
     }
+	
+	public EPGroupInfo getInfo() {
+		return this.info;
+	}
 	
 	@Override
 	public boolean testPermission(final CommandSource source) {

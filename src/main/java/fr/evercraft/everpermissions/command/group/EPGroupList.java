@@ -19,7 +19,6 @@ package fr.evercraft.everpermissions.command.group;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
@@ -36,6 +35,7 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -84,19 +84,11 @@ public class EPGroupList extends ESubCommand<EverPermissions> {
 		return this.command(source, args.getWorld().getName());
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource player, final String worldName) {
-		Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-		// Monde introuvable
-		if (!typeGroup.isPresent()) {
-			EAMessages.WORLD_NOT_FOUND.sender()
-				.prefix(EPMessages.PREFIX)
-				.replace("{world}", worldName)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
+	private CompletableFuture<Boolean> command(final CommandSource player, final String worldName) throws EMessageException {
+		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
+		Set<EGroupSubject> groups = this.plugin.getService().getGroupSubjects().getGroups(typeGroup);
 		
 		List<Text> list = new ArrayList<Text>();
-		Set<EGroupSubject> groups = this.plugin.getService().getGroupSubjects().getGroups(typeGroup.get());
 		
 		// Aucun groupe
 		if (groups.isEmpty()) {
@@ -104,7 +96,7 @@ public class EPGroupList extends ESubCommand<EverPermissions> {
 		// Les groupes
 		} else {
 			// Le groupe par défaut
-			this.plugin.getService().getGroupSubjects().getDefaultGroup(typeGroup.get()).ifPresent(subject -> {
+			this.plugin.getService().getGroupSubjects().getDefaultGroup(typeGroup).ifPresent(subject -> {
 				list.add(EPMessages.GROUP_LIST_DEFAULT.getFormat()
 						.toText("{group}", this.parent.getButtonInfo(subject.getName(), worldName)));
 			});
@@ -122,7 +114,7 @@ public class EPGroupList extends ESubCommand<EverPermissions> {
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
 				EPMessages.GROUP_LIST_TITLE.getFormat()
-					.toText("{type}", typeGroup.get())
+					.toText("{type}", typeGroup)
 					.toBuilder()
 					.onClick(TextActions.runCommand("/" + this.getName() + " " + Args.MARKER_WORLD + " \"" + worldName + "\""))
 					.build(), 
