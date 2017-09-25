@@ -18,7 +18,6 @@ package fr.evercraft.everpermissions.command.group;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
@@ -50,13 +49,10 @@ public class EPGroupOptionRemove extends ESubCommand<EverPermissions> {
     					(source, args) -> args.getArgs().size() <= 1)
         		.arg((source, args) -> this.getAllGroups(args.getWorld().getName()))
     			.arg((source, args) -> {
-    				Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(args.getWorld().getName());
-    				if (!typeGroup.isPresent()) return this.getAllOptions();
-
-    				Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(args.getArg(0).orElse(""));
-    				if (!group.isPresent()) return this.getAllOptions();
+    				String typeGroup = EPCommand.getTypeWorld(source, this.plugin.getService().getGroupSubjects(), args.getWorld().getName());
+    				EGroupSubject group = EPCommand.getGroup(source, this.plugin.getService(), args.getArg(0).orElse(""), typeGroup);
     				
-    				return group.get().getSubjectData().getOptions(typeGroup.get()).keySet();
+    				return group.getSubjectData().getOptions(typeGroup).keySet();
     			});
     }
 	

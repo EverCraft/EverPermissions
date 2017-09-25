@@ -18,7 +18,6 @@ package fr.evercraft.everpermissions.command.group;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -52,14 +51,10 @@ public class EPGroupInheritanceRemove extends ESubCommand<EverPermissions> {
     					(source, args) -> args.getArgs().size() <= 1)
         		.arg((source, args) -> this.getAllGroups(args.getWorld().getName()))
     			.arg((source, args) -> {
-					String worldName = args.getWorld().getName();
-					Optional<String> typeGroup = this.plugin.getService().getGroupSubjects().getTypeWorld(worldName);
-    				if (!typeGroup.isPresent()) return this.getAllGroups(worldName);
-
-    				Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(args.getArg(0).orElse(""));
-    				if (!group.isPresent()) return this.getAllGroups(worldName);
+    				String typeGroup = EPCommand.getTypeWorld(source, this.plugin.getService().getGroupSubjects(), args.getWorld().getName());
+    				EGroupSubject group = EPCommand.getGroup(source, this.plugin.getService(), args.getArg(0).orElse(""), typeGroup);
     				
-    				return group.get().getSubjectData().getParents(typeGroup.get()).stream()
+    				return group.getSubjectData().getParents(typeGroup).stream()
     						.map(subject -> subject.resolve().join().getFriendlyIdentifier().orElse(subject.getSubjectIdentifier()))
     						.collect(Collectors.toSet());
     			});

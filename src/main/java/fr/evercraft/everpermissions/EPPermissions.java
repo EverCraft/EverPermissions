@@ -35,29 +35,32 @@ public enum EPPermissions implements EnumPermission {
 	USER_CLEAR("commands.user.clear", EPMessages.PERMISSIONS_COMMANDS_USER_CLEAR),
 	
 	// Joueur : Groupes
-	USER_ADD_GROUP("commands.user.group.add", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_ADD),
-	USER_DEL_GROUP("commands.user.group.remove", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_REMOVE),
+	USER_GROUP_EXECUTE("commands.user.group.execute", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_ADD),
+	USER_GROUP_SET("commands.user.group.set", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_ADD),
+	USER_GROUP_REMOVE("commands.user.group.remove", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_REMOVE),
+	USER_GROUP_PROMOTE("commands.user.group.promote", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_PROMOTE),
+	USER_GROUP_DEMOTE("commands.user.group.demote", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_DEMOTE),
+	USER_GROUP_INFO("commands.user.group.info", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_INFO),
 	
-	USER_ADD_SUBGROUP("commands.user.group.addsub", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_ADDSUB),
-	USER_DEL_SUBGROUP("commands.user.group.removesub", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_REMOVESUB),
-	
-	USER_PROMOTE_GROUP("commands.user.group.promote", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_PROMOTE),
-	USER_DEMOTE_GROUP("commands.user.group.demote", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_DEMOTE),
-	USER_LIST_GROUP("commands.user.group.list", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_LIST),
+	// Joueur : SubGroupes
+	USER_SUBGROUP_EXECUTE("commands.user.subgroup.execute", EPMessages.PERMISSIONS_COMMANDS_USER_SUBGROUP_EXECUTE),
+	USER_SUBGROUP_ADD("commands.user.subgroup.add", EPMessages.PERMISSIONS_COMMANDS_USER_SUBGROUP_ADD),
+	USER_SUBGROUP_REMOVE("commands.user.subgroup.remove", EPMessages.PERMISSIONS_COMMANDS_USER_SUBGROUP_REMOVE),
+	USER_SUBGROUP_INFO("commands.user.subgroup.info", EPMessages.PERMISSIONS_COMMANDS_USER_SUBGROUP_INFO),
 	
 	// Joueur : Permissions
-	USER_ADD_PERMISSION("commands.user.permission.add", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_ADD),
-	USER_DEL_PERMISSION("commands.user.permission.remove", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_REMOVE),
-	
-	USER_CHECK_PERMISSION("commands.user.permission.check", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_CHECK),
-	USER_LIST_PERMISSION("commands.user.permission.list", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_LIST),
+	USER_PERMISSION_EXECUTE("commands.user.permission.execute", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_EXECUTE),
+	USER_PERMISSION_ADD("commands.user.permission.add", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_ADD),
+	USER_PERMISSION_REMOVE("commands.user.permission.remove", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_REMOVE),
+	USER_PERMISSION_CHECK("commands.user.permission.check", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_CHECK),
+	USER_PERMISSION_INFO("commands.user.permission.info", EPMessages.PERMISSIONS_COMMANDS_USER_PERMISSION_INFO),
 	
 	// Joueur : Options
-	USER_ADD_OPTION("commands.user.option.add", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_ADD),
-	USER_DEL_OPTION("commands.user.option.remove", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_REMOVE),
-	
-	USER_CHECK_OPTION("commands.user.option.check", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_CHECK),
-	USER_LIST_OPTION("commands.user.option.list", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_LIST),
+	USER_OPTION_EXECUTE("commands.user.option.execute", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_EXECUTE),
+	USER_OPTION_ADD("commands.user.option.add", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_ADD),
+	USER_OPTION_REMOVE("commands.user.option.remove", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_REMOVE),
+	USER_OPTION_CHECK("commands.user.option.check", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_CHECK),
+	USER_OPTION_INFO("commands.user.option.info", EPMessages.PERMISSIONS_COMMANDS_USER_OPTION_INFO),
 	
 	// Groupe : Groupes
 	GROUP_EXECUTE("commands.group.execute", EPMessages.PERMISSIONS_COMMANDS_GROUP_EXECUTE),

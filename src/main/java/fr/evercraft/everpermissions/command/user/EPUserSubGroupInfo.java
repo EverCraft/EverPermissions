@@ -14,55 +14,56 @@
  * You should have received a copy of the GNU General Public License
  * along with EverPermissions.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.evercraft.everpermissions.command.group;
+package fr.evercraft.everpermissions.command.user;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.world.World;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.exception.message.EMessageException;
+import fr.evercraft.everapi.java.UtilsCompletableFuture;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
+import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
-public class EPGroupPermissionRemove extends ESubCommand<EverPermissions> {
+public class EPUserSubGroupInfo extends ESubCommand<EverPermissions> {
 	
 	private final Args.Builder pattern;
+	private final EPUserSubGroup parent;
 	
-	public EPGroupPermissionRemove(final EverPermissions plugin, final EPGroupPermission parent) {
-        super(plugin, parent, "remove");
+	public EPUserSubGroupInfo(final EverPermissions plugin, final EPUserSubGroup parent) {
+        super(plugin, parent, "info");
         
+        this.parent = parent;
         this.pattern = Args.builder()
         		.value(Args.MARKER_WORLD, 
-    					(source, args) -> this.plugin.getService().getGroupSubjects().getTypeWorlds(),
+    					(source, args) -> this.plugin.getService().getUserSubjects().getTypeWorlds(),
     					(source, args) -> args.getArgs().size() <= 1)
-        		.arg((source, args) -> this.getAllGroups(args.getWorld().getName()))
-    			.arg((source, args) -> {
-    				String typeGroup = EPCommand.getTypeWorld(source, this.plugin.getService().getGroupSubjects(), args.getWorld().getName());
-    				EGroupSubject group = EPCommand.getGroup(source, this.plugin.getService(), args.getArg(0).orElse(""), typeGroup);
-    				
-    				return group.getSubjectData().getPermissions(typeGroup).keySet();
-    			});
+        		.arg((source, args) -> this.getAllUsers(args.getArg(0).orElse(""), source));
     }
 	
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.GROUP_PERMISSION_REMOVE.get());
+		return source.hasPermission(EPPermissions.USER_SUBGROUP_INFO.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.GROUP_PERMISSION_REMOVE_DESCRIPTION.getText();
+		return EPMessages.USER_SUBGROUP_INFO_DESCRIPTION.getText();
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
@@ -71,8 +72,7 @@ public class EPGroupPermissionRemove extends ESubCommand<EverPermissions> {
 
 	public Text help(final CommandSource source) {
 		return Text.builder("/" + this.getName() + " [" + Args.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
-												 + " <" + EAMessages.ARGS_GROUP.getString() + ">"
-												 + " <" + EAMessages.ARGS_PERMISSION.getString() + ">")
+												 + " <" + EAMessages.ARGS_USER.getString() + ">")
 					.onClick(TextActions.suggestCommand("/" + this.getName() + " "))
 					.color(TextColors.RED)
 					.build();
@@ -82,43 +82,47 @@ public class EPGroupPermissionRemove extends ESubCommand<EverPermissions> {
 		Args args = this.pattern.build(this.plugin, source, argsList);
 		List<String> argsString = args.getArgs();
 		
-		if (argsString.size() != 2) {
+		if (argsString.size() != 1) {
 			source.sendMessage(this.help(source));
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		return this.command(source, argsString.get(0), argsString.get(1), args.getWorld().getName());
+		World world = args.getWorld();
+		String typeUser = EPCommand.getTypeWorld(source, this.plugin.getService().getUserSubjects(), world.getName());
+		
+		return UtilsCompletableFuture.anyOf(args.getArg(0, Args.USERS).orElse(Arrays.asList()).stream()
+				.map(user -> this.command(source, user, world.getName(), typeUser))
+				.collect(Collectors.toList()));
 	}
-
-	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String permission, final String worldName) throws EMessageException {
-		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
-		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
-		
-		if (group.getSubjectData().getPermissions(typeGroup).get(permission) == null) {
-			EPMessages.GROUP_PERMISSION_REMOVE_ERROR.sender()
-				.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
-				.replace("{permission}", permission)
-				.replace("{type}", typeGroup)
-				.sendTo(player);
-			return CompletableFuture.completedFuture(false);
-		}
-		
-		return group.getSubjectData().setPermission(typeGroup, permission, Tristate.UNDEFINED)
-			.exceptionally(e -> false)
-			.thenApply(result -> {
-				if (!result) {
+	
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final String worldName, final String typeUser) {
+		return this.plugin.getService().getUserSubjects().load(user.getIdentifier())
+			.exceptionally(e -> null)
+			.thenApply(subject -> {
+				if (subject == null) {
 					EAMessages.COMMAND_ERROR.sender()
 						.prefix(EPMessages.PREFIX)
-						.sendTo(player);
+						.sendTo(staff);
 					return false;
 				}
 				
-				EPMessages.GROUP_PERMISSION_REMOVE_STAFF.sender()
-					.replace("{group}", group.getFriendlyIdentifier().orElse(groupName))
-					.replace("{permission}", permission)
-					.replace("{type}", typeGroup)
-					.sendTo(player);
+				this.command(staff, user, subject, worldName, typeUser);
 				return true;
 			});
+	}
+
+	private void command(final CommandSource player, final EUser user, final EUserSubject subject, final String worldName, final String typeUser) {
+		List<Text> list = new ArrayList<Text>();
+		this.parent.getParent().getInfo().addSubGroups(list, user, subject, worldName, typeUser);
+		this.parent.getParent().getInfo().addSubGroupsTransient(list, user, subject, worldName, typeUser);
+		
+		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
+				EPMessages.USER_SUBGROUP_INFO_TITLE.getFormat().toText(
+					"{player}", user.getName(),
+					"{type}", typeUser)
+				.toBuilder()
+				.onClick(TextActions.runCommand("/" + this.getName() + " " + Args.MARKER_WORLD + " \"" + worldName  + "\" \"" + typeUser + "\""))
+				.build(), 
+				list, player);
 	}
 }

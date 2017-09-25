@@ -31,8 +31,17 @@ import fr.evercraft.everpermissions.EverPermissions;
 
 public class EPUser extends EParentSubCommand<EverPermissions> {
 	
+	private final EPUserInfo info;
+	
 	public EPUser(final EverPermissions plugin, final EParentCommand<EverPermissions> command) {
 		super(plugin, command, "user");
+		
+		this.info = new EPUserInfo(this.plugin, this);
+		
+		new EPUserGroup(this.plugin, this);
+		new EPUserSubGroup(this.plugin, this);
+		new EPUserPermission(this.plugin, this);
+		new EPUserOption(this.plugin, this);
     }
 	
 	@Override
@@ -48,6 +57,10 @@ public class EPUser extends EParentSubCommand<EverPermissions> {
 	@Override
 	public boolean testPermissionHelp(final CommandSource source) {
 		return true;
+	}
+	
+	public EPUserInfo getInfo() {
+		return this.info;
 	}
 	
 	public Text getButtonPermissionKey(final String groupName, final String permission, final Boolean value, final String worldName) {
