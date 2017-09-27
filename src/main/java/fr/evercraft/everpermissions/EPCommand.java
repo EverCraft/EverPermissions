@@ -17,20 +17,34 @@
 package fr.evercraft.everpermissions;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.text.Text;
+
+import com.google.common.collect.ImmutableSet;
 
 import fr.evercraft.everapi.exception.message.EMessageException;
 import fr.evercraft.everapi.plugin.command.EParentCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.command.collection.EPCollection;
 import fr.evercraft.everpermissions.command.group.EPGroup;
 import fr.evercraft.everpermissions.command.sub.EPReload;
 import fr.evercraft.everpermissions.command.user.EPUser;
+import fr.evercraft.everpermissions.exception.CollectionNotFoundException;
 import fr.evercraft.everpermissions.exception.GroupNotFoundWorldException;
 import fr.evercraft.everpermissions.exception.GroupTypeWorldNotFoundException;
+import fr.evercraft.everpermissions.exception.SubjectNotFoundException;
 import fr.evercraft.everpermissions.service.EPermissionService;
+import fr.evercraft.everpermissions.service.permission.collection.ECommandBlockCollection;
 import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
+import fr.evercraft.everpermissions.service.permission.collection.EUserCollection;
 import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 
 public class EPCommand extends EParentCommand<EverPermissions> {
 	
@@ -40,6 +54,7 @@ public class EPCommand extends EParentCommand<EverPermissions> {
 		new EPReload(this.plugin, this);
 		new EPGroup(this.plugin, this);
 		new EPUser(this.plugin, this);
+		new EPCollection(this.plugin, this);
     }
 	
 	@Override
@@ -55,6 +70,24 @@ public class EPCommand extends EParentCommand<EverPermissions> {
 	@Override
 	public boolean testPermissionHelp(final CommandSource source) {
 		return source.hasPermission(EPPermissions.HELP.get());
+	}
+	
+	public static Set<String> getAllCollections(EPermissionService service) throws EMessageException {
+		return service.getLoadedCollections().values().stream()
+				.filter(collection -> (collection instanceof EUserCollection || collection instanceof ECommandBlockCollection))
+				.filter(collection -> !collection.getIdentifier().equals(PermissionService.SUBJECTS_USER))
+				.map(collection -> collection.getIdentifier())
+				.collect(Collectors.toSet());
+	}
+	
+	public static Set<String> getAllSubjects(EPermissionService service, String collectionIdentifier) throws EMessageException {
+		Optional<SubjectCollection> collection = service.getCollection(collectionIdentifier);
+		if (!collection.isPresent()) return ImmutableSet.of();
+		if (!(collection.get() instanceof EUserCollection || collection.get() instanceof ECommandBlockCollection)) return ImmutableSet.of();
+		
+		return collection.get().getLoadedSubjects().stream()
+				.map(subject -> subject.getIdentifier())
+				.collect(Collectors.toSet());
 	}
 	
 	public static String getTypeWorld(CommandSource source, ESubjectCollection<?> collection, String world) throws EMessageException {
@@ -73,5 +106,15 @@ public class EPCommand extends EParentCommand<EverPermissions> {
 		} else {
 			return group.get();
 		}
+	}
+	
+	public static EUserSubject getSubject(CommandSource source, EPermissionService service, String collectionIdentifier, String subjectIdentifier) throws EMessageException {
+		Optional<SubjectCollection> collection = service.getCollection(collectionIdentifier);
+		if (!collection.isPresent() || collection.get().getIdentifier().equals(PermissionService.SUBJECTS_USER)) throw new CollectionNotFoundException(source, collectionIdentifier);
+		
+		Optional<Subject> subject = collection.get().getSubject(subjectIdentifier);
+		if (!subject.isPresent() || !(subject.get() instanceof EUserSubject)) throw new SubjectNotFoundException(source, collectionIdentifier, subjectIdentifier);
+		
+		return (EUserSubject) subject.get();
 	}
 }

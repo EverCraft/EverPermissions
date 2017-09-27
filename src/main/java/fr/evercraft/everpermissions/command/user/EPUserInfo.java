@@ -131,7 +131,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
 					"{player}", user.getName(),
 					"{type}", typeUser)
 				.toBuilder()
-				.onClick(TextActions.runCommand("/" + this.getName() + " " + Args.MARKER_WORLD + " \"" + worldName  + "\" \"" + typeUser + "\""))
+				.onClick(TextActions.runCommand("/" + this.getName() + " " + Args.MARKER_WORLD + " \"" + worldName  + "\" \"" + subject.getIdentifier() + "\""))
 				.build(), 
 				list, player);
 	}

@@ -140,10 +140,9 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	public Optional<T> get(String identifier) {
 		identifier = identifier.toLowerCase();
 		
-		if (identifier.length() == 36) {
-			T subject = this.identifierSubjects.get(identifier);
-			if (subject != null) return Optional.of(subject);
-		}
+		T subject = this.identifierSubjects.get(identifier);
+		if (subject != null) return Optional.of(subject);
+		
 		return Optional.ofNullable(this.nameSubjects.get(identifier));
 	}
 	
