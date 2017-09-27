@@ -71,7 +71,7 @@ public class EPMessage extends EMessage<EverPermissions> {
 		USER_INFO_GROUP_EMPTY(						"    &6&l➤  Groupe : &7Aucun"),
 		USER_INFO_SUBGROUP(							"    &6&l➤  Sous-groupes : "),
 		USER_INFO_SUBGROUP_LINE(					"        &7&l●  &7{subgroup}"),
-		USER_INFO_SUBGROUP_EMPTY(					"    &6&l➤  Sous-goupes : &7Aucune"),
+		USER_INFO_SUBGROUP_EMPTY(					"    &6&l➤  Sous-goupes : &7Aucun"),
 		USER_INFO_GROUP_TRANSIENT(					"    &6&l➤  Groupe temporaires : &7{group}"),
 		USER_INFO_SUBGROUP_TRANSIENT(				"    &6&l➤ Sous-groupes temporaires : "),
 		USER_INFO_SUBGROUP_TRANSIENT_LINE(			"        &7&l●  &7{subgroup}"),
@@ -91,6 +91,9 @@ public class EPMessage extends EMessage<EverPermissions> {
 		USER_INFO_OPTION_TRANSIENT_LINE(			"        &7&l●  &7{option} : &7'{value}&7'"),
 		
 		USER_CLEAR_DESCRIPTION(						"Supprime un joueur"),
+		USER_CLEAR_CONFIRMATION(					"&7Souhaitez-vous vraiment réinitialiser toutes les données de &6{player} &7: {confirmation}"),
+		USER_CLEAR_CONFIRMATION_BUTTON(				"&a[Confirmer]"),
+		USER_CLEAR_CONFIRMATION_BUTTON_HOVER(		"&cCliquez ici pour réinitialisé toutes les données de &6{player}&c."),
 		USER_CLEAR_STAFF(							"&7Vous avez réinitialisé toutes les données de &6{player}&7."),
 		USER_CLEAR_PLAYER(							"&7Vos données ont été réinitialisé."),
 		USER_CLEAR_EQUALS(							"&7Vous avez réinitialisé toutes vos données."),

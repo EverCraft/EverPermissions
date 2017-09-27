@@ -49,7 +49,7 @@ public class EPUserGroupRemove extends ESubCommand<EverPermissions> {
 	private final Args.Builder pattern;
 	
 	public EPUserGroupRemove(final EverPermissions plugin, final EPUserGroup parent) {
-        super(plugin, parent, "set");
+        super(plugin, parent, "remove");
         
         this.pattern = Args.builder()
         		.value(Args.MARKER_WORLD, 
@@ -82,7 +82,7 @@ public class EPUserGroupRemove extends ESubCommand<EverPermissions> {
 		Args args = this.pattern.build(this.plugin, source, argsList);
 		List<String> argsString = args.getArgs();
 		
-		if (argsString.size() != 2) {
+		if (argsString.size() != 1) {
 			source.sendMessage(this.help(source));
 			return CompletableFuture.completedFuture(false);
 		}

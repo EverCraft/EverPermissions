@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -338,6 +339,13 @@ public class EUserSubject extends ESubject {
 			this.write_lock.unlock();
 		}
     }
+    
+    public CompletableFuture<Boolean> clear() {
+		return this.data.clear().thenCompose(result -> {
+			if (!result) return CompletableFuture.completedFuture(false);
+			return this.transientData.clear();
+		});
+	}
 	
 	/*
      * Groupes

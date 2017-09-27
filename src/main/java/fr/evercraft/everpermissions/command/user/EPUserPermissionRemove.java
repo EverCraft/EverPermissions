@@ -19,14 +19,17 @@ package fr.evercraft.everpermissions.command.user;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.World;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
@@ -34,8 +37,10 @@ import fr.evercraft.everapi.exception.message.EMessageException;
 import fr.evercraft.everapi.java.UtilsCompletableFuture;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
+import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everpermissions.service.permission.data.EUserData;
 import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
@@ -53,7 +58,16 @@ public class EPUserPermissionRemove extends ESubCommand<EverPermissions> {
     					(source, args) -> this.plugin.getService().getUserSubjects().getTypeWorlds(),
     					(source, args) -> args.getArgs().size() <= 1)
         		.arg((source, args) -> this.getAllUsers(args.getArg(0).orElse(""), source))
-        		.arg((source, args) -> this.getAllPermissions());
+        		.arg((source, args) -> {
+        			Optional<EPlayer> player = this.plugin.getEServer().getEPlayer(args.getArg(0).orElse(""));
+        			if (!player.isPresent()) return this.getAllPermissions();
+        			
+        			SubjectData data = player.get().getSubjectData();
+        			if (!(data instanceof EUserData)) return this.getAllPermissions();
+        			
+        			String typeUser = EPCommand.getTypeWorld(source, this.plugin.getService().getUserSubjects(), args.getWorld().getName());
+        			return ((EUserData) data).getPermissions(typeUser).keySet();
+        		});
     }
 	
 	public boolean testPermission(final CommandSource source) {
@@ -113,7 +127,7 @@ public class EPUserPermissionRemove extends ESubCommand<EverPermissions> {
 	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final String permission, 
 			final String worldName, final String typeUser) {
 		
-		if (subject.getSubjectData().getPermissions(typeUser).get(permission) != null) {
+		if (subject.getSubjectData().getPermissions(typeUser).get(permission) == null) {
 			if (staff.getIdentifier().equals(user.getIdentifier())) {
 				EPMessages.USER_PERMISSION_REMOVE_ERROR_EQUALS.sender()
 					.replace("{player}", user.getName())
@@ -130,7 +144,7 @@ public class EPUserPermissionRemove extends ESubCommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		return subject.getSubjectData().setPermission(typeUser, permission, null)
+		return subject.getSubjectData().setPermission(typeUser, permission, Tristate.UNDEFINED)
 			.exceptionally(e -> false)
 			.thenApply(result -> {
 				if (!result) {

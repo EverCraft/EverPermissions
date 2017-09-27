@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with EverPermissions.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.evercraft.everpermissions.command;
+package fr.evercraft.everpermissions.command.sub;
 
 import java.util.Arrays;
 import java.util.Collection;

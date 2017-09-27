@@ -124,7 +124,8 @@ public class EPUserGroupSet extends ESubCommand<EverPermissions> {
 				EPMessages.USER_GROUP_SET_ERROR_EQUALS.sender()
 					.replace("{player}", user.getName())
 					.replace("{group}", groupName)
-					.replace("{type}", typeUser);
+					.replace("{type}", typeUser)
+					.sendTo(staff);
 			} else {
 				EPMessages.USER_GROUP_SET_ERROR_STAFF.sender()
 					.replace("{player}", user.getName())

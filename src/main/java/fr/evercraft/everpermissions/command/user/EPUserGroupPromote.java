@@ -52,7 +52,7 @@ public class EPUserGroupPromote extends ESubCommand<EverPermissions> {
 	private final Args.Builder pattern;
 	
 	public EPUserGroupPromote(final EverPermissions plugin, final EPUserGroup parent) {
-        super(plugin, parent, "set");
+        super(plugin, parent, "promote");
         
         this.pattern = Args.builder()
         		.value(Args.MARKER_WORLD, 

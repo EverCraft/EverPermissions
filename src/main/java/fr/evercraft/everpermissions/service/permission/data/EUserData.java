@@ -365,4 +365,26 @@ public class EUserData extends ESubjectData {
 		Preconditions.checkNotNull(contexts, "contexts");
 		return this.clearOptions(this.plugin.getService().getContextCalculator().getUser(contexts));
 	}
+
+	public CompletableFuture<Boolean> clear() {
+		return CompletableFuture.supplyAsync(() -> {			
+			if (!this.getSubject().getContainingCollection().getStorage().clear(this)) return false;
+			
+			this.clearExecute();
+			this.onUpdate();
+			return true;
+		}, this.plugin.getThreadAsync());
+	}
+	
+	public void clearExecute() {
+		this.write_lock.lock();
+		try {
+			this.groups.clear();
+			this.parents.clear();
+			this.permissions.clear();
+			this.options.clear();
+		} finally {
+			this.write_lock.unlock();
+		}
+	}
 }

@@ -52,7 +52,7 @@ public class EPUserGroupDemote extends ESubCommand<EverPermissions> {
 	private final Args.Builder pattern;
 	
 	public EPUserGroupDemote(final EverPermissions plugin, final EPUserGroup parent) {
-        super(plugin, parent, "set");
+        super(plugin, parent, "demote");
         
         this.pattern = Args.builder()
         		.value(Args.MARKER_WORLD, 
