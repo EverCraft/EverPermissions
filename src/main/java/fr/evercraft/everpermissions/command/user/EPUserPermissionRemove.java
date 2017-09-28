@@ -40,8 +40,8 @@ import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.data.EUserData;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.permission.data.EPUserData;
+import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -63,10 +63,10 @@ public class EPUserPermissionRemove extends ESubCommand<EverPermissions> {
         			if (!player.isPresent()) return this.getAllPermissions();
         			
         			SubjectData data = player.get().getSubjectData();
-        			if (!(data instanceof EUserData)) return this.getAllPermissions();
+        			if (!(data instanceof EPUserData)) return this.getAllPermissions();
         			
         			String typeUser = EPCommand.getTypeWorld(source, this.plugin.getService().getUserSubjects(), args.getWorld().getName());
-        			return ((EUserData) data).getPermissions(typeUser).keySet();
+        			return ((EPUserData) data).getPermissions(typeUser).keySet();
         		});
     }
 	
@@ -124,7 +124,7 @@ public class EPUserPermissionRemove extends ESubCommand<EverPermissions> {
 			});
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final String permission, 
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EPUserSubject subject, final String permission, 
 			final String worldName, final String typeUser) {
 		
 		if (subject.getSubjectData().getPermissions(typeUser).get(permission) == null) {

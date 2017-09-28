@@ -16,8 +16,10 @@
  */
 package fr.evercraft.everpermissions.service.permission.collection;
 
+import fr.evercraft.everapi.services.permission.EGroupCollection;
+import fr.evercraft.everapi.services.permission.EGroupSubject;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
 
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -35,10 +37,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
+public class EPGroupCollection extends EPSubjectCollection<EPGroupSubject> implements EGroupCollection {
 	private final ConcurrentMap<String, EGroupSubject> defaults;
 
-    public EGroupCollection(final EverPermissions plugin) {
+    public EPGroupCollection(final EverPermissions plugin) {
     	super(plugin, PermissionService.SUBJECTS_GROUP);
     	
     	this.defaults = new ConcurrentHashMap<String, EGroupSubject>();
@@ -51,13 +53,13 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 		for (String identifier : identifiers) {
 			identifier = identifier.toLowerCase();
 			
-			EGroupSubject newSubject = this.add(identifier);
+			EPGroupSubject newSubject = this.add(identifier);
 			this.identifierSubjects.put(identifier, newSubject);
 		}
 		
 		if (!this.storage.load((Collection) this.identifierSubjects.values())) return false;
 		
-		for (EGroupSubject subject : this.identifierSubjects.values()) {
+		for (EPGroupSubject subject : this.identifierSubjects.values()) {
 			subject.getFriendlyIdentifier().ifPresent(name -> this.nameSubjects.put(name.toLowerCase(), subject));
 		}
 		return true;
@@ -74,11 +76,11 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
     }
     
     @Override
-	protected EGroupSubject add(String identifier) {
+	protected EPGroupSubject add(String identifier) {
     	try {
-    		return new EGroupSubject(this.plugin, UUID.fromString(identifier).toString(), this);
+    		return new EPGroupSubject(this.plugin, UUID.fromString(identifier).toString(), this);
     	} catch (IllegalArgumentException e) {
-    		EGroupSubject subject = new EGroupSubject(this.plugin, this.nextUUID().toString(), this);
+    		EPGroupSubject subject = new EPGroupSubject(this.plugin, this.nextUUID().toString(), this);
     		subject.setFriendlyIdentifierExecute(identifier);
     		return subject;
     	}
@@ -107,7 +109,7 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
      */
     public CompletableFuture<Boolean> register(final String name, final String worldType) {
     	// Création du groupe si il n'existe pas
-    	EGroupSubject group =  this.identifierSubjects.get(name);
+    	EPGroupSubject group =  this.identifierSubjects.get(name);
     	if (group != null) {
     		group.registerTypeWorld(worldType);
     		
@@ -117,7 +119,7 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
     	
     	String identifier = this.nextUUID().toString();
     	
-    	EGroupSubject newGroup = new EGroupSubject(this.plugin, identifier, this);
+    	EPGroupSubject newGroup = new EPGroupSubject(this.plugin, identifier, this);
     	newGroup.setFriendlyIdentifierExecute(name);
     	newGroup.registerTypeWorld(worldType);
     	
@@ -131,9 +133,10 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
 	 * @param type Le type de groupe
 	 * @return La liste des groupes
 	 */
+    @Override
 	public Set<EGroupSubject> getGroups(final String typeWorld) {
 		Set<EGroupSubject> groups = new HashSet<EGroupSubject>();
-		for (EGroupSubject group : this.identifierSubjects.values()) {
+		for (EPGroupSubject group : this.identifierSubjects.values()) {
 			if (group.hasTypeWorld(typeWorld)) {
 				groups.add(group);
 			}
@@ -145,15 +148,17 @@ public class EGroupCollection extends ESubjectCollection<EGroupSubject> {
      * GroupDefault
      */
     
+	@Override
     public ConcurrentMap<String, EGroupSubject> getDefaultGroups() {
 		return this.defaults;
 	}
 
+	@Override
 	public Optional<EGroupSubject> getDefaultGroup(final String typeWorld) {
 		return Optional.ofNullable(this.defaults.get(typeWorld));
 	}
 	
-	public boolean setDefaultExecute(final String typeWorld, final EGroupSubject group, boolean value) {
+	public boolean setDefaultExecute(final String typeWorld, final EPGroupSubject group, boolean value) {
 		if (value) {
 			this.defaults.put(typeWorld, group);
 		} else {

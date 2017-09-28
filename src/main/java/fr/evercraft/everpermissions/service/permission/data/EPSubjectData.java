@@ -30,7 +30,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
@@ -39,18 +38,19 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import fr.evercraft.everapi.event.ESpongeEventFactory;
+import fr.evercraft.everapi.services.permission.ESubjectData;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.ESubject;
+import fr.evercraft.everpermissions.service.permission.EPContextCalculator;
+import fr.evercraft.everpermissions.service.permission.subject.EPSubject;
 
-public abstract class ESubjectData implements SubjectData {
+public abstract class EPSubjectData<T extends EPSubject> implements ESubjectData {
 	
 	protected final EverPermissions plugin;
-	protected final ESubject subject;
+	protected final T subject;
 	protected final boolean transientData;
 	
 	protected final ConcurrentMap<String, Map<String, String>> options;
-	protected final ConcurrentMap<String, ENode> permissions;
+	protected final ConcurrentMap<String, EPNode> permissions;
 	protected final ConcurrentMap<String, List<SubjectReference>> parents;
 	
 	// MultiThreading
@@ -58,7 +58,7 @@ public abstract class ESubjectData implements SubjectData {
 	protected final Lock write_lock;
 	protected final Lock read_lock;
 
-	public ESubjectData(final EverPermissions plugin, final ESubject subject, boolean transientData) {
+	public EPSubjectData(final EverPermissions plugin, final T subject, boolean transientData) {
 		Preconditions.checkNotNull(plugin, "plugin");
 		Preconditions.checkNotNull(subject, "subject");
 		
@@ -67,7 +67,7 @@ public abstract class ESubjectData implements SubjectData {
 		this.transientData = transientData;
 		
 		this.options = new ConcurrentHashMap<String, Map<String, String>>();
-		this.permissions = new ConcurrentHashMap<String, ENode>();
+		this.permissions = new ConcurrentHashMap<String, EPNode>();
 		this.parents = new ConcurrentHashMap<String, List<SubjectReference>>();
 		
 		// MultiThreading
@@ -76,18 +76,22 @@ public abstract class ESubjectData implements SubjectData {
 		this.read_lock = this.lock.readLock();
 	}
 	
+	@Override
 	public String getIdentifier() {
 		return this.subject.getIdentifier();
 	}
 	
-	public ESubject getSubject() {
+	@Override
+	public T getSubject() {
 		return this.subject;
 	}
 	
+	@Override
 	public String getCollectionIdentifier() {
 		return this.subject.getCollectionIdentifier();
 	}
 	
+	@Override
 	public boolean isTransient() {
 		return this.transientData;
 	}
@@ -114,13 +118,13 @@ public abstract class ESubjectData implements SubjectData {
 	 * Permissions
 	 */
 	
-	public ENode getNodeTree(final String typeWorld) {
+	public EPNode getNodeTree(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
 		this.read_lock.lock();
 		try {
-			ENode perms = this.permissions.get(typeWorld);
-			if (perms == null) return new ENode();
+			EPNode perms = this.permissions.get(typeWorld);
+			if (perms == null) return new EPNode();
 			return perms;
 		} finally {
 			this.read_lock.unlock();
@@ -130,18 +134,19 @@ public abstract class ESubjectData implements SubjectData {
 	@Override
 	public Map<Set<Context>, Map<String, Boolean>> getAllPermissions() {
 		ImmutableMap.Builder<Set<Context>, Map<String, Boolean>> ret = ImmutableMap.builder();
-		for (Map.Entry<String, ENode> ent : this.permissions.entrySet()) {
-			ret.put(EContextCalculator.of(ent.getKey()), ent.getValue().asMap());
+		for (Map.Entry<String, EPNode> ent : this.permissions.entrySet()) {
+			ret.put(EPContextCalculator.of(ent.getKey()), ent.getValue().asMap());
 		}
 		return ret.build();
 	}
 	
+	@Override
 	public Map<String, Boolean> getPermissions(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
 		this.read_lock.lock();
 		try {
-			ENode perms = this.permissions.get(typeWorld);
+			EPNode perms = this.permissions.get(typeWorld);
 			if (perms == null) return ImmutableMap.of();
 			return perms.asMap();
 		} finally {
@@ -149,6 +154,7 @@ public abstract class ESubjectData implements SubjectData {
 		}
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> setPermission(final String typeWorld, final String permission, final Tristate value) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		Preconditions.checkNotNull(permission, "permission");
@@ -172,10 +178,10 @@ public abstract class ESubjectData implements SubjectData {
 	public void setPermissionExecute(final String typeWorld, final String permission, final Tristate value) {
 		this.write_lock.lock();
 		try {
-			ENode oldTree = this.permissions.get(typeWorld);
+			EPNode oldTree = this.permissions.get(typeWorld);
 			if (oldTree == null) {
 				if (value != Tristate.UNDEFINED) {
-					this.permissions.putIfAbsent(typeWorld, ENode.of(ImmutableMap.of(permission, value.asBoolean())));
+					this.permissions.putIfAbsent(typeWorld, EPNode.of(ImmutableMap.of(permission, value.asBoolean())));
 				}
 			} else if (value == Tristate.UNDEFINED) {
 				if (oldTree.getTristate(permission) != Tristate.UNDEFINED) {
@@ -189,6 +195,7 @@ public abstract class ESubjectData implements SubjectData {
 		}
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> clearPermissions(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
@@ -248,12 +255,13 @@ public abstract class ESubjectData implements SubjectData {
 	 * Groups
 	 */
 	
+	@Override
 	public Map<Set<Context>, List<SubjectReference>> getAllParents() {
 		this.read_lock.lock();
 		try {
 			ImmutableMap.Builder<Set<Context>, List<SubjectReference>> builder = ImmutableMap.builder();
 			for (Entry<String, List<SubjectReference>> groups : this.parents.entrySet()) {
-				builder.put(EContextCalculator.of(groups.getKey()), groups.getValue());
+				builder.put(EPContextCalculator.of(groups.getKey()), groups.getValue());
 			}
 			return builder.build();
 		} finally {
@@ -261,6 +269,7 @@ public abstract class ESubjectData implements SubjectData {
 		}
 	}
 	
+	@Override
 	public List<SubjectReference> getParents(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
@@ -274,6 +283,7 @@ public abstract class ESubjectData implements SubjectData {
 		}
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> addParent(final String typeWorld, final SubjectReference parent) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		Preconditions.checkNotNull(parent, "parent");
@@ -317,11 +327,12 @@ public abstract class ESubjectData implements SubjectData {
 	public Map<Set<Context>, Map<String, String>> getAllOptions() {
 		 ImmutableMap.Builder<Set<Context>, Map<String, String>> builder = ImmutableMap.builder();
 		 for (Entry<String, Map<String, String>> option : this.options.entrySet()) {
-		 	builder.put(EContextCalculator.of(option.getKey()), ImmutableMap.copyOf(option.getValue()));
+		 	builder.put(EPContextCalculator.of(option.getKey()), ImmutableMap.copyOf(option.getValue()));
 		 }
 		 return builder.build();
 	}
 	
+	@Override
 	public Map<String, String> getOptions(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
@@ -335,6 +346,7 @@ public abstract class ESubjectData implements SubjectData {
 		}
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> setOption(final String typeWorld, final String key, final String value) {
 		return CompletableFuture.supplyAsync(() -> {
 			String oldValue = this.getOptions(typeWorld).get(key);
@@ -375,6 +387,7 @@ public abstract class ESubjectData implements SubjectData {
 		}
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> clearOptions(final String typeWorld) {
 		return CompletableFuture.supplyAsync(() -> {
 			this.read_lock.lock();

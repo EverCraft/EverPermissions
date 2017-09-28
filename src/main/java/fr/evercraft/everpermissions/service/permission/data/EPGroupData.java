@@ -29,12 +29,13 @@ import org.spongepowered.api.util.Tristate;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
+import fr.evercraft.everapi.services.permission.EGroupData;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
 
-public class EGroupData extends ESubjectData {
+public class EPGroupData extends EPSubjectData<EPGroupSubject> implements EGroupData {
 
-    public EGroupData(final EverPermissions plugin, final EGroupSubject subject, boolean transientData) {
+    public EPGroupData(final EverPermissions plugin, final EPGroupSubject subject, boolean transientData) {
         super(plugin, subject, transientData);
     }
     
@@ -152,6 +153,7 @@ public class EGroupData extends ESubjectData {
 		return this.clearParents(this.plugin.getService().getContextCalculator().getGroup(contexts));
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> clearParents(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		

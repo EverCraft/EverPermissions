@@ -17,7 +17,7 @@
 package fr.evercraft.everpermissions.service.permission.subject;
 
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
+import fr.evercraft.everpermissions.service.permission.collection.EPSubjectCollection;
 
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.MemorySubjectData;
@@ -27,15 +27,16 @@ import org.spongepowered.api.util.Tristate;
 import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class ETransientSubject extends ESubject {
+public class EPTransientSubject extends EPSubject {
 	private final MemorySubjectData data;
 	private final MemorySubjectData transientData;
 
-    public ETransientSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<?> collection) {
+    public EPTransientSubject(final EverPermissions plugin, final String identifier, final EPSubjectCollection<?> collection) {
     	super(plugin, identifier, collection);
     	
     	this.data = new MemorySubjectData(plugin.getService());
@@ -149,5 +150,10 @@ public class ETransientSubject extends ESubject {
 	@Override
 	public boolean isSubjectDataPersisted() {
 		return false;
+	}
+
+	@Override
+	public List<SubjectReference> getParents(String typeGroup) {
+		return Arrays.asList();
 	}
 }

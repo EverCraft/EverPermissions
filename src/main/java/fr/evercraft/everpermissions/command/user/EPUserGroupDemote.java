@@ -39,10 +39,10 @@ import fr.evercraft.everapi.java.UtilsCompletableFuture;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everapi.server.user.EUser;
+import fr.evercraft.everapi.services.permission.EGroupSubject;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.permission.EPContextCalculator;
+import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -117,10 +117,10 @@ public class EPUserGroupDemote extends ESubCommand<EverPermissions> {
 			});
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final EGroupSubject group, 
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EPUserSubject subject, final EGroupSubject group, 
 			final String worldName, final String typeUser) {
 		String groupName = group.getName();
-		Set<Context> contexts = EContextCalculator.of(worldName);
+		Set<Context> contexts = EPContextCalculator.of(worldName);
 		Optional<SubjectReference> oldGroup = subject.getSubjectData().getGroup(contexts);
 		
 		if (oldGroup.isPresent()) {

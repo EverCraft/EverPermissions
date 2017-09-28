@@ -35,7 +35,7 @@ import fr.evercraft.everapi.plugin.command.EParentCommand;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -88,7 +88,7 @@ public class EPGroupCreate extends ESubCommand<EverPermissions> {
 	private CompletableFuture<Boolean> command(final CommandSource player, final String groupName, final String worldName) throws EMessageException {
 		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
 		
-		Optional<EGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
+		Optional<EPGroupSubject> group = this.plugin.getService().getGroupSubjects().get(groupName);
 		// Groupe existant
 		if (group.isPresent() && group.get().hasTypeWorld(typeGroup)) {
 			EPMessages.GROUP_ADD_ERROR.sender()

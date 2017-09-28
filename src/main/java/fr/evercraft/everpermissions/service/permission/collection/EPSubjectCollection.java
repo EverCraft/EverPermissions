@@ -16,16 +16,16 @@
  */
 package fr.evercraft.everpermissions.service.permission.collection;
 
+import fr.evercraft.everapi.services.permission.ESubjectCollection;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.storage.EConfigCollectionStorage;
 import fr.evercraft.everpermissions.service.permission.storage.ESqlCollectionStorage;
 import fr.evercraft.everpermissions.service.permission.storage.ICollectionStorage;
-import fr.evercraft.everpermissions.service.permission.subject.ESubject;
-import fr.evercraft.everpermissions.service.permission.subject.ESubjectReference;
+import fr.evercraft.everpermissions.service.permission.subject.EPSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPSubjectReference;
 
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.service.context.Context;
@@ -48,7 +48,7 @@ import java.util.function.Predicate;
 /**
  * Subject collection
  */
-public abstract class ESubjectCollection<T extends ESubject> implements SubjectCollection {
+public abstract class EPSubjectCollection<T extends EPSubject> implements ESubjectCollection {
 	protected final EverPermissions plugin;
 	
 	private final String identifier;
@@ -59,7 +59,7 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	protected ICollectionStorage storage;
 	protected final ConcurrentMap<String, String> worlds;
 
-	public ESubjectCollection(final EverPermissions plugin, final String identifier) {
+	public EPSubjectCollection(final EverPermissions plugin, final String identifier) {
 		this.plugin = plugin;
 		this.identifier = identifier;
 		
@@ -123,10 +123,12 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 		}
 	}
 	
+	@Override
 	public Optional<String> getTypeWorld(final String world) {
 		return Optional.ofNullable(this.worlds.get(world));
 	}
 	
+	@Override
 	public Set<String> getTypeWorlds() {
 		return this.worlds.keySet();
 	}
@@ -177,7 +179,7 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	@Override
 	public CompletableFuture<Map<String, Subject>> loadSubjects(Set<String> identifiers) {
 		ImmutableMap.Builder<String, Subject> subjects = ImmutableMap.builder();
-		Set<ESubject> newSubjects = new HashSet<ESubject>();
+		Set<EPSubject> newSubjects = new HashSet<EPSubject>();
 		for (String identifier : identifiers) {
 			identifier = identifier.toLowerCase();
 			
@@ -230,7 +232,7 @@ public abstract class ESubjectCollection<T extends ESubject> implements SubjectC
 	public SubjectReference newSubjectReference(String subjectIdentifier) {
 		Preconditions.checkNotNull(subjectIdentifier, "subjectIdentifier");
 		
-		return new ESubjectReference(this.plugin.getService(), this.identifier, subjectIdentifier);
+		return new EPSubjectReference(this.plugin.getService(), this.identifier, subjectIdentifier);
 	}
 	
 	@Override

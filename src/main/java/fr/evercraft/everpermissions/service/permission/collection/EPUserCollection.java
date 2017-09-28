@@ -27,18 +27,20 @@ import org.spongepowered.api.service.permission.SubjectReference;
 
 import com.google.common.base.Preconditions;
 
+import fr.evercraft.everapi.services.permission.EUserCollection;
+import fr.evercraft.everapi.services.permission.EUserSubject;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 
-public class EUserCollection extends ESubjectCollection<EUserSubject> {
+public class EPUserCollection extends EPSubjectCollection<EPUserSubject> implements EUserCollection {
 
-	public EUserCollection(final EverPermissions plugin, String collectionIdentifier) {
+	public EPUserCollection(final EverPermissions plugin, String collectionIdentifier) {
 		super(plugin, collectionIdentifier);
 	}
 	
 	@Override
-	protected EUserSubject add(String identifier) {
-		return new EUserSubject(this.plugin, identifier, this);
+	protected EPUserSubject add(String identifier) {
+		return new EPUserSubject(this.plugin, identifier, this);
 	}
 	
 	@Override

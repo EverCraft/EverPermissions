@@ -32,7 +32,7 @@ import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -80,7 +80,7 @@ public class EPGroupRename extends ESubCommand<EverPermissions> {
 	}
 
 	private CompletableFuture<Boolean> command(final CommandSource player, final String oldGroupName, final String newGroupName) {		
-		Optional<EGroupSubject> oldGroup = this.plugin.getService().getGroupSubjects().get(oldGroupName);
+		Optional<EPGroupSubject> oldGroup = this.plugin.getService().getGroupSubjects().get(oldGroupName);
 		// Groupe introuvable
 		if (!oldGroup.isPresent()) {
 			EAMessages.GROUP_NOT_FOUND.sender()
@@ -89,7 +89,7 @@ public class EPGroupRename extends ESubCommand<EverPermissions> {
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		Optional<EGroupSubject> newGroup = this.plugin.getService().getGroupSubjects().get(newGroupName);
+		Optional<EPGroupSubject> newGroup = this.plugin.getService().getGroupSubjects().get(newGroupName);
 		// Groupe introuvable
 		if (newGroup.isPresent()) {
 			EPMessages.GROUP_RENAME_ERROR.sender()

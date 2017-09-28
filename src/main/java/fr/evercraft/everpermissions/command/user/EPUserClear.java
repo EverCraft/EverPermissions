@@ -35,7 +35,7 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -128,7 +128,7 @@ public class EPUserClear extends ESubCommand<EverPermissions> {
 			});
 	}
 	
-	private CompletableFuture<Boolean> commandConfirmation(final CommandSource staff, final EUser user, final EUserSubject subject) {
+	private CompletableFuture<Boolean> commandConfirmation(final CommandSource staff, final EUser user, final EPUserSubject subject) {
 		return subject.clear()
 				.exceptionally(e -> false)
 				.thenApply(result -> {

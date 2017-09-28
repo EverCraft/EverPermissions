@@ -16,8 +16,9 @@
  */
 package fr.evercraft.everpermissions.service.permission.subject;
 
+import fr.evercraft.everapi.services.permission.ESubject;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
+import fr.evercraft.everpermissions.service.permission.collection.EPSubjectCollection;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.Subject;
@@ -39,10 +40,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public abstract class ESubject implements Subject {
+public abstract class EPSubject implements ESubject {
 	protected final EverPermissions plugin;
 	
-	protected final ESubjectCollection<?> collection;
+	protected final EPSubjectCollection<?> collection;
 	protected final String identifier;
 	protected String name;
 	
@@ -53,7 +54,7 @@ public abstract class ESubject implements Subject {
 	protected final Lock write_lock;
 	protected final Lock read_lock;
 
-	public ESubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<?> collection) {
+	public EPSubject(final EverPermissions plugin, final String identifier, final EPSubjectCollection<?> collection) {
 		this.plugin = plugin;
 		
 		this.identifier = identifier;
@@ -68,6 +69,7 @@ public abstract class ESubject implements Subject {
 		this.plugin.getELogger().debug("Creation du subject (subject='" + this.identifier + "';collection='" + this.collection + "')");
 	}
 
+	@Override
 	public abstract void reload();
 	
 	/*
@@ -80,10 +82,11 @@ public abstract class ESubject implements Subject {
 	}
 	
 	@Override
-	public ESubjectCollection<?> getContainingCollection() {
+	public EPSubjectCollection<?> getContainingCollection() {
 		return this.collection;
 	}
 	
+	@Override
 	public String getCollectionIdentifier() {
 		return this.collection.getIdentifier();
 	}
@@ -135,9 +138,10 @@ public abstract class ESubject implements Subject {
 	
 	@Override
 	public SubjectReference asSubjectReference() {
-		return new ESubjectReference(this.plugin.getService(), this.getContainingCollection().getIdentifier(), this.getIdentifier());
+		return new EPSubjectReference(this.plugin.getService(), this.getContainingCollection().getIdentifier(), this.getIdentifier());
 	}
 	
+	@Override
 	public Optional<String> getFriendlyIdentifier() {
 		this.read_lock.lock();
 		try {
@@ -168,12 +172,14 @@ public abstract class ESubject implements Subject {
 		}
 	}
 
+	@Override
 	public void clearCache() {}
 	
 	/*
 	 * Verbose
 	 */
 	
+	@Override
 	public void addVerbose(CommandSource source, Set<String> permission) {
 		this.write_lock.lock();
 		try {
@@ -183,6 +189,7 @@ public abstract class ESubject implements Subject {
 		}
 	}
 	
+	@Override
 	public Optional<Set<String>> getVerbose(CommandSource source) {
 		this.read_lock.lock();
 		try {
@@ -192,6 +199,7 @@ public abstract class ESubject implements Subject {
 		}
 	}
 	
+	@Override
 	public void removeVerbose(CommandSource source) {
 		this.write_lock.lock();
 		try {
@@ -201,6 +209,7 @@ public abstract class ESubject implements Subject {
 		}
 	}
 	
+	@Override
 	public ImmutableMap<String, Set<String>> getVerboses() {
 		this.read_lock.lock();
 		try {

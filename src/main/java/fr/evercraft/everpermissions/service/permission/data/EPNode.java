@@ -24,7 +24,7 @@ import org.spongepowered.api.util.Tristate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 
-public class ENode extends HashMap<String, ENode> {
+public class EPNode extends HashMap<String, EPNode> {
 	private static final long serialVersionUID = -3369286570178770580L;
 	private static final Splitter NODE_SPLITTER = Splitter.on('.');
 	
@@ -34,17 +34,17 @@ public class ENode extends HashMap<String, ENode> {
 	 * Constructor
 	 */
 
-    public ENode() {
+    public EPNode() {
         super();
         this.value = Tristate.UNDEFINED;
     }
     
-    private ENode(final Tristate value) {
+    private EPNode(final Tristate value) {
     	super();
         this.value = value;
     }
     
-    private ENode(final Map<String, ENode> children, final Tristate value) {
+    private EPNode(final Map<String, EPNode> children, final Tristate value) {
     	super();
     	this.putAll(children);
         this.value = value;
@@ -66,8 +66,8 @@ public class ENode extends HashMap<String, ENode> {
      * Clone
      * @return Nouveau node
      */
-    public ENode copy() {
-    	return new ENode(this, this.value);
+    public EPNode copy() {
+    	return new EPNode(this, this.value);
     }
 
     /**
@@ -77,7 +77,7 @@ public class ENode extends HashMap<String, ENode> {
      */
     public Tristate getTristate(final String permission) {
         Iterable<String> parts = NODE_SPLITTER.split(permission.toLowerCase());
-        ENode currentNode = this;
+        EPNode currentNode = this;
         Tristate lastUndefinedVal = Tristate.UNDEFINED;
         for (String str : parts) {
             if (!currentNode.containsKey(str)) {
@@ -99,7 +99,7 @@ public class ENode extends HashMap<String, ENode> {
      */
     public Map<String, Boolean> asMap() {
         ImmutableMap.Builder<String, Boolean> ret = ImmutableMap.builder();
-        for (Map.Entry<String, ENode> ent : this.entrySet()) {
+        for (Map.Entry<String, EPNode> ent : this.entrySet()) {
             populateMap(ret, ent.getKey(), ent.getValue());
         }
         return ret.build();
@@ -111,11 +111,11 @@ public class ENode extends HashMap<String, ENode> {
      * @param prefix Le prefix
      * @param currentNode Le node
      */
-    private void populateMap(final ImmutableMap.Builder<String, Boolean> values, final String prefix, final ENode currentNode) {
+    private void populateMap(final ImmutableMap.Builder<String, Boolean> values, final String prefix, final EPNode currentNode) {
         if (currentNode.getTristate() != Tristate.UNDEFINED) {
             values.put(prefix, currentNode.value.asBoolean());
         }
-        for (Map.Entry<String, ENode> ent : currentNode.entrySet()) {
+        for (Map.Entry<String, EPNode> ent : currentNode.entrySet()) {
             populateMap(values, prefix + '.' + ent.getKey(), ent.getValue());
         }
     }
@@ -129,7 +129,7 @@ public class ENode extends HashMap<String, ENode> {
      * @param values Permission : Valeur
      * @return Le node
      */
-    public static ENode of(final Map<String, Boolean> values) {
+    public static EPNode of(final Map<String, Boolean> values) {
         return of(values, Tristate.UNDEFINED);
     }
 
@@ -139,16 +139,16 @@ public class ENode extends HashMap<String, ENode> {
      * @param defaultValue La valeur par défaut
      * @return Le node
      */
-    public static ENode of(final Map<String, Boolean> values, final Tristate defaultValue) {
-    	ENode newTree = new ENode(defaultValue);
+    public static EPNode of(final Map<String, Boolean> values, final Tristate defaultValue) {
+    	EPNode newTree = new EPNode(defaultValue);
         for (Map.Entry<String, Boolean> value : values.entrySet()) {
             Iterable<String> parts = NODE_SPLITTER.split(value.getKey().toLowerCase());
-            ENode currentNode = newTree;
+            EPNode currentNode = newTree;
             for (String part : parts) {
                 if (currentNode.containsKey(part)) {
                     currentNode = currentNode.get(part);
                 } else {
-                	ENode newNode = new ENode();
+                	EPNode newNode = new EPNode();
                     currentNode.put(part, newNode);
                     currentNode = newNode;
                 }
@@ -164,16 +164,16 @@ public class ENode extends HashMap<String, ENode> {
      * @param value La valeur
      * @return Le nouveau node
      */
-    public ENode withValue(final String node, final Tristate value) {
+    public EPNode withValue(final String node, final Tristate value) {
         Iterable<String> parts = NODE_SPLITTER.split(node.toLowerCase());
-        ENode newRoot = this.copy();
-        ENode currentPtr = newRoot;
+        EPNode newRoot = this.copy();
+        EPNode currentPtr = newRoot;
 
         for (String part : parts) {
-        	ENode oldChild = currentPtr.get(part);
-        	ENode newChild;
+        	EPNode oldChild = currentPtr.get(part);
+        	EPNode newChild;
             if (oldChild == null) {
-            	newChild = new ENode();
+            	newChild = new EPNode();
             } else {
             	newChild = oldChild.copy();
             }
@@ -189,8 +189,8 @@ public class ENode extends HashMap<String, ENode> {
      * @param values Une map de permission
      * @return Le nouveau node
      */
-    public ENode withAll(final Map<String, Tristate> values) {
-    	ENode node = this;
+    public EPNode withAll(final Map<String, Tristate> values) {
+    	EPNode node = this;
         for (Map.Entry<String, Tristate> ent : values.entrySet()) {
         	node = node.withValue(ent.getKey(), ent.getValue());
         }

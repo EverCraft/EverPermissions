@@ -36,14 +36,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import fr.evercraft.everapi.services.permission.EUserData;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.ESubject;
+import fr.evercraft.everpermissions.service.permission.EPContextCalculator;
+import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 
-public class EUserData extends ESubjectData {	
+public class EPUserData extends EPSubjectData<EPUserSubject> implements EUserData {	
 	protected final ConcurrentMap<String, SubjectReference> groups;
 	
-	public EUserData(final EverPermissions plugin, final ESubject subject, boolean transientData) {
+	public EPUserData(final EverPermissions plugin, final EPUserSubject subject, boolean transientData) {
 		super(plugin, subject, transientData);
 		
 		this.groups = new ConcurrentHashMap<String, SubjectReference>();
@@ -111,7 +112,7 @@ public class EUserData extends ESubjectData {
 			
 			ImmutableMap.Builder<Set<Context>, List<SubjectReference>> builder = ImmutableMap.builder();
 			for (Entry<String, List<SubjectReference>> parents : ret.entrySet()) {
-				builder.put(EContextCalculator.of(parents.getKey()), ImmutableList.copyOf(parents.getValue()));
+				builder.put(EPContextCalculator.of(parents.getKey()), ImmutableList.copyOf(parents.getValue()));
 			}
 			return builder.build();
 		} finally {
@@ -125,6 +126,7 @@ public class EUserData extends ESubjectData {
 		return this.getParents(this.plugin.getService().getContextCalculator().getUser(contexts));
 	}
 	
+	@Override
 	public List<SubjectReference> getParents(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
@@ -148,11 +150,13 @@ public class EUserData extends ESubjectData {
 		}
 	}
 	
+	@Override
 	public Optional<SubjectReference> getGroup(final Set<Context> contexts) {
 		Preconditions.checkNotNull(contexts, "contexts");
 		return this.getGroup(this.plugin.getService().getContextCalculator().getUser(contexts));
 	}
 	
+	@Override
 	public Optional<SubjectReference> getGroup(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
@@ -164,11 +168,13 @@ public class EUserData extends ESubjectData {
 		}
 	}
 	
+	@Override
 	public List<SubjectReference> getSubGroup(final Set<Context> contexts) {
 		Preconditions.checkNotNull(contexts, "contexts");
 		return this.getSubGroup(this.plugin.getService().getContextCalculator().getUser(contexts));
 	}
 	
+	@Override
 	public List<SubjectReference> getSubGroup(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		
@@ -182,6 +188,7 @@ public class EUserData extends ESubjectData {
 		}
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> setGroup(final Set<Context> contexts, final SubjectReference parent) {
 		Preconditions.checkNotNull(contexts, "contexts");
 		
@@ -190,6 +197,7 @@ public class EUserData extends ESubjectData {
 		return this.setGroup(this.plugin.getService().getContextCalculator().getUser(contexts), parent);
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> setGroup(final String typeWorld, final SubjectReference parent) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		Preconditions.checkNotNull(parent, "parent");
@@ -228,6 +236,7 @@ public class EUserData extends ESubjectData {
 	 * SubGroups
 	 */
 
+	@Override
 	public CompletableFuture<Boolean> addParent(final Set<Context> contexts, final SubjectReference parent) {
 		Preconditions.checkNotNull(contexts, "contexts");
 		
@@ -236,6 +245,7 @@ public class EUserData extends ESubjectData {
 		return this.addParent(this.plugin.getService().getContextCalculator().getUser(contexts), parent);
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> removeParent(final Set<Context> contexts, final SubjectReference parent) {
 		Preconditions.checkNotNull(contexts, "contexts");
 		if (!parent.getCollectionIdentifier().equals(PermissionService.SUBJECTS_GROUP)) return CompletableFuture.completedFuture(false);
@@ -243,6 +253,7 @@ public class EUserData extends ESubjectData {
 		return this.removeParent(this.plugin.getService().getContextCalculator().getUser(contexts), parent);
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> removeParent(final String typeWorld, final SubjectReference parent) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		Preconditions.checkNotNull(parent, "parent");
@@ -281,11 +292,13 @@ public class EUserData extends ESubjectData {
 		}
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> clearParents(final Set<Context> contexts) {
 		Preconditions.checkNotNull(contexts, "contexts");
 		return this.clearParents(this.plugin.getService().getContextCalculator().getUser(contexts));
 	}
 	
+	@Override
 	public CompletableFuture<Boolean> clearParents(final String typeWorld) {
 		Preconditions.checkNotNull(typeWorld, "typeWorld");
 		

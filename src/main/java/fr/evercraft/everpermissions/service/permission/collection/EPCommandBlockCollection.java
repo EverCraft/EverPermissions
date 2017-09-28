@@ -20,13 +20,13 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 
-public class ECommandBlockCollection extends EUserCollection {
+public class EPCommandBlockCollection extends EPUserCollection {
 	
-	private EUserSubject commandBlock;
+	private EPUserSubject commandBlock;
 
-	public ECommandBlockCollection(final EverPermissions plugin, String collectionIdentifier) {
+	public EPCommandBlockCollection(final EverPermissions plugin, String collectionIdentifier) {
 		super(plugin, collectionIdentifier);
 	}
 	
@@ -37,12 +37,12 @@ public class ECommandBlockCollection extends EUserCollection {
 	}
 	
 	@Override
-	public Optional<EUserSubject> get(String identifier) {
+	public Optional<EPUserSubject> get(String identifier) {
 		return Optional.ofNullable(this.commandBlock);
 	}
 	
 	@Override
-	public CompletableFuture<EUserSubject> load(String identifier) {
+	public CompletableFuture<EPUserSubject> load(String identifier) {
 		return CompletableFuture.completedFuture(this.commandBlock);
 	}
 }

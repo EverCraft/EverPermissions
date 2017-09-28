@@ -38,10 +38,10 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.server.user.EUser;
+import fr.evercraft.everapi.services.permission.EGroupSubject;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.data.EUserData;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.permission.data.EPUserData;
+import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -63,10 +63,10 @@ public class EPUserSubGroupRemove extends ESubCommand<EverPermissions> {
         			if (!player.isPresent()) return this.getAllGroups(args.getWorld().getName());
         			
         			SubjectData data = player.get().getSubjectData();
-        			if (!(data instanceof EUserData)) return this.getAllGroups(args.getWorld().getName());
+        			if (!(data instanceof EPUserData)) return this.getAllGroups(args.getWorld().getName());
         			
         			String typeUser = EPCommand.getTypeWorld(source, this.plugin.getService().getUserSubjects(), args.getWorld().getName());
-        			return ((EUserData) data).getSubGroup(typeUser).stream()
+        			return ((EPUserData) data).getSubGroup(typeUser).stream()
         					.map(subgroup -> subgroup.resolve().join().getFriendlyIdentifier().orElse(subgroup.getSubjectIdentifier()))
         					.collect(Collectors.toSet());
         		});
@@ -127,7 +127,7 @@ public class EPUserSubGroupRemove extends ESubCommand<EverPermissions> {
 			});
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final EGroupSubject group, 
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EPUserSubject subject, final EGroupSubject group, 
 			final String worldName, final String typeUser) {
 		String groupName = group.getName();
 		

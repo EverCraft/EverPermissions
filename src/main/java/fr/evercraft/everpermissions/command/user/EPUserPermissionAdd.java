@@ -37,7 +37,7 @@ import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -114,7 +114,7 @@ public class EPUserPermissionAdd extends ESubCommand<EverPermissions> {
 			});
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final String permission, 
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EPUserSubject subject, final String permission, 
 			final boolean value, final String worldName, final String typeUser) {
 		
 		Boolean oldValue = subject.getSubjectData().getPermissions(typeUser).get(permission);

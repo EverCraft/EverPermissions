@@ -39,8 +39,8 @@ import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everapi.server.player.EPlayer;
 import fr.evercraft.everapi.server.user.EUser;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.data.EUserData;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.permission.data.EPUserData;
+import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -62,10 +62,10 @@ public class EPUserOptionRemove extends ESubCommand<EverPermissions> {
         			if (!player.isPresent()) return this.getAllOptions();
         			
         			SubjectData data = player.get().getSubjectData();
-        			if (!(data instanceof EUserData)) return this.getAllOptions();
+        			if (!(data instanceof EPUserData)) return this.getAllOptions();
         			
         			String typeUser = EPCommand.getTypeWorld(source, this.plugin.getService().getUserSubjects(), args.getWorld().getName());
-        			return ((EUserData) data).getOptions(typeUser).keySet();
+        			return ((EPUserData) data).getOptions(typeUser).keySet();
         		});
     }
 	
@@ -123,7 +123,7 @@ public class EPUserOptionRemove extends ESubCommand<EverPermissions> {
 			});
 	}
 
-	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EUserSubject subject, final String option, 
+	private CompletableFuture<Boolean> command(final CommandSource staff, final EUser user, final EPUserSubject subject, final String option, 
 			final String worldName, final String typeUser) {
 		
 		if (subject.getSubjectData().getOptions(typeUser).get(option) == null) {

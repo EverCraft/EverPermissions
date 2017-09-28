@@ -46,11 +46,11 @@ import com.google.common.reflect.TypeToken;
 
 import fr.evercraft.everapi.plugin.file.EConfig;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.data.ESubjectData;
-import fr.evercraft.everpermissions.service.permission.data.EUserData;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
-import fr.evercraft.everpermissions.service.permission.subject.ESubject;
-import fr.evercraft.everpermissions.service.permission.subject.ESubjectReference;
+import fr.evercraft.everpermissions.service.permission.data.EPSubjectData;
+import fr.evercraft.everpermissions.service.permission.data.EPUserData;
+import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPSubjectReference;
 
 public class EConfigSubjectStorage extends EConfig<EverPermissions> {	
 	private final String collection;
@@ -85,15 +85,15 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 		} catch (IOException e) {}
 	}
 	
-	public boolean load(final ESubject subject) {
-		if (!(subject.getSubjectData() instanceof ESubjectData)) return true;
+	public boolean load(final EPSubject subject) {
+		if (!(subject.getSubjectData() instanceof EPSubjectData<?>)) return true;
 		
 		ConfigurationNode configSubject = this.get(subject.getIdentifier());
-		ESubjectData dataSubject = (ESubjectData) subject.getSubjectData();
+		EPSubjectData<?> dataSubject = (EPSubjectData<?>) subject.getSubjectData();
 		
 		if (configSubject.isVirtual()) {
-			if (subject instanceof EGroupSubject) {
-				EGroupSubject group = (EGroupSubject) subject;
+			if (subject instanceof EPGroupSubject) {
+				EPGroupSubject group = (EPGroupSubject) subject;
 				if (!group.hasTypeWorld(this.typeWorld)) return true;
 				
 				configSubject.setValue(ImmutableMap.of());
@@ -161,8 +161,8 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 			
 			// Chargement du groupe
 			String group = configSubject.getNode("group").getString(null);
-			if (dataSubject instanceof EUserData && group != null) {
-				((EUserData) dataSubject).setGroupExecute(this.typeWorld, this.plugin.getService().getGroupSubjects().newSubjectReference(group));
+			if (dataSubject instanceof EPUserData && group != null) {
+				((EPUserData) dataSubject).setGroupExecute(this.typeWorld, this.plugin.getService().getGroupSubjects().newSubjectReference(group));
 				this.plugin.getELogger().debug("Loading : ("
 						+ "identifier=" + subject.getIdentifier() + ";"
 						+ "group=" + group + ";"
@@ -171,29 +171,29 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 			
 			// Chargement du default
 			boolean isDefault = configSubject.getNode("default").getBoolean(false);
-			if (subject instanceof EGroupSubject && isDefault) {
-				this.plugin.getService().getGroupSubjects().setDefaultExecute(this.typeWorld, (EGroupSubject) subject, true);
+			if (subject instanceof EPGroupSubject && isDefault) {
+				this.plugin.getService().getGroupSubjects().setDefaultExecute(this.typeWorld, (EPGroupSubject) subject, true);
 				this.plugin.getELogger().debug("Loading : ("
 						+ "identifier=" + subject.getIdentifier() + ";"
 						+ "default='true';"
 						+ "type=" + this.typeWorld + ")");
 			}
 			
-			if (subject instanceof EGroupSubject) {
-				((EGroupSubject) subject).registerTypeWorld(this.typeWorld);
+			if (subject instanceof EPGroupSubject) {
+				((EPGroupSubject) subject).registerTypeWorld(this.typeWorld);
 			}
 		}
 		return true;
 	}
 	
-	public boolean load(Collection<ESubject> subjects) {
-		for (ESubject subject : subjects) {
+	public boolean load(Collection<EPSubject> subjects) {
+		for (EPSubject subject : subjects) {
 			if (!this.load(subject)) return false;
 		}
 		return true;
 	}
 	
-	public boolean clear(ESubjectData subject) {
+	public boolean clear(EPSubjectData<?> subject) {
 		this.getNode().removeChild(subject.getIdentifier());
 		return this.save(true);
 	}
@@ -202,7 +202,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 	 * Permissions
 	 */
 
-	public boolean setPermission(final ESubjectData subject, final String permission, final Tristate value, final boolean insert) {
+	public boolean setPermission(final EPSubjectData<?> subject, final String permission, final Tristate value, final boolean insert) {
 		ConfigurationNode permissions = this.getNode().getNode(subject.getIdentifier(), "permissions");
 		// Supprime une permission
 		if (value.equals(Tristate.UNDEFINED)) {
@@ -216,7 +216,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 		return this.save(true);
 	}
 
-	public boolean clearPermissions(final ESubjectData subject) {
+	public boolean clearPermissions(final EPSubjectData<?> subject) {
 		this.get(subject.getIdentifier()).removeChild("permissions");
 		
 		this.plugin.getELogger().debug("Removed the permissions configuration file : (identifier='" + subject + "';type='" + this.typeWorld + "')");
@@ -227,7 +227,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 	 * Options
 	 */
 	
-	public boolean setOption(final ESubjectData subject, final String option, final String value, final boolean insert) {
+	public boolean setOption(final EPSubjectData<?> subject, final String option, final String value, final boolean insert) {
 		ConfigurationNode options = this.get(subject + ".options");
 		if (value == null) {
 			options.removeChild(option);
@@ -239,7 +239,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 		return this.save(true);
 	}
 
-	public boolean clearOptions(final ESubjectData subject) {
+	public boolean clearOptions(final EPSubjectData<?> subject) {
 		this.get(subject.getIdentifier()).removeChild("options");
 		this.plugin.getELogger().debug("Removed the options configuration file : (identifier='" + subject + "';type='" + this.typeWorld + "')");
 		return this.save(true);
@@ -249,7 +249,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 	 * Groups
 	 */
 	
-	public boolean addParent(final ESubjectData subject, final SubjectReference parent) {
+	public boolean addParent(final EPSubjectData<?> subject, final SubjectReference parent) {
 		try {
 			List<String> subgroups = new ArrayList<String>(this.get(subject.getIdentifier() + "." + this.parentIdentifier).getList(TypeToken.of(String.class)));
 			subgroups.add(parent.getSubjectIdentifier());
@@ -260,13 +260,13 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 		return false;
 	}
 	
-	public boolean setGroup(final ESubjectData subject, final SubjectReference parent, boolean insert) {
+	public boolean setGroup(final EPSubjectData<?> subject, final SubjectReference parent, boolean insert) {
 		this.get(subject.getIdentifier() + ".group").setValue(parent.getSubjectIdentifier());
 		this.plugin.getELogger().debug("Added to the configs file : (identifier='" + subject + "';group='" + parent.getSubjectIdentifier() + "';type='" + this.typeWorld + "')");
 		return this.save(true);
     }
 
-	public boolean removeParent(final ESubjectData subject, final SubjectReference parent) {
+	public boolean removeParent(final EPSubjectData<?> subject, final SubjectReference parent) {
 		ConfigurationNode group = this.get(subject.getIdentifier() + ".group");
 		if (!group.isVirtual() && group.getString("").equals(parent.getSubjectIdentifier())) {
 			this.get(subject.getIdentifier()).removeChild("group");
@@ -287,7 +287,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 		return false;
 	}
 	
-	public boolean clearParents(final ESubjectData subject) {
+	public boolean clearParents(final EPSubjectData<?> subject) {
 		ConfigurationNode config = this.get(subject.getIdentifier());
 		config.removeChild(this.parentIdentifier);
 		config.removeChild("group");
@@ -295,7 +295,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 		return this.save(true);
 	}
 	
-	public boolean setFriendlyIdentifier(ESubject subject, @Nullable String name) {
+	public boolean setFriendlyIdentifier(EPSubject subject, @Nullable String name) {
 		if (name == null) {
 			this.get(subject.getIdentifier()).removeChild("name");
 		} else {
@@ -304,7 +304,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 		return this.save(true);
 	}
 	
-	public boolean setDefault(EGroupSubject subject, boolean value) {
+	public boolean setDefault(EPGroupSubject subject, boolean value) {
 		if (!value) {
 			this.get(subject.getIdentifier()).removeChild("default");
 		} else {
@@ -340,7 +340,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 			for (String value : permissions) {
 				ConfigurationNode result = configPermission.getNode(value);
 				if (!result.isVirtual()) {
-					subjects.put(new ESubjectReference(this.plugin.getService(), this.collection, configSubject.getKey().toString()), result.getBoolean(false));
+					subjects.put(new EPSubjectReference(this.plugin.getService(), this.collection, configSubject.getKey().toString()), result.getBoolean(false));
 					continue;
 				}
 			}

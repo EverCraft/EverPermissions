@@ -30,6 +30,9 @@ import com.google.common.collect.ImmutableSet;
 
 import fr.evercraft.everapi.exception.message.EMessageException;
 import fr.evercraft.everapi.plugin.command.EParentCommand;
+import fr.evercraft.everapi.services.permission.EGroupSubject;
+import fr.evercraft.everapi.services.permission.ESubjectCollection;
+import fr.evercraft.everapi.services.permission.EUserSubject;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.command.collection.EPCollection;
 import fr.evercraft.everpermissions.command.group.EPGroup;
@@ -39,12 +42,11 @@ import fr.evercraft.everpermissions.exception.CollectionNotFoundException;
 import fr.evercraft.everpermissions.exception.GroupNotFoundWorldException;
 import fr.evercraft.everpermissions.exception.GroupTypeWorldNotFoundException;
 import fr.evercraft.everpermissions.exception.SubjectNotFoundException;
-import fr.evercraft.everpermissions.service.EPermissionService;
-import fr.evercraft.everpermissions.service.permission.collection.ECommandBlockCollection;
-import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
-import fr.evercraft.everpermissions.service.permission.collection.EUserCollection;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.EPPermissionService;
+import fr.evercraft.everpermissions.service.permission.collection.EPCommandBlockCollection;
+import fr.evercraft.everpermissions.service.permission.collection.EPUserCollection;
+import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 
 public class EPCommand extends EParentCommand<EverPermissions> {
 	
@@ -72,25 +74,25 @@ public class EPCommand extends EParentCommand<EverPermissions> {
 		return source.hasPermission(EPPermissions.HELP.get());
 	}
 	
-	public static Set<String> getAllCollections(EPermissionService service) throws EMessageException {
+	public static Set<String> getAllCollections(EPPermissionService service) throws EMessageException {
 		return service.getLoadedCollections().values().stream()
-				.filter(collection -> (collection instanceof EUserCollection || collection instanceof ECommandBlockCollection))
+				.filter(collection -> (collection instanceof EPUserCollection || collection instanceof EPCommandBlockCollection))
 				.filter(collection -> !collection.getIdentifier().equals(PermissionService.SUBJECTS_USER))
 				.map(collection -> collection.getIdentifier())
 				.collect(Collectors.toSet());
 	}
 	
-	public static Set<String> getAllSubjects(EPermissionService service, String collectionIdentifier) throws EMessageException {
+	public static Set<String> getAllSubjects(EPPermissionService service, String collectionIdentifier) throws EMessageException {
 		Optional<SubjectCollection> collection = service.getCollection(collectionIdentifier);
 		if (!collection.isPresent()) return ImmutableSet.of();
-		if (!(collection.get() instanceof EUserCollection || collection.get() instanceof ECommandBlockCollection)) return ImmutableSet.of();
+		if (!(collection.get() instanceof EPUserCollection || collection.get() instanceof EPCommandBlockCollection)) return ImmutableSet.of();
 		
 		return collection.get().getLoadedSubjects().stream()
 				.map(subject -> subject.getIdentifier())
 				.collect(Collectors.toSet());
 	}
 	
-	public static String getTypeWorld(CommandSource source, ESubjectCollection<?> collection, String world) throws EMessageException {
+	public static String getTypeWorld(CommandSource source, ESubjectCollection collection, String world) throws EMessageException {
 		Optional<String> type = collection.getTypeWorld(world);
 		if (!type.isPresent()) {
 			throw new GroupNotFoundWorldException(source, world);
@@ -99,8 +101,8 @@ public class EPCommand extends EParentCommand<EverPermissions> {
 		}
 	}
 	
-	public static EGroupSubject getGroup(CommandSource source, EPermissionService service, String groupName, String typeWorld) throws EMessageException {
-		Optional<EGroupSubject> group = service.getGroupSubjects().get(groupName);
+	public static EGroupSubject getGroup(CommandSource source, EPPermissionService service, String groupName, String typeWorld) throws EMessageException {
+		Optional<EPGroupSubject> group = service.getGroupSubjects().get(groupName);
 		if (!group.isPresent() || !group.get().hasTypeWorld(typeWorld)) {
 			throw new GroupTypeWorldNotFoundException(source, groupName, typeWorld);
 		} else {
@@ -108,12 +110,12 @@ public class EPCommand extends EParentCommand<EverPermissions> {
 		}
 	}
 	
-	public static EUserSubject getSubject(CommandSource source, EPermissionService service, String collectionIdentifier, String subjectIdentifier) throws EMessageException {
+	public static EUserSubject getSubject(CommandSource source, EPPermissionService service, String collectionIdentifier, String subjectIdentifier) throws EMessageException {
 		Optional<SubjectCollection> collection = service.getCollection(collectionIdentifier);
 		if (!collection.isPresent() || collection.get().getIdentifier().equals(PermissionService.SUBJECTS_USER)) throw new CollectionNotFoundException(source, collectionIdentifier);
 		
 		Optional<Subject> subject = collection.get().getSubject(subjectIdentifier);
-		if (!subject.isPresent() || !(subject.get() instanceof EUserSubject)) throw new SubjectNotFoundException(source, collectionIdentifier, subjectIdentifier);
+		if (!subject.isPresent() || !(subject.get() instanceof EPUserSubject)) throw new SubjectNotFoundException(source, collectionIdentifier, subjectIdentifier);
 		
 		return (EUserSubject) subject.get();
 	}

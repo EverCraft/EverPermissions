@@ -25,9 +25,9 @@ import javax.annotation.Nullable;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
-import fr.evercraft.everpermissions.service.permission.data.ESubjectData;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
-import fr.evercraft.everpermissions.service.permission.subject.ESubject;
+import fr.evercraft.everpermissions.service.permission.data.EPSubjectData;
+import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPSubject;
 
 public interface ICollectionStorage {
 	
@@ -37,51 +37,51 @@ public interface ICollectionStorage {
 
 	boolean unregister(String typeWorld);
     
-    public boolean load(ESubject subject);
+    public boolean load(EPSubject subject);
     
-    public boolean load(Collection<ESubject> subjects);
+    public boolean load(Collection<EPSubject> subjects);
     
-    public boolean clear(ESubjectData subject);
+    public boolean clear(EPSubjectData<?> subject);
     
-    public boolean clear(ESubjectData subject, String typeWorld);
+    public boolean clear(EPSubjectData<?> subject, String typeWorld);
     
-    public boolean setFriendlyIdentifier(ESubject subject, @Nullable String name);
+    public boolean setFriendlyIdentifier(EPSubject subject, @Nullable String name);
     
-    public boolean setDefault(EGroupSubject subject, String typeWorld, boolean value);
+    public boolean setDefault(EPGroupSubject subject, String typeWorld, boolean value);
     
     /*
      * Permissions
      */
 
-    public boolean setPermission(ESubjectData subject, String typeWorld, String  permission, Tristate value, boolean insert);
+    public boolean setPermission(EPSubjectData<?> subject, String typeWorld, String  permission, Tristate value, boolean insert);
 
-    public boolean clearPermissions(ESubjectData subject, String typeWorld);
+    public boolean clearPermissions(EPSubjectData<?> subject, String typeWorld);
     
-    public boolean clearPermissions(ESubjectData subject);
+    public boolean clearPermissions(EPSubjectData<?> subject);
     
     /*
      * Options
      */
     
-    public boolean setOption(ESubjectData subject, String typeWorld, String type, String name, boolean insert);
+    public boolean setOption(EPSubjectData<?> subject, String typeWorld, String type, String name, boolean insert);
 
-    public boolean clearOptions(ESubjectData subject, String typeWorld);
+    public boolean clearOptions(EPSubjectData<?> subject, String typeWorld);
     
-    public boolean clearOptions(ESubjectData subject);
+    public boolean clearOptions(EPSubjectData<?> subject);
 
     /*
      * Groups
      */
     
-    public boolean addParent(ESubjectData subject, String typeWorld, SubjectReference parent);
+    public boolean addParent(EPSubjectData<?> subject, String typeWorld, SubjectReference parent);
     
-    public boolean setGroup(ESubjectData subject, String typeWorld, SubjectReference parent, boolean insert);
+    public boolean setGroup(EPSubjectData<?> subject, String typeWorld, SubjectReference parent, boolean insert);
 
-    public boolean removeParent(ESubjectData subject, String typeWorld, SubjectReference parent);
+    public boolean removeParent(EPSubjectData<?> subject, String typeWorld, SubjectReference parent);
 
-    public boolean clearParents(ESubjectData subject, String typeWorld);
+    public boolean clearParents(EPSubjectData<?> subject, String typeWorld);
     
-    public boolean clearParents(ESubjectData subject);
+    public boolean clearParents(EPSubjectData<?> subject);
     
     /*
      * 

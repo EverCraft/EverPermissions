@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
-import fr.evercraft.everpermissions.service.EPermissionService;
+import fr.evercraft.everpermissions.service.EPPermissionService;
 
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -42,13 +42,13 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
-public class EPermissionDescription implements PermissionDescription {
-    private final EPermissionService service;
+public class EPPermissionDescription implements PermissionDescription {
+    private final EPPermissionService service;
     private final String permission;
     private final Text description;
     private final PluginContainer plugin;
 
-    public EPermissionDescription(EPermissionService service, PluginContainer plugin, String permission, Text description) {
+    public EPPermissionDescription(EPPermissionService service, PluginContainer plugin, String permission, Text description) {
     	this.service = checkNotNull(service, "service");
         this.permission = checkNotNull(permission, "permission");
         this.description = checkNotNull(description, "description");
@@ -89,9 +89,9 @@ public class EPermissionDescription implements PermissionDescription {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof EPermissionDescription)) return false;
+        if (!(obj instanceof EPPermissionDescription)) return false;
         
-        EPermissionDescription other = (EPermissionDescription) obj;
+        EPPermissionDescription other = (EPPermissionDescription) obj;
         return this.permission.equals(other.permission) && this.plugin == other.plugin && this.description == other.description;
     }
     
@@ -102,13 +102,13 @@ public class EPermissionDescription implements PermissionDescription {
 
 	public static class Builder implements PermissionDescription.Builder {
         private final PluginContainer plugin;
-        private final EPermissionService service;
+        private final EPPermissionService service;
         
         private String id;
         private Text description;
         private final Map<String, Tristate> roleAssignments;
 
-        public Builder(EPermissionService service, PluginContainer plugin) {
+        public Builder(EPPermissionService service, PluginContainer plugin) {
         	this.service = service;
             this.plugin = plugin;
             this.roleAssignments = new LinkedHashMap<>();
@@ -134,9 +134,9 @@ public class EPermissionDescription implements PermissionDescription {
         }
 
         @Override
-        public EPermissionDescription register() throws IllegalStateException {
+        public EPPermissionDescription register() throws IllegalStateException {
             checkState(this.id != null, "No id set");
-            EPermissionDescription description = new EPermissionDescription(this.service, this.plugin, this.id, this.description);
+            EPPermissionDescription description = new EPPermissionDescription(this.service, this.plugin, this.id, this.description);
             this.service.registerDescription(description);
 
             // Set role-templates

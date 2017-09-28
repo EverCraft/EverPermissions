@@ -32,9 +32,9 @@ import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.exception.message.EMessageException;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
+import fr.evercraft.everapi.services.permission.EGroupSubject;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
+import fr.evercraft.everpermissions.service.permission.EPContextCalculator;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -91,7 +91,7 @@ public class EPGroupOptionCheck extends ESubCommand<EverPermissions> {
 		String typeGroup = EPCommand.getTypeWorld(player, this.plugin.getService().getGroupSubjects(), worldName);
 		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
 		
-		Set<Context> contexts = EContextCalculator.of(worldName);
+		Set<Context> contexts = EPContextCalculator.of(worldName);
 		String value = group.getSubjectData().getOptions(contexts).get(option);
 		// Si il y a une valeur
 		if (value != null) {

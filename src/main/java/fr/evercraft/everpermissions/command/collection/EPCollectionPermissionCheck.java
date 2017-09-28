@@ -34,9 +34,9 @@ import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.exception.message.EMessageException;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
+import fr.evercraft.everapi.services.permission.EUserSubject;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.permission.EPContextCalculator;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -99,7 +99,7 @@ public class EPCollectionPermissionCheck extends ESubCommand<EverPermissions> {
 
 	private void command(final CommandSource staff, final EUserSubject subject, final String permission, final String worldName, final String typeUser) {
 		
-		Set<Context> contexts = EContextCalculator.of(worldName);
+		Set<Context> contexts = EPContextCalculator.of(worldName);
 		Tristate value = subject.getPermissionValue(contexts, permission);
 		// Permission : True
 		if (value.equals(Tristate.TRUE)) {

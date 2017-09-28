@@ -16,10 +16,11 @@
  */
 package fr.evercraft.everpermissions.service.permission.subject;
 
+import fr.evercraft.everapi.services.permission.EGroupSubject;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
-import fr.evercraft.everpermissions.service.permission.data.EGroupData;
+import fr.evercraft.everpermissions.service.permission.EPContextCalculator;
+import fr.evercraft.everpermissions.service.permission.collection.EPSubjectCollection;
+import fr.evercraft.everpermissions.service.permission.data.EPGroupData;
 
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.SubjectReference;
@@ -35,17 +36,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class EGroupSubject extends ESubject {
-	private final EGroupData data;
-	private final EGroupData transientData;
+public class EPGroupSubject extends EPSubject implements EGroupSubject {
+	private final EPGroupData data;
+	private final EPGroupData transientData;
 	
 	private final Set<String> typeWorlds;
 	
-    public EGroupSubject(final EverPermissions plugin, final String identifier, final ESubjectCollection<?> collection) {
+    public EPGroupSubject(final EverPermissions plugin, final String identifier, final EPSubjectCollection<?> collection) {
     	super(plugin, identifier, collection);
     	
-    	this.data = new EGroupData(this.plugin, this, false);
-        this.transientData = new EGroupData(this.plugin, this, true);
+    	this.data = new EPGroupData(this.plugin, this, false);
+        this.transientData = new EPGroupData(this.plugin, this, true);
         
         this.typeWorlds = new HashSet<String>();
     }
@@ -60,17 +61,18 @@ public class EGroupSubject extends ESubject {
      * Accesseurs
      */
     
+    @Override
 	public String getName() {
 		return this.getFriendlyIdentifier().orElse(this.getIdentifier());
 	}
     
     @Override
-	public EGroupData getSubjectData() {
+	public EPGroupData getSubjectData() {
 		return this.data;
 	}
 
 	@Override
-	public EGroupData getTransientSubjectData() {
+	public EPGroupData getTransientSubjectData() {
 		return this.transientData;
 	}
 	
@@ -86,7 +88,7 @@ public class EGroupSubject extends ESubject {
 	@Override
 	public Tristate getPermissionValue(final Set<Context> contexts, final String permission) {  		
 		Tristate value = this.getPermissionExecute(contexts, permission);
-		this.verbose(EContextCalculator.getWorld(contexts), permission, value);
+		this.verbose(EPContextCalculator.getWorld(contexts), permission, value);
 		return value;
 	}
 	
@@ -128,7 +130,7 @@ public class EGroupSubject extends ESubject {
 	@Override
     public Optional<String> getOption(final Set<Context> contexts, final String option) {
 		Optional<String> value = this.getOptionExecute(contexts, option);
-		this.verbose(EContextCalculator.getWorld(contexts), option, value);
+		this.verbose(EPContextCalculator.getWorld(contexts), option, value);
 		return value;
 	}
 
@@ -174,6 +176,7 @@ public class EGroupSubject extends ESubject {
         return this.getParents(this.plugin.getService().getContextCalculator().getGroup(contexts));
     }
     
+    
     public List<SubjectReference> getParents(final String typeWorldGroup) {
     	List<SubjectReference> list = new ArrayList<SubjectReference>();
     	list.addAll(this.data.getParents(typeWorldGroup));
@@ -185,6 +188,7 @@ public class EGroupSubject extends ESubject {
 	 * World
 	 */
     
+    @Override
     public CompletableFuture<Boolean> setDefault(final String typeWorld, boolean value) {
     	Preconditions.checkNotNull(typeWorld, "typeWorld");
     	
@@ -207,11 +211,13 @@ public class EGroupSubject extends ESubject {
 		}, this.plugin.getThreadAsync());
 	}
     
+    @Override
     public boolean isDefault(final String typeWorld) {
     	Optional<EGroupSubject> oldDefault = this.plugin.getService().getGroupSubjects().getDefaultGroup(typeWorld);
     	return oldDefault.isPresent() && oldDefault.get().equals(this);
     }
 	
+    @Override
 	public Set<String> getTypeWorlds() {
 		this.read_lock.lock();
 		try {
@@ -221,6 +227,7 @@ public class EGroupSubject extends ESubject {
 		}
 	}
 	
+    @Override
 	public boolean hasTypeWorld(final String typeWorld) {
 		this.read_lock.lock();
 		try {

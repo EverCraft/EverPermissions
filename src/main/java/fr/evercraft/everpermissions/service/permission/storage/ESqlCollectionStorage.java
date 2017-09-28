@@ -38,11 +38,11 @@ import com.google.common.collect.ImmutableSet;
 
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.data.ESubjectData;
-import fr.evercraft.everpermissions.service.permission.data.EUserData;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
-import fr.evercraft.everpermissions.service.permission.subject.ESubject;
-import fr.evercraft.everpermissions.service.permission.subject.ESubjectReference;
+import fr.evercraft.everpermissions.service.permission.data.EPSubjectData;
+import fr.evercraft.everpermissions.service.permission.data.EPUserData;
+import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPSubjectReference;
 
 public class ESqlCollectionStorage implements ICollectionStorage {
 	private final EverPermissions plugin;
@@ -58,16 +58,16 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	public void reload() {
 	}    
     
-    public boolean load(final ESubject subject) {
+    public boolean load(final EPSubject subject) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
 			
 			SubjectData data = subject.getSubjectData();
-			if (data instanceof ESubjectData) {
-				this.loadPermissions(connection, (ESubjectData) data);
-				this.loadOptions(connection, (ESubjectData) data);
-				this.loadGroups(connection, (ESubjectData) data);
+			if (data instanceof EPSubjectData<?>) {
+				this.loadPermissions(connection, (EPSubjectData<?>) data);
+				this.loadOptions(connection, (EPSubjectData<?>) data);
+				this.loadGroups(connection, (EPSubjectData<?>) data);
 			}
 			
 			this.plugin.getELogger().debug("Chargement du subject (subject='" + subject.getIdentifier() + "';collection='" + subject.getCollectionIdentifier() + "')");
@@ -81,17 +81,17 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
     }
     
-    public boolean load(final Collection<ESubject> subjects) {
+    public boolean load(final Collection<EPSubject> subjects) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
 			
-			for (ESubject subject : subjects) {
+			for (EPSubject subject : subjects) {
 				SubjectData data = subject.getSubjectData();
-				if (data instanceof ESubjectData) {
-					this.loadPermissions(connection, (ESubjectData) data);
-					this.loadOptions(connection, (ESubjectData) data);
-					this.loadGroups(connection, (ESubjectData) data);
+				if (data instanceof EPSubjectData<?>) {
+					this.loadPermissions(connection, (EPSubjectData<?>) data);
+					this.loadOptions(connection, (EPSubjectData<?>) data);
+					this.loadGroups(connection, (EPSubjectData<?>) data);
 				}
 				
 				this.plugin.getELogger().debug("Chargement du subject (subject='" + subject.getIdentifier() + "';collection='" + subject.getCollectionIdentifier() + "')");
@@ -106,7 +106,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
     }
     
-    public void insertProfils(final Connection connection, final ESubjectData subject) throws SQLException {
+    public void insertProfils(final Connection connection, final EPSubjectData<?> subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "INSERT INTO `" + this.plugin.getDataBases().getTableUsersProfiles() + "` "
 						+ "VALUES (?, ?, ?);";
@@ -129,7 +129,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	    }
 	}
     
-    public void loadProfils(final Connection connection, final ESubjectData subject) throws SQLException {
+    public void loadProfils(final Connection connection, final EPSubjectData<?> subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT `name` " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersProfiles() + "` "
@@ -156,7 +156,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	    }
 	}
     
-    public void loadPermissions(final Connection connection, final ESubjectData subject) throws SQLException {
+    public void loadPermissions(final Connection connection, final EPSubjectData<?> subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT *" 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
@@ -183,7 +183,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	    }
 	}
 
-	public void loadOptions(final Connection connection, final ESubjectData subject) throws SQLException {
+	public void loadOptions(final Connection connection, final EPSubjectData<?> subject) throws SQLException {
 		PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT *" 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersOptions() + "` "
@@ -209,7 +209,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	    }
 	}
 
-	public void loadGroups(final Connection connection, final ESubjectData subject) throws SQLException {
+	public void loadGroups(final Connection connection, final EPSubjectData<?> subject) throws SQLException {
 		PreparedStatement preparedStatement = null;
 		String query = 	  "SELECT *" 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
@@ -223,8 +223,8 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 			while(list.next()) {
 				Subject group = this.plugin.getService().getGroupSubjects().loadSubject(list.getString("group")).join();
 				if (group != null) {
-					if (list.getInt("priority") == 0 && subject instanceof EUserData) {
-						((EUserData) subject).setGroupExecute(list.getString("world"), group.asSubjectReference());
+					if (list.getInt("priority") == 0 && subject instanceof EPUserData) {
+						((EPUserData) subject).setGroupExecute(list.getString("world"), group.asSubjectReference());
 						this.plugin.getELogger().debug("Loading : ("
 	    						+ "identifier=" + subject.getIdentifier() + ";"
 	    						+ "collection='" + this.collection + "';"
@@ -249,7 +249,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	}
 	
 	@Override
-	public boolean clear(ESubjectData subject) {
+	public boolean clear(EPSubjectData<?> subject) {
 		Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
@@ -273,7 +273,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean clear(ESubjectData subject, String typeWorld) {
+	public boolean clear(EPSubjectData<?> subject, String typeWorld) {
 		Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
@@ -295,7 +295,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
 	}
 	
-	public boolean setFriendlyIdentifier(final ESubject subject, final @Nullable String name) {
+	public boolean setFriendlyIdentifier(final EPSubject subject, final @Nullable String name) {
 		Connection connection = null;
     	PreparedStatement preparedStatement = null;
     	String query = 	  "UPDATE `" + this.plugin.getDataBases().getTableUsersProfiles() + "` "
@@ -326,7 +326,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
 	}
 
-	public boolean clearProfils(final Connection connection, final ESubjectData subject) throws SQLException {
+	public boolean clearProfils(final Connection connection, final EPSubjectData<?> subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE "
     					+ "FROM `" + this.plugin.getDataBases().getTableUsersProfiles() + "` "
@@ -349,7 +349,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
      * Permissions
      */
 	
-    public boolean setPermission(final ESubjectData subject, final String typeWorld, final String permission, Tristate value, final boolean insert) {
+    public boolean setPermission(final EPSubjectData<?> subject, final String typeWorld, final String permission, Tristate value, final boolean insert) {
     	Connection connection = null;
     	PreparedStatement preparedStatement = null;
     	try {
@@ -414,7 +414,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     	return false;
     }
     
-    public boolean clearPermissions(final ESubjectData subject, final String typeWorld) {
+    public boolean clearPermissions(final EPSubjectData<?> subject, final String typeWorld) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
@@ -429,7 +429,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
     }
     
-    public boolean clearPermissions(final Connection connection, final ESubjectData subject, final String typeWorld) throws SQLException {
+    public boolean clearPermissions(final Connection connection, final EPSubjectData<?> subject, final String typeWorld) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
@@ -452,7 +452,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	    }
     }
     
-    public boolean clearPermissions(final ESubjectData subject) {
+    public boolean clearPermissions(final EPSubjectData<?> subject) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
@@ -467,7 +467,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
     }
     
-    public boolean clearPermissions(final Connection connection, final ESubjectData subject) throws SQLException {
+    public boolean clearPermissions(final Connection connection, final EPSubjectData<?> subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersPermissions() + "` "
@@ -492,7 +492,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
      * Options
      */
     
-    public boolean setOption(final ESubjectData subject, final String typeWorld, final String option, final String value, final boolean insert) {
+    public boolean setOption(final EPSubjectData<?> subject, final String typeWorld, final String option, final String value, final boolean insert) {
     	Connection connection = null;
     	PreparedStatement preparedStatement = null;
     	try {
@@ -558,7 +558,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     	return false;
     }
 
-    public boolean clearOptions(final ESubjectData subject, final String typeWorld) {
+    public boolean clearOptions(final EPSubjectData<?> subject, final String typeWorld) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
@@ -573,7 +573,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
     }
     
-    public boolean clearOptions(final Connection connection, final ESubjectData subject, final String typeWorld) throws SQLException {
+    public boolean clearOptions(final Connection connection, final EPSubjectData<?> subject, final String typeWorld) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersOptions() + "` "
@@ -596,7 +596,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	    }
     }
     
-    public boolean clearOptions(final ESubjectData subject) {
+    public boolean clearOptions(final EPSubjectData<?> subject) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
@@ -611,7 +611,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
     }
     
-    public boolean clearOptions(final Connection connection, final ESubjectData subject) throws SQLException {
+    public boolean clearOptions(final Connection connection, final EPSubjectData<?> subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersOptions() + "` "
@@ -636,7 +636,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
      * Groups
      */
     
-    public boolean addParent(final ESubjectData subject, final String typeWorld, final SubjectReference parent) {
+    public boolean addParent(final EPSubjectData<?> subject, final String typeWorld, final SubjectReference parent) {
     	Connection connection = null;
     	PreparedStatement preparedStatement = null;
     	String query = 	  "INSERT INTO `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
@@ -663,7 +663,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     	return false;
     }
     
-    public boolean setGroup(final ESubjectData subject, final String typeWorld, final SubjectReference parent, boolean insert) {
+    public boolean setGroup(final EPSubjectData<?> subject, final String typeWorld, final SubjectReference parent, boolean insert) {
     	Connection connection = null;
     	PreparedStatement preparedStatement = null;
     	try {
@@ -712,7 +712,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     	return false;
     }
 
-    public boolean removeParent(final ESubjectData subject, final String typeWorld, final SubjectReference parent) {
+    public boolean removeParent(final EPSubjectData<?> subject, final String typeWorld, final SubjectReference parent) {
     	Connection connection = null;
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
@@ -745,7 +745,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
     	return false;
     }
     
-    public boolean clearParents(final ESubjectData subject, final String typeWorld) {
+    public boolean clearParents(final EPSubjectData<?> subject, final String typeWorld) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
@@ -760,7 +760,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
     }
     
-    public boolean clearParents(final Connection connection, final ESubjectData subject, final String typeWorld) throws SQLException {
+    public boolean clearParents(final Connection connection, final EPSubjectData<?> subject, final String typeWorld) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
@@ -784,7 +784,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	    }
     }
 
-    public boolean clearParents(final ESubjectData subject) {
+    public boolean clearParents(final EPSubjectData<?> subject) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
@@ -799,7 +799,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
     }
     
-    public boolean clearParents(final Connection connection, final ESubjectData subject) throws SQLException {
+    public boolean clearParents(final Connection connection, final EPSubjectData<?> subject) throws SQLException {
     	PreparedStatement preparedStatement = null;
     	String query = 	  "DELETE " 
 						+ "FROM `" + this.plugin.getDataBases().getTableUsersGroups() + "` "
@@ -901,7 +901,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 			preparedStatement.setString(3, permission);
 			ResultSet list = preparedStatement.executeQuery();
 			while (list.next()) {
-				identifiers.put(new ESubjectReference(this.plugin.getService(), this.collection, list.getString("uuid")), list.getBoolean("boolean"));
+				identifiers.put(new EPSubjectReference(this.plugin.getService(), this.collection, list.getString("uuid")), list.getBoolean("boolean"));
 			}
     	} catch (SQLException e) {
     		this.plugin.getELogger().warn("Error : " + e.getMessage());
@@ -917,7 +917,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean setDefault(EGroupSubject subject, String typeWorld, boolean value) {
+	public boolean setDefault(EPGroupSubject subject, String typeWorld, boolean value) {
 		// Les groupes sont uniquement sauvegardé en fichier
 		return false;
 	}

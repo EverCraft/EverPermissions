@@ -24,7 +24,7 @@ import fr.evercraft.everapi.EverAPI;
 import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.exception.ServerDisableException;
 import fr.evercraft.everapi.plugin.EPlugin;
-import fr.evercraft.everpermissions.service.EPermissionService;
+import fr.evercraft.everpermissions.service.EPPermissionService;
 
 @Plugin(id = "everpermissions", 
 		name = "EverPermissions", 
@@ -40,7 +40,7 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 	private EPConfig config;
 	private EPMessage messages;
 	
-	private EPermissionService service;
+	private EPPermissionService service;
 	private EPDataBases database;
 
 	@Override
@@ -50,7 +50,7 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 		
 		this.database = new EPDataBases(this);
 		
-		this.service = new EPermissionService(this);
+		this.service = new EPPermissionService(this);
 		this.service.load();
 		this.getGame().getServiceManager().setProvider(this, PermissionService.class, this.service);
 	}
@@ -93,7 +93,7 @@ public class EverPermissions extends EPlugin<EverPermissions> {
 		return this.database;
 	}
 
-	public EPermissionService getService() {
+	public EPPermissionService getService() {
 		return this.service;
 	}
 }

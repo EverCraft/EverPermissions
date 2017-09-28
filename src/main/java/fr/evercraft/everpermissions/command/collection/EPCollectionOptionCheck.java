@@ -34,9 +34,9 @@ import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.exception.message.EMessageException;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
+import fr.evercraft.everapi.services.permission.EUserSubject;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.EContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.EUserSubject;
+import fr.evercraft.everpermissions.service.permission.EPContextCalculator;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -98,7 +98,7 @@ public class EPCollectionOptionCheck extends ESubCommand<EverPermissions> {
 	
 	private CompletableFuture<Boolean> command(final CommandSource staff, final EUserSubject subject, final String option, final String worldName, final String typeUser) {
 		
-		Set<Context> contexts = EContextCalculator.of(worldName);
+		Set<Context> contexts = EPContextCalculator.of(worldName);
 		Optional<String> value = subject.getOption(contexts, option);
 		// Il y a une valeur
 		if (!value.isPresent()) {

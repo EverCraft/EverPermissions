@@ -23,10 +23,10 @@ import java.util.concurrent.TimeUnit;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
 
-import fr.evercraft.everpermissions.service.EPermissionService;
+import fr.evercraft.everpermissions.service.EPPermissionService;
 
-public class ESubjectReference implements SubjectReference {
-	private final EPermissionService service;
+public class EPSubjectReference implements SubjectReference {
+	private final EPPermissionService service;
 	
 	private final String collectionIdentifier;
 	private final String subjectIdentifier;
@@ -34,7 +34,7 @@ public class ESubjectReference implements SubjectReference {
 	private long lastLookup = 0L;
 	private WeakReference<Subject> cache = null;
 	
-	public ESubjectReference(EPermissionService service, String collectionIdentifier, String subjectIdentifier) {
+	public EPSubjectReference(EPPermissionService service, String collectionIdentifier, String subjectIdentifier) {
 		this.service = service;
 		this.collectionIdentifier = collectionIdentifier; 
 		this.subjectIdentifier = subjectIdentifier;

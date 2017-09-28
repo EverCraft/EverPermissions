@@ -29,9 +29,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.data.ESubjectData;
-import fr.evercraft.everpermissions.service.permission.subject.EGroupSubject;
-import fr.evercraft.everpermissions.service.permission.subject.ESubject;
+import fr.evercraft.everpermissions.service.permission.data.EPSubjectData;
+import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPSubject;
 
 public class EConfigCollectionStorage implements ICollectionStorage {
 	private final EverPermissions plugin;
@@ -66,7 +66,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean load(ESubject subject) {
+	public boolean load(EPSubject subject) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.load(subject)) return false;
 		}
@@ -76,7 +76,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 	
 	@Override
-	public boolean load(Collection<ESubject> subjects) {
+	public boolean load(Collection<EPSubject> subjects) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.load(subjects)) {
 				System.err.println("EConfigCollectionStorage erreur load : " + storage);
@@ -87,7 +87,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 	
 	@Override
-	public boolean clear(ESubjectData subject) {
+	public boolean clear(EPSubjectData<?> subject) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.clear(subject)) return false;
 		}
@@ -95,7 +95,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean clear(ESubjectData subject, String typeWorld) {
+	public boolean clear(EPSubjectData<?> subject, String typeWorld) {
 		EConfigSubjectStorage storage = this.storages.get(typeWorld);
 		if (storage == null) return false;
 		
@@ -103,7 +103,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean setFriendlyIdentifier(ESubject subject, String name) {
+	public boolean setFriendlyIdentifier(EPSubject subject, String name) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.setFriendlyIdentifier(subject, name)) return false;
 		}
@@ -111,7 +111,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 	
 	@Override
-	public boolean setDefault(EGroupSubject subject, String typeWorld, boolean value) {
+	public boolean setDefault(EPGroupSubject subject, String typeWorld, boolean value) {
 		EConfigSubjectStorage storage = this.storages.get(typeWorld);
 		if (storage == null) return false;
 		
@@ -119,7 +119,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean setPermission(ESubjectData subject, String typeWorld, String permission, Tristate value, boolean insert) {
+	public boolean setPermission(EPSubjectData<?> subject, String typeWorld, String permission, Tristate value, boolean insert) {
 		EConfigSubjectStorage storage = this.storages.get(typeWorld);
 		if (storage == null) return false;
 		
@@ -127,7 +127,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean clearPermissions(ESubjectData subject, String typeWorld) {
+	public boolean clearPermissions(EPSubjectData<?> subject, String typeWorld) {
 		EConfigSubjectStorage storage = this.storages.get(typeWorld);
 		if (storage == null) return false;
 		
@@ -135,7 +135,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean clearPermissions(ESubjectData subject) {
+	public boolean clearPermissions(EPSubjectData<?> subject) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.clearPermissions(subject)) return false;
 		}
@@ -143,7 +143,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean setOption(ESubjectData subject, String typeWorld, String option, String value, boolean insert) {
+	public boolean setOption(EPSubjectData<?> subject, String typeWorld, String option, String value, boolean insert) {
 		EConfigSubjectStorage storage = this.storages.get(typeWorld);
 		if (storage == null) return false;
 		
@@ -151,7 +151,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean clearOptions(ESubjectData subject, String typeWorld) {
+	public boolean clearOptions(EPSubjectData<?> subject, String typeWorld) {
 		EConfigSubjectStorage storage = this.storages.get(typeWorld);
 		if (storage == null) return false;
 		
@@ -159,7 +159,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean clearOptions(ESubjectData subject) {
+	public boolean clearOptions(EPSubjectData<?> subject) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.clearOptions(subject)) return false;
 		}
@@ -167,7 +167,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean addParent(ESubjectData subject, String typeWorld, SubjectReference parent) {
+	public boolean addParent(EPSubjectData<?> subject, String typeWorld, SubjectReference parent) {
 		EConfigSubjectStorage storage = this.storages.get(typeWorld);
 		if (storage == null) return false;
 		
@@ -175,7 +175,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean setGroup(ESubjectData subject, String typeWorld, SubjectReference parent, boolean insert) {
+	public boolean setGroup(EPSubjectData<?> subject, String typeWorld, SubjectReference parent, boolean insert) {
 		EConfigSubjectStorage storage = this.storages.get(typeWorld);
 		if (storage == null) return false;
 		
@@ -183,7 +183,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean removeParent(ESubjectData subject, String typeWorld, SubjectReference parent) {
+	public boolean removeParent(EPSubjectData<?> subject, String typeWorld, SubjectReference parent) {
 		EConfigSubjectStorage storage = this.storages.get(typeWorld);
 		if (storage == null) return false;
 		
@@ -191,7 +191,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean clearParents(ESubjectData subject, String typeWorld) {
+	public boolean clearParents(EPSubjectData<?> subject, String typeWorld) {
 		EConfigSubjectStorage storage = this.storages.get(typeWorld);
 		if (storage == null) return false;
 		
@@ -199,7 +199,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean clearParents(ESubjectData subject) {
+	public boolean clearParents(EPSubjectData<?> subject) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.clearParents(subject)) return false;
 		}

@@ -32,16 +32,16 @@ import org.spongepowered.api.world.Locatable;
 
 import com.google.common.collect.ImmutableSet;
 
+import fr.evercraft.everapi.services.permission.ESubjectCollection;
 import fr.evercraft.everpermissions.EPConfig;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.collection.ESubjectCollection;
 
-public class EContextCalculator implements ContextCalculator<Subject> {
+public class EPContextCalculator implements ContextCalculator<Subject> {
 	
 	public static final Set<Context> EMPTY = ImmutableSet.of();
 	private final EverPermissions plugin;
 	
-    public EContextCalculator(final EverPermissions plugin) {
+    public EPContextCalculator(final EverPermissions plugin) {
         this.plugin = plugin;
     }
 
@@ -95,11 +95,11 @@ public class EContextCalculator implements ContextCalculator<Subject> {
     }
     
     public String get(final String identifierCollection, final Set<Context> contexts) {
-    	Optional<ESubjectCollection<?>> collection = this.plugin.getService().get(identifierCollection);
+    	Optional<ESubjectCollection> collection = this.plugin.getService().get(identifierCollection);
     	if (!collection.isPresent()) return EPConfig.DEFAULT;
     	
-    	return collection.get().getTypeWorld(EContextCalculator.getWorld(contexts).orElse(""))
-    		.orElseGet(() -> collection.get().getTypeWorld(EContextCalculator.getWorld(SubjectData.GLOBAL_CONTEXT).orElse("")).orElse(EPConfig.DEFAULT));
+    	return collection.get().getTypeWorld(EPContextCalculator.getWorld(contexts).orElse(""))
+    		.orElseGet(() -> collection.get().getTypeWorld(EPContextCalculator.getWorld(SubjectData.GLOBAL_CONTEXT).orElse("")).orElse(EPConfig.DEFAULT));
     }
 	 
     /**

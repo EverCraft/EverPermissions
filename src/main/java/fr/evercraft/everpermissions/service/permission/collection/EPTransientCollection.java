@@ -18,7 +18,7 @@ package fr.evercraft.everpermissions.service.permission.collection;
 
 import fr.evercraft.everpermissions.EPConfig;
 import fr.evercraft.everpermissions.EverPermissions;
-import fr.evercraft.everpermissions.service.permission.subject.ETransientSubject;
+import fr.evercraft.everpermissions.service.permission.subject.EPTransientSubject;
 
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
@@ -33,15 +33,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class ETransientCollection extends ESubjectCollection<ETransientSubject> {
+public class EPTransientCollection extends EPSubjectCollection<EPTransientSubject> {
 
-    public ETransientCollection(final EverPermissions plugin, String collection) {
+    public EPTransientCollection(final EverPermissions plugin, String collection) {
     	super(plugin, collection);
     }
     
 	@Override
-	protected ETransientSubject add(String identifier) {
-    	return new ETransientSubject(this.plugin, identifier, this);
+	protected EPTransientSubject add(String identifier) {
+    	return new EPTransientSubject(this.plugin, identifier, this);
 	}
 	
 	@Override
