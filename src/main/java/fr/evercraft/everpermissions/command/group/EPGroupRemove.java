@@ -87,7 +87,7 @@ public class EPGroupRemove extends ESubCommand<EverPermissions> {
 		EGroupSubject group = EPCommand.getGroup(player, this.plugin.getService(), groupName, typeGroup);
 		
 		// Le groupe n'a pas été supprimé
-		return group.clear(typeGroup)
+		return group.removeTypeWorld(typeGroup)
 			.exceptionally(e -> false)
 			.thenApply(result -> {
 				if (!result) {

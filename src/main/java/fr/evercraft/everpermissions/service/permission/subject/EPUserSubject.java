@@ -92,11 +92,6 @@ public class EPUserSubject extends EPSubject implements EUserSubject {
      */
     
     @Override
-    public Optional<SubjectReference> getGroup() {
-        return this.getGroup(this.getActiveContexts());
-    }
-    
-    @Override
     public Optional<SubjectReference> getGroup(final Set<Context> contexts) {
     	Optional<SubjectReference> group = this.transientData.getGroup(contexts);
     	if (group.isPresent()) return group;

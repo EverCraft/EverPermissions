@@ -62,11 +62,6 @@ public class EPGroupSubject extends EPSubject implements EGroupSubject {
      */
     
     @Override
-	public String getName() {
-		return this.getFriendlyIdentifier().orElse(this.getIdentifier());
-	}
-    
-    @Override
 	public EPGroupData getSubjectData() {
 		return this.data;
 	}
@@ -246,7 +241,7 @@ public class EPGroupSubject extends EPSubject implements EGroupSubject {
 		}
 	}
 
-	public CompletableFuture<Boolean> clear(String typeWorld) {
+	public CompletableFuture<Boolean> removeTypeWorld(String typeWorld) {
 		return this.data.clear(typeWorld).thenCompose(result -> {
 			if (!result) return CompletableFuture.completedFuture(false);
 			return this.transientData.clear(typeWorld);

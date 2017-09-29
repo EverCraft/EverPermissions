@@ -43,6 +43,7 @@ public class EPCollection extends EParentSubCommand<EverPermissions> {
 		new EPCollectionPermission(this.plugin, this);
 		new EPCollectionOption(this.plugin, this);
 		new EPCollectionClear(this.plugin, this);
+		new EPCollectionList(this.plugin, this);
     }
 	
 	@Override

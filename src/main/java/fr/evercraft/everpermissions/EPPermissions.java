@@ -96,6 +96,7 @@ public enum EPPermissions implements EnumPermission {
 	COLLECTION_EXECUTE("commands.collection.execute", EPMessages.PERMISSIONS_COMMANDS_COLLECTION_EXECUTE),
 	COLLECTION_INFO("commands.collection.info", EPMessages.PERMISSIONS_COMMANDS_COLLECTION_INFO),
 	COLLECTION_CLEAR("commands.collection.clear", EPMessages.PERMISSIONS_COMMANDS_COLLECTION_CLEAR),
+	COLLECTION_LIST("commands.collection.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_LIST),
 	
 	// Collection : Groupes
 	COLLECTION_GROUP_EXECUTE("commands.user.group.execute", EPMessages.PERMISSIONS_COMMANDS_COLLECTION_GROUP_ADD),
