@@ -23,6 +23,7 @@ import fr.evercraft.everapi.exception.PluginDisableException;
 import fr.evercraft.everapi.message.EMessageSender;
 import fr.evercraft.everapi.services.permission.EPermissionService;
 import fr.evercraft.everapi.services.permission.ESubjectCollection;
+import fr.evercraft.everapi.services.permission.EUserSubject;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.EPContextCalculator;
@@ -33,7 +34,6 @@ import fr.evercraft.everpermissions.service.permission.collection.EPSubjectColle
 import fr.evercraft.everpermissions.service.permission.collection.EPTransientCollection;
 import fr.evercraft.everpermissions.service.permission.collection.EPUserCollection;
 import fr.evercraft.everpermissions.service.permission.subject.EPSubjectReference;
-import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -60,7 +60,7 @@ public class EPPermissionService implements EPermissionService {
 	
 	private final EverPermissions plugin;
 
-	private EPUserSubject defaultSubject;
+	private EUserSubject defaultSubject;
 
 	private final EPUserCollection users;
 	private final EPGroupCollection groups;
@@ -134,7 +134,7 @@ public class EPPermissionService implements EPermissionService {
 	}
 	
 	@Override
-	public EPUserSubject getDefaults() {
+	public EUserSubject getDefaults() {
 		return this.defaultSubject;
 	}
 	
@@ -156,7 +156,7 @@ public class EPPermissionService implements EPermissionService {
 		return Optional.ofNullable(this.collections.get(identifier.toLowerCase()));
 	}
 	
-	public Optional<ESubjectCollection> get(String identifier) {
+	public Optional<ESubjectCollection<?>> get(String identifier) {
 		return Optional.ofNullable(this.collections.get(identifier.toLowerCase()));
 	}
 

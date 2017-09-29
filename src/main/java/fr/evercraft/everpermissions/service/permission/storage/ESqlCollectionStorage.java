@@ -37,6 +37,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import fr.evercraft.everapi.exception.ServerDisableException;
+import fr.evercraft.everapi.services.permission.ESubject;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.data.EPSubjectData;
 import fr.evercraft.everpermissions.service.permission.data.EPUserData;
@@ -58,7 +59,7 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 	public void reload() {
 	}    
     
-    public boolean load(final EPSubject subject) {
+    public boolean load(final ESubject subject) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
@@ -81,12 +82,12 @@ public class ESqlCollectionStorage implements ICollectionStorage {
 		return false;
     }
     
-    public boolean load(final Collection<EPSubject> subjects) {
+    public boolean load(final Collection<ESubject> subjects) {
     	Connection connection = null;
 		try {
 			connection = this.plugin.getDataBases().getConnection();
 			
-			for (EPSubject subject : subjects) {
+			for (ESubject subject : subjects) {
 				SubjectData data = subject.getSubjectData();
 				if (data instanceof EPSubjectData<?>) {
 					this.loadPermissions(connection, (EPSubjectData<?>) data);

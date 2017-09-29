@@ -45,6 +45,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 
 import fr.evercraft.everapi.plugin.file.EConfig;
+import fr.evercraft.everapi.services.permission.ESubject;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.data.EPSubjectData;
 import fr.evercraft.everpermissions.service.permission.data.EPUserData;
@@ -85,7 +86,8 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 		} catch (IOException e) {}
 	}
 	
-	public boolean load(final EPSubject subject) {
+	public boolean load(final ESubject subject) {
+		if (!(subject instanceof EPSubject)) return true;
 		if (!(subject.getSubjectData() instanceof EPSubjectData<?>)) return true;
 		
 		ConfigurationNode configSubject = this.get(subject.getIdentifier());
@@ -106,7 +108,7 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 			if (name != null) {
 				Optional<String> oldName = subject.getFriendlyIdentifier();
 				if (!oldName.isPresent()) {
-					subject.setFriendlyIdentifierExecute(name);
+					((EPSubject) subject).setFriendlyIdentifierExecute(name);
 					this.plugin.getELogger().debug("Loading : (identifier=" + subject.getIdentifier() + ";name=" + name + ";type=" + this.typeWorld + ")");
 				} else if (!oldName.get().equals(name)) {
 					this.plugin.getELogger().warn("Loading error : (identifier=" + subject.getIdentifier() + ";name1=" + name + ";name2=" + oldName.get() + ";type=" + this.typeWorld + ")");
@@ -186,8 +188,8 @@ public class EConfigSubjectStorage extends EConfig<EverPermissions> {
 		return true;
 	}
 	
-	public boolean load(Collection<EPSubject> subjects) {
-		for (EPSubject subject : subjects) {
+	public boolean load(Collection<ESubject> subjects) {
+		for (ESubject subject : subjects) {
 			if (!this.load(subject)) return false;
 		}
 		return true;

@@ -46,7 +46,7 @@ public class EPCollectionPermissionRemove extends ESubCommand<EverPermissions> {
         
         this.pattern = Args.builder()
         		.value(Args.MARKER_WORLD, 
-    					(source, args) -> this.plugin.getService().getUserSubjects().getTypeWorlds(),
+    					(source, args) -> this.plugin.getService().getUserSubjects().getWorlds(),
     					(source, args) -> args.getArgs().size() <= 1)
         		.arg((source, args) -> EPCommand.getAllCollections(this.plugin.getService()))
         		.arg((source, args) -> EPCommand.getAllSubjects(this.plugin.getService(), args.getArg(0).orElse("")))

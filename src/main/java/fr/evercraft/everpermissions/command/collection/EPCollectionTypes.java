@@ -19,6 +19,7 @@ package fr.evercraft.everpermissions.command.collection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.command.CommandException;
@@ -26,41 +27,35 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.world.World;
 
 import fr.evercraft.everapi.EAMessage.EAMessages;
 import fr.evercraft.everapi.exception.message.EMessageException;
+import fr.evercraft.everapi.plugin.EChat;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
-import fr.evercraft.everapi.services.permission.EUserSubject;
-import fr.evercraft.everpermissions.EPMessage.EPMessages;
+import fr.evercraft.everapi.services.permission.EUserCollection;
 import fr.evercraft.everpermissions.EPCommand;
+import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
-public class EPCollectionOptionInfo extends ESubCommand<EverPermissions> {
+public class EPCollectionTypes extends ESubCommand<EverPermissions> {
 	
 	private final Args.Builder pattern;
-	private final EPCollectionOption parent;
 	
-	public EPCollectionOptionInfo(final EverPermissions plugin, final EPCollectionOption parent) {
-        super(plugin, parent, "info");
+	public EPCollectionTypes(final EverPermissions plugin, final EPCollection parent) {
+        super(plugin, parent, "types");
         
-        this.parent = parent;
         this.pattern = Args.builder()
-        		.value(Args.MARKER_WORLD, 
-    					(source, args) -> this.plugin.getService().getUserSubjects().getWorlds(),
-    					(source, args) -> args.getArgs().size() <= 1)
-        		.arg((source, args) -> EPCommand.getAllCollections(this.plugin.getService()))
-        		.arg((source, args) -> EPCommand.getAllSubjects(this.plugin.getService(), args.getArg(0).orElse("")));
+        		.arg((source, args) -> EPCommand.getAllCollections(this.plugin.getService()));
     }
 	
 	public boolean testPermission(final CommandSource source) {
-		return source.hasPermission(EPPermissions.COLLECTION_OPTION_INFO.get());
+		return source.hasPermission(EPPermissions.COLLECTION_TYPES.get());
 	}
 
 	public Text description(final CommandSource source) {
-		return EPMessages.COLLECTION_OPTION_INFO_DESCRIPTION.getText();
+		return EPMessages.COLLECTION_TYPES_DESCRIPTION.getText();
 	}
 	
 	public Collection<String> tabCompleter(final CommandSource source, final List<String> args) throws CommandException {
@@ -68,9 +63,7 @@ public class EPCollectionOptionInfo extends ESubCommand<EverPermissions> {
 	}
 
 	public Text help(final CommandSource source) {
-		return Text.builder("/" + this.getName() + " [" + Args.MARKER_WORLD + " " + EAMessages.ARGS_WORLD.getString() + "]"
-												 + " <" + EAMessages.ARGS_COLLECTION.getString() + ">"
-												 + " <" + EAMessages.ARGS_SUBJECT.getString() + ">")
+		return Text.builder("/" + this.getName() + " <" + EAMessages.ARGS_COLLECTION.getString() + ">")
 					.onClick(TextActions.suggestCommand("/" + this.getName() + " "))
 					.color(TextColors.RED)
 					.build();
@@ -80,33 +73,32 @@ public class EPCollectionOptionInfo extends ESubCommand<EverPermissions> {
 		Args args = this.pattern.build(this.plugin, source, argsList);
 		List<String> argsString = args.getArgs();
 		
-		if (argsString.size() != 2) {
+		if (argsString.size() != 1) {
 			source.sendMessage(this.help(source));
 			return CompletableFuture.completedFuture(false);
 		}
 		
-		World world = args.getWorld();
-		EUserSubject subject = EPCommand.getSubject(source, this.plugin.getService(), argsString.get(0), argsString.get(1));
-		String typeUser = EPCommand.getTypeWorld(source, this.plugin.getService().getUserSubjects(), world.getName());
-		
-		this.command(source, subject, world.getName(), typeUser);
-		return CompletableFuture.completedFuture(true);
+		EUserCollection collection = EPCommand.getCollection(source, this.plugin.getService(), argsString.get(0));
+		return this.command(source, collection);
 	}
-
-	private void command(final CommandSource player, final EUserSubject subject, final String worldName, final String typeUser) {
+	
+	private CompletableFuture<Boolean> command(final CommandSource player, final EUserCollection collection) throws EMessageException {
+		TreeMap<String, String> types = new TreeMap<String, String>(collection.getTypeWorlds());
+		
 		List<Text> list = new ArrayList<Text>();
-		this.parent.getParent().getInfo().addOptions(list, subject, worldName, typeUser);
-		this.parent.getParent().getInfo().addOptionsTransient(list, subject, worldName, typeUser);
+		types.forEach((world, type) -> {
+			list.add(EPMessages.COLLECTION_TYPES_LINE.getFormat()
+					.toText("{world}", EChat.getButtomCopy(world),
+							"{type}", EChat.getButtomCopy(type)));
+		});
 		
 		this.plugin.getEverAPI().getManagerService().getEPagination().sendTo(
-				EPMessages.COLLECTION_OPTION_INFO_TITLE.getFormat().toText(
-					"{subject}", subject.getIdentifier(),
-					"{collection}", subject.getCollectionIdentifier(),
-					"{type}", typeUser)
-				.toBuilder()
-				.onClick(TextActions.runCommand("/" + this.getName() + " " + 
-						Args.MARKER_WORLD + " \"" + worldName  + "\" \"" + subject.getCollectionIdentifier() + "\" \"" + subject.getIdentifier() + "\""))
-				.build(), 
+				EPMessages.COLLECTION_TYPES_TITLE.getFormat()
+					.toText("{collection}", collection.getIdentifier())
+					.toBuilder()
+					.onClick(TextActions.runCommand("/" + this.getName()))
+					.build(), 
 				list, player);
+		return CompletableFuture.completedFuture(true);
 	}
 }

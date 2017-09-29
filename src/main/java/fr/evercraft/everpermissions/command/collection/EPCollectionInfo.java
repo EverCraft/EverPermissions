@@ -54,7 +54,7 @@ public class EPCollectionInfo extends ESubCommand<EverPermissions> {
         this.parent = parent;
         this.pattern = Args.builder()
         		.value(Args.MARKER_WORLD, 
-    					(source, args) -> this.plugin.getService().getGroupSubjects().getTypeWorlds(),
+    					(source, args) -> this.plugin.getService().getGroupSubjects().getWorlds(),
     					(source, args) -> args.getArgs().size() <= 1)
         		.arg((source, args) -> EPCommand.getAllCollections(this.plugin.getService()))
         		.arg((source, args) -> EPCommand.getAllSubjects(this.plugin.getService(), args.getArg(0).orElse("")));

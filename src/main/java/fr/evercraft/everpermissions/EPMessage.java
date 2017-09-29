@@ -42,6 +42,14 @@ public class EPMessage extends EMessage<EverPermissions> {
 		WORLD_EMPTY(								"&cVous devez préciser le nom du monde.", 
 													"&cYou must specify the name of the world."),
 		
+		DESCRIPTION_DESCRIPTION(					"Description de chaque permission"),
+		DESCRIPTION_TITLE(							"&aLa liste des permissions"),
+		DESCRIPTION_TITLE_SEARCH(					"&aLa liste des permissions : &6{permission}"),
+		DESCRIPTION_LINE(							"    &6&l➤ {permission}"),
+		DESCRIPTION_PERMISSION(						"&7{permission}"),
+		DESCRIPTION_PERMISSION_HOVER(				"&c{description}"),
+		 
+		
 		// Commands :		
 		TRANSFERT_DESCRIPTION(						"Transfère les données des joueurs",
 													"Transfers the data of the players"),
@@ -64,6 +72,10 @@ public class EPMessage extends EMessage<EverPermissions> {
 		
 		// User :
 		USER_DESCRIPTION(							"Gestion des joueurs"),
+		
+		USER_TYPES_DESCRIPTION(						"Affiche le type de chaque monde pour les joueurs"),
+		USER_TYPES_TITLE(							"&aLe type de chaque monde pour les joueurs"),
+		USER_TYPES_LINE(							"    &6&l➤  {world} : &7{type}"),
 		
 		USER_INFO_DESCRIPTION(						"Affiche les informations d'un groupe"),
 		USER_INFO_TITLE(							"&aLe joueur &6{player} &adans les mondes de type &6{type}"),
@@ -246,6 +258,10 @@ public class EPMessage extends EMessage<EverPermissions> {
 		// Group : Group
 		GROUP_DESCRIPTION(							"Gestion des groupes"),
 		
+		GROUP_TYPES_DESCRIPTION(					"Affiche le type de chaque monde pour les groupes"),
+		GROUP_TYPES_TITLE(							"&aLe type de chaque monde pour les groupes"),
+		GROUP_TYPES_LINE(							"    &6&l➤  {world} : &7{type}"),
+		
 		GROUP_ADD_DESCRIPTION(						"Ajoute un groupe à un monde"),
 		GROUP_ADD_STAFF(							"&7Vous avez créé le groupe &6{group} &7dans les mondes de type &6{type}&7."),
 		GROUP_ADD_ERROR(							"&cIl existe déjà un groupe &6{group} &cdans les mondes de type &6{type}&c."),
@@ -365,6 +381,10 @@ public class EPMessage extends EMessage<EverPermissions> {
 		COLLECTION_LIST_DESCRIPTION(					"Affiche la liste des collections"),
 		COLLECTION_LIST_TITLE(							"&aLa liste des collections"),
 		COLLECTION_LIST_LINE(							"    &6&l➤ {collection}"),
+		
+		COLLECTION_TYPES_DESCRIPTION(					"Affiche le type de chaque monde pour une collection"),
+		COLLECTION_TYPES_TITLE(							"&aLe type de chaque monde de la collection &6{collection}"),
+		COLLECTION_TYPES_LINE(							"    &6&l➤  {world} : &7{type}"),
 		
 		COLLECTION_INFO_DESCRIPTION(					"Affiche les informations d'un groupe"),
 		COLLECTION_INFO_TITLE(							"&aLe subject &6{subject} &adans les mondes de type &6{type}"),
@@ -492,9 +512,11 @@ public class EPMessage extends EMessage<EverPermissions> {
 		PERMISSIONS_COMMANDS_HELP(""),
 		PERMISSIONS_COMMANDS_RELOAD(""),
 		PERMISSIONS_COMMANDS_MIGRATE(""),
+		PERMISSIONS_COMMANDS_DESCRIPTION(""),
 		PERMISSIONS_COMMANDS_USER_EXECUTE(""),
 		PERMISSIONS_COMMANDS_USER_CLEAR(""),
 		PERMISSIONS_COMMANDS_USER_INFO(""),
+		PERMISSIONS_COMMANDS_USER_TYPES(""),
 		PERMISSIONS_COMMANDS_USER_VERBOSE(""),
 		PERMISSIONS_COMMANDS_USER_GROUP_EXECUTE(""),
 		PERMISSIONS_COMMANDS_USER_GROUP_ADD(""),
@@ -523,6 +545,7 @@ public class EPMessage extends EMessage<EverPermissions> {
 		PERMISSIONS_COMMANDS_GROUP_LIST(""),
 		PERMISSIONS_COMMANDS_GROUP_RENAME(""),
 		PERMISSIONS_COMMANDS_GROUP_INFO(""),
+		PERMISSIONS_COMMANDS_GROUP_TYPES(""),
 		PERMISSIONS_COMMANDS_GROUP_VERBOSE(""),
 		PERMISSIONS_COMMANDS_GROUP_INHERITANCE_EXECUTE(""),
 		PERMISSIONS_COMMANDS_GROUP_INHERITANCE_INFO(""),
@@ -542,6 +565,7 @@ public class EPMessage extends EMessage<EverPermissions> {
 		PERMISSIONS_COMMANDS_COLLECTION_CLEAR(""),
 		PERMISSIONS_COMMANDS_COLLECTION_LIST(""),
 		PERMISSIONS_COMMANDS_COLLECTION_INFO(""),
+		PERMISSIONS_COMMANDS_COLLECTION_TYPES(""),
 		PERMISSIONS_COMMANDS_COLLECTION_VERBOSE(""),
 		PERMISSIONS_COMMANDS_COLLECTION_GROUP_EXECUTE(""),
 		PERMISSIONS_COMMANDS_COLLECTION_GROUP_ADD(""),

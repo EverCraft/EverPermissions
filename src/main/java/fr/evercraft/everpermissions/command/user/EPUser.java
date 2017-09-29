@@ -43,6 +43,7 @@ public class EPUser extends EParentSubCommand<EverPermissions> {
 		new EPUserPermission(this.plugin, this);
 		new EPUserOption(this.plugin, this);
 		new EPUserClear(this.plugin, this);
+		new EPUserTypes(this.plugin, this);
     }
 	
 	@Override

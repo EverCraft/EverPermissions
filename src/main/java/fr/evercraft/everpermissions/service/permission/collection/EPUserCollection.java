@@ -32,7 +32,7 @@ import fr.evercraft.everapi.services.permission.EUserSubject;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 
-public class EPUserCollection extends EPSubjectCollection<EPUserSubject> implements EUserCollection {
+public class EPUserCollection extends EPSubjectCollection<EUserSubject> implements EUserCollection {
 
 	public EPUserCollection(final EverPermissions plugin, String collectionIdentifier) {
 		super(plugin, collectionIdentifier);

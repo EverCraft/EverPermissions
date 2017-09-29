@@ -37,7 +37,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class EPGroupCollection extends EPSubjectCollection<EPGroupSubject> implements EGroupCollection {
+public class EPGroupCollection extends EPSubjectCollection<EGroupSubject> implements EGroupCollection {
 	private final ConcurrentMap<String, EGroupSubject> defaults;
 
     public EPGroupCollection(final EverPermissions plugin) {
@@ -59,7 +59,7 @@ public class EPGroupCollection extends EPSubjectCollection<EPGroupSubject> imple
 		
 		if (!this.storage.load((Collection) this.identifierSubjects.values())) return false;
 		
-		for (EPGroupSubject subject : this.identifierSubjects.values()) {
+		for (EGroupSubject subject : this.identifierSubjects.values()) {
 			subject.getFriendlyIdentifier().ifPresent(name -> this.nameSubjects.put(name.toLowerCase(), subject));
 		}
 		return true;
@@ -109,7 +109,7 @@ public class EPGroupCollection extends EPSubjectCollection<EPGroupSubject> imple
      */
     public CompletableFuture<Boolean> register(final String name, final String worldType) {
     	// Création du groupe si il n'existe pas
-    	EPGroupSubject group =  this.identifierSubjects.get(name);
+    	EGroupSubject group =  this.identifierSubjects.get(name);
     	if (group != null) {
     		group.registerTypeWorld(worldType);
     		
@@ -136,7 +136,7 @@ public class EPGroupCollection extends EPSubjectCollection<EPGroupSubject> imple
     @Override
 	public Set<EGroupSubject> getGroups(final String typeWorld) {
 		Set<EGroupSubject> groups = new HashSet<EGroupSubject>();
-		for (EPGroupSubject group : this.identifierSubjects.values()) {
+		for (EGroupSubject group : this.identifierSubjects.values()) {
 			if (group.hasTypeWorld(typeWorld)) {
 				groups.add(group);
 			}

@@ -41,6 +41,7 @@ public class EPGroup extends EParentSubCommand<EverPermissions> {
 		new EPGroupRemove(this.plugin, this);
 		new EPGroupDefault(this.plugin, this);
 		new EPGroupList(this.plugin, this);
+		new EPGroupTypes(this.plugin, this);
 		new EPGroupRename(this.plugin, this);
 		new EPGroupVerbose(this.plugin, this);
 		

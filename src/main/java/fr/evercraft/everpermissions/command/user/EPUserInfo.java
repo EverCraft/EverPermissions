@@ -40,8 +40,8 @@ import fr.evercraft.everapi.java.UtilsCompletableFuture;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everapi.server.user.EUser;
+import fr.evercraft.everapi.services.permission.EUserSubject;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -57,7 +57,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
         this.parent = parent;
         this.pattern = Args.builder()
         		.value(Args.MARKER_WORLD, 
-    					(source, args) -> this.plugin.getService().getGroupSubjects().getTypeWorlds(),
+    					(source, args) -> this.plugin.getService().getGroupSubjects().getWorlds(),
     					(source, args) -> args.getArgs().size() <= 1)
         		.arg((source, args) -> this.getAllUsers(args.getArg(0).orElse("")));
     }
@@ -115,7 +115,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
 			});
 	}
 
-	private void command(final CommandSource player, final EUser user, final EPUserSubject subject, final String worldName, final String typeUser) {
+	private void command(final CommandSource player, final EUser user, final EUserSubject subject, final String worldName, final String typeUser) {
 		List<Text> list = new ArrayList<Text>();
 		this.addGroup(list, user, subject, worldName, typeUser);
 		this.addSubGroups(list, user, subject, worldName, typeUser);
@@ -137,7 +137,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// Le groupe
-	public void addGroup(List<Text> list, EUser user, EPUserSubject subject, String worldName, String typeUser) {
+	public void addGroup(List<Text> list, EUser user, EUserSubject subject, String worldName, String typeUser) {
 		Optional<SubjectReference> group = subject.getSubjectData().getGroup(typeUser);
 		if (!group.isPresent()) {
 			list.add(EPMessages.USER_INFO_GROUP_EMPTY.getText());
@@ -148,7 +148,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des sous-groupes
-	public void addSubGroups(List<Text> list, EUser user, EPUserSubject subject, String worldName, String typeUser) {
+	public void addSubGroups(List<Text> list, EUser user, EUserSubject subject, String worldName, String typeUser) {
 		List<SubjectReference> groups = subject.getSubjectData().getSubGroup(typeUser);
 		if (groups.isEmpty()) {
 			list.add(EPMessages.USER_INFO_SUBGROUP_EMPTY.getText());
@@ -162,7 +162,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// Le groupe
-	public void addGroupTransient(List<Text> list, EUser user, EPUserSubject subject, String worldName, String typeUser) {
+	public void addGroupTransient(List<Text> list, EUser user, EUserSubject subject, String worldName, String typeUser) {
 		Optional<SubjectReference> group = subject.getTransientSubjectData().getGroup(typeUser);
 		if (group.isPresent()) {
 			list.add(EPMessages.USER_INFO_GROUP_TRANSIENT.getFormat()
@@ -171,7 +171,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des sous-groupes temporaires
-	public void addSubGroupsTransient(List<Text> list, EUser user, EPUserSubject subject, String worldName, String typeUser) {
+	public void addSubGroupsTransient(List<Text> list, EUser user, EUserSubject subject, String worldName, String typeUser) {
 		List<SubjectReference> groups = subject.getTransientSubjectData().getSubGroup(typeUser);
 		if (!groups.isEmpty()) {
 			list.add(EPMessages.USER_INFO_SUBGROUP_TRANSIENT.getText());
@@ -183,7 +183,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des permissions
-	public void addPermissions(List<Text> list, EUser user, EPUserSubject subject, String worldName, String typeUser) {
+	public void addPermissions(List<Text> list, EUser user, EUserSubject subject, String worldName, String typeUser) {
 		TreeMap<String, Boolean> permissions = new TreeMap<String, Boolean>(subject.getSubjectData().getPermissions(typeUser));
 		if (permissions.isEmpty()) {
 			list.add(EPMessages.USER_INFO_PERMISSION_EMPTY.getText());
@@ -204,7 +204,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des permissions temporaires
-	public void addPermissionsTransient(List<Text> list, EUser user, EPUserSubject subject, String worldName, String typeUser) {
+	public void addPermissionsTransient(List<Text> list, EUser user, EUserSubject subject, String worldName, String typeUser) {
 		TreeMap<String, Boolean> permissions = new TreeMap<String, Boolean>(subject.getTransientSubjectData().getPermissions(typeUser));
 		if (!permissions.isEmpty()) {
 			list.add(EPMessages.USER_INFO_PERMISSION_TRANSIENT.getText());
@@ -223,7 +223,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des options
-	public void addOptions(List<Text> list, EUser user, EPUserSubject subject, String worldName, String typeUser) {
+	public void addOptions(List<Text> list, EUser user, EUserSubject subject, String worldName, String typeUser) {
 		TreeMap<String, String> options = new TreeMap<String, String>(subject.getSubjectData().getOptions(typeUser));
 		if (options.isEmpty()) {
 			list.add(EPMessages.USER_INFO_OPTION_EMPTY.getText());
@@ -238,7 +238,7 @@ public class EPUserInfo extends ESubCommand<EverPermissions> {
 	}
 	
 	// La liste des options temporaires
-	public void addOptionsTransient(List<Text> list, EUser user, EPUserSubject subject, String worldName, String typeUser) {
+	public void addOptionsTransient(List<Text> list, EUser user, EUserSubject subject, String worldName, String typeUser) {
 		TreeMap<String, String> options = new TreeMap<String, String>(subject.getTransientSubjectData().getOptions(typeUser));
 		if (!options.isEmpty()) {
 			list.add(EPMessages.USER_INFO_OPTION_TRANSIENT.getText());

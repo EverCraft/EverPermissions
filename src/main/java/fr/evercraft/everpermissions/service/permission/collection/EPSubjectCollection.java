@@ -16,12 +16,12 @@
  */
 package fr.evercraft.everpermissions.service.permission.collection;
 
+import fr.evercraft.everapi.services.permission.ESubject;
 import fr.evercraft.everapi.services.permission.ESubjectCollection;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.storage.EConfigCollectionStorage;
 import fr.evercraft.everpermissions.service.permission.storage.ESqlCollectionStorage;
 import fr.evercraft.everpermissions.service.permission.storage.ICollectionStorage;
-import fr.evercraft.everpermissions.service.permission.subject.EPSubject;
 import fr.evercraft.everpermissions.service.permission.subject.EPSubjectReference;
 
 import org.spongepowered.api.service.permission.PermissionService;
@@ -48,7 +48,7 @@ import java.util.function.Predicate;
 /**
  * Subject collection
  */
-public abstract class EPSubjectCollection<T extends EPSubject> implements ESubjectCollection {
+public abstract class EPSubjectCollection<T extends ESubject> implements ESubjectCollection<T> {
 	protected final EverPermissions plugin;
 	
 	private final String identifier;
@@ -129,7 +129,12 @@ public abstract class EPSubjectCollection<T extends EPSubject> implements ESubje
 	}
 	
 	@Override
-	public Set<String> getTypeWorlds() {
+	public Map<String, String> getTypeWorlds() {
+		return ImmutableMap.copyOf(this.worlds);
+	}
+	
+	@Override
+	public Set<String> getWorlds() {
 		return this.worlds.keySet();
 	}
 	
@@ -179,7 +184,7 @@ public abstract class EPSubjectCollection<T extends EPSubject> implements ESubje
 	@Override
 	public CompletableFuture<Map<String, Subject>> loadSubjects(Set<String> identifiers) {
 		ImmutableMap.Builder<String, Subject> subjects = ImmutableMap.builder();
-		Set<EPSubject> newSubjects = new HashSet<EPSubject>();
+		Set<ESubject> newSubjects = new HashSet<ESubject>();
 		for (String identifier : identifiers) {
 			identifier = identifier.toLowerCase();
 			

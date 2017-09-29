@@ -34,8 +34,8 @@ import fr.evercraft.everapi.java.UtilsCompletableFuture;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everapi.server.user.EUser;
+import fr.evercraft.everapi.services.permission.EUserSubject;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
-import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
 
@@ -50,7 +50,7 @@ public class EPUserClear extends ESubCommand<EverPermissions> {
         		.empty(Args.MARKER_CONFIRMATION,
         				(source, args) -> args.getArgs().size() >= 1)
         		.value(Args.MARKER_WORLD, 
-    					(source, args) -> this.plugin.getService().getUserSubjects().getTypeWorlds(),
+    					(source, args) -> this.plugin.getService().getUserSubjects().getWorlds(),
     					(source, args) -> args.getArgs().size() <= 1)
         		.arg((source, args) -> this.getAllUsers(args.getArg(0).orElse(""), source));
     }
@@ -128,7 +128,7 @@ public class EPUserClear extends ESubCommand<EverPermissions> {
 			});
 	}
 	
-	private CompletableFuture<Boolean> commandConfirmation(final CommandSource staff, final EUser user, final EPUserSubject subject) {
+	private CompletableFuture<Boolean> commandConfirmation(final CommandSource staff, final EUser user, final EUserSubject subject) {
 		return subject.clear()
 				.exceptionally(e -> false)
 				.thenApply(result -> {

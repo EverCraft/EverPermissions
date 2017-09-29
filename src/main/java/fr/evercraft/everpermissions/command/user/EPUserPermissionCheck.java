@@ -38,9 +38,9 @@ import fr.evercraft.everapi.java.UtilsCompletableFuture;
 import fr.evercraft.everapi.plugin.command.Args;
 import fr.evercraft.everapi.plugin.command.ESubCommand;
 import fr.evercraft.everapi.server.user.EUser;
+import fr.evercraft.everapi.services.permission.EUserSubject;
 import fr.evercraft.everpermissions.EPMessage.EPMessages;
 import fr.evercraft.everpermissions.service.permission.EPContextCalculator;
-import fr.evercraft.everpermissions.service.permission.subject.EPUserSubject;
 import fr.evercraft.everpermissions.EPCommand;
 import fr.evercraft.everpermissions.EPPermissions;
 import fr.evercraft.everpermissions.EverPermissions;
@@ -54,7 +54,7 @@ public class EPUserPermissionCheck extends ESubCommand<EverPermissions> {
         
         this.pattern = Args.builder()
         		.value(Args.MARKER_WORLD, 
-    					(source, args) -> this.plugin.getService().getUserSubjects().getTypeWorlds(),
+    					(source, args) -> this.plugin.getService().getUserSubjects().getWorlds(),
     					(source, args) -> args.getArgs().size() <= 1)
         		.arg((source, args) -> this.getAllUsers(args.getArg(0).orElse(""), source))
         		.arg((source, args) -> this.getAllPermissions());
@@ -115,7 +115,7 @@ public class EPUserPermissionCheck extends ESubCommand<EverPermissions> {
 			});
 	}
 
-	private void command(final CommandSource staff, final EUser user, final EPUserSubject subject, final String permission, 
+	private void command(final CommandSource staff, final EUser user, final EUserSubject subject, final String permission, 
 			final String worldName, final String typeUser) {
 		
 		Set<Context> contexts = EPContextCalculator.of(worldName);

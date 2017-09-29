@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
+import fr.evercraft.everapi.services.permission.ESubject;
 import fr.evercraft.everpermissions.service.permission.data.EPSubjectData;
 import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
 import fr.evercraft.everpermissions.service.permission.subject.EPSubject;
@@ -37,9 +38,9 @@ public interface ICollectionStorage {
 
 	boolean unregister(String typeWorld);
     
-    public boolean load(EPSubject subject);
+    public boolean load(ESubject subject);
     
-    public boolean load(Collection<EPSubject> subjects);
+    public boolean load(Collection<ESubject> subjects);
     
     public boolean clear(EPSubjectData<?> subject);
     

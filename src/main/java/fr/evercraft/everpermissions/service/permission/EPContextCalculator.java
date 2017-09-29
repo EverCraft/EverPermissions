@@ -95,7 +95,7 @@ public class EPContextCalculator implements ContextCalculator<Subject> {
     }
     
     public String get(final String identifierCollection, final Set<Context> contexts) {
-    	Optional<ESubjectCollection> collection = this.plugin.getService().get(identifierCollection);
+    	Optional<ESubjectCollection<?>> collection = this.plugin.getService().get(identifierCollection);
     	if (!collection.isPresent()) return EPConfig.DEFAULT;
     	
     	return collection.get().getTypeWorld(EPContextCalculator.getWorld(contexts).orElse(""))

@@ -28,6 +28,7 @@ import org.spongepowered.api.util.Tristate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import fr.evercraft.everapi.services.permission.ESubject;
 import fr.evercraft.everpermissions.EverPermissions;
 import fr.evercraft.everpermissions.service.permission.data.EPSubjectData;
 import fr.evercraft.everpermissions.service.permission.subject.EPGroupSubject;
@@ -66,7 +67,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 
 	@Override
-	public boolean load(EPSubject subject) {
+	public boolean load(ESubject subject) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.load(subject)) return false;
 		}
@@ -76,7 +77,7 @@ public class EConfigCollectionStorage implements ICollectionStorage {
 	}
 	
 	@Override
-	public boolean load(Collection<EPSubject> subjects) {
+	public boolean load(Collection<ESubject> subjects) {
 		for (EConfigSubjectStorage storage : this.storages.values()) {
 			if (!storage.load(subjects)) {
 				System.err.println("EConfigCollectionStorage erreur load : " + storage);

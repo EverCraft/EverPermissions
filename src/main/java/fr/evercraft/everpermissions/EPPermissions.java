@@ -28,11 +28,13 @@ public enum EPPermissions implements EnumPermission {
 	HELP("commands.help", EPMessages.PERMISSIONS_COMMANDS_HELP),
 	RELOAD("commands.reload", EPMessages.PERMISSIONS_COMMANDS_RELOAD),
 	MIGRATE("commands.migrate", EPMessages.PERMISSIONS_COMMANDS_MIGRATE),
+	DESCRIPTION("commands.description", EPMessages.PERMISSIONS_COMMANDS_DESCRIPTION),
 	
 	// Joueur :
 	USER_EXECUTE("commands.user.execute", EPMessages.PERMISSIONS_COMMANDS_USER_EXECUTE),
 	USER_INFO("commands.user.info", EPMessages.PERMISSIONS_COMMANDS_USER_INFO),
 	USER_CLEAR("commands.user.clear", EPMessages.PERMISSIONS_COMMANDS_USER_CLEAR),
+	USER_TYPES("commands.user.types", EPMessages.PERMISSIONS_COMMANDS_USER_TYPES),
 	
 	// Joueur : Groupes
 	USER_GROUP_EXECUTE("commands.user.group.execute", EPMessages.PERMISSIONS_COMMANDS_USER_GROUP_ADD),
@@ -70,6 +72,7 @@ public enum EPPermissions implements EnumPermission {
 	GROUP_LIST("commands.group.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_LIST),
 	GROUP_RENAME("commands.group.rename", EPMessages.PERMISSIONS_COMMANDS_GROUP_RENAME),
 	GROUP_INFO("commands.group.info", EPMessages.PERMISSIONS_COMMANDS_GROUP_INFO),
+	GROUP_TYPES("commands.group.types", EPMessages.PERMISSIONS_COMMANDS_GROUP_TYPES),
 	GROUP_VERBOSE("commands.group.verbose", EPMessages.PERMISSIONS_COMMANDS_GROUP_VERBOSE),
 	
 	// Groupe : Inheritance
@@ -96,7 +99,8 @@ public enum EPPermissions implements EnumPermission {
 	COLLECTION_EXECUTE("commands.collection.execute", EPMessages.PERMISSIONS_COMMANDS_COLLECTION_EXECUTE),
 	COLLECTION_INFO("commands.collection.info", EPMessages.PERMISSIONS_COMMANDS_COLLECTION_INFO),
 	COLLECTION_CLEAR("commands.collection.clear", EPMessages.PERMISSIONS_COMMANDS_COLLECTION_CLEAR),
-	COLLECTION_LIST("commands.collection.list", EPMessages.PERMISSIONS_COMMANDS_GROUP_LIST),
+	COLLECTION_LIST("commands.collection.list", EPMessages.PERMISSIONS_COMMANDS_COLLECTION_LIST),
+	COLLECTION_TYPES("commands.collection.types", EPMessages.PERMISSIONS_COMMANDS_COLLECTION_TYPES),
 	
 	// Collection : Groupes
 	COLLECTION_GROUP_EXECUTE("commands.user.group.execute", EPMessages.PERMISSIONS_COMMANDS_COLLECTION_GROUP_ADD),
