@@ -34,8 +34,8 @@ This plugin is licensed under [GNU License](https://github.com/EverCraft/EverPer
 ## Clone ##
 The following steps will ensure your project is cloned properly
 
-1. `git clone git@github.com:EverCraft/EverPermissions.git`
-2. `cd EverPermissions`
+1. `git clone --recursive git@github.com:EverCraft/EverPlugins.git`
+2. `cd EverPlugins/EverPermissions`
 
 ## Building ##
 To compile EverPermissions, you need to compile [EverPlugins](https://github.com/EverCraft/EverPlugins)
