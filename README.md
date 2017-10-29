@@ -1,16 +1,29 @@
 EverPermissions
 =============
 
-A minecraft plugin for Sponge platforms.
+## Description ##
+EverPermissions est un plugin de gestion de permissions pour les administrateurs de serveur. Il permet gérer les permissions des joueurs ou des groupes afin de créer des restrictions. Ce plugin est basé sur GroupManager tout en implémentant les fonctionnalités de SpongeAPI.
 
-## Links ##
+## Implémentation ##
+* Permissions par monde
+* Permissions par Groupes/Utilisateurs/CommandBlock/Server
+* Gestion des inhéritences
+* Gestion des options (Préfix, Suffix, …)
+* Chargement des données des joueurs en asynchrone
+* Commandes interactives
+* Sauvegarde des données des joueurs sur une base de données ou fichier de configuration
+* API et événement personnalisé
+* Tous les messages peuvent être modifiés dans le fichier de configuration
+* [Pour plus d'informations](https://docs.evercraft.fr/everpermissions/index.html)
+
+## Liens ##
 * [Download](https://github.com/EverCraft/EverPermissions/releases)
 * [Wiki](http://wiki.evercraft.fr)
 * [Issues](https://github.com/EverCraft/EverPermissions/issues)
 * [Website](http://evercraft.fr)
 * [Support Me](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RUSKPBMNJG5R4)
 
-## License ##
+## Licence ##
 This plugin is licensed under [GNU License](https://github.com/EverCraft/EverPermissions/blob/master/LICENSE).
 
 ## Prerequisites ##
@@ -21,3 +34,6 @@ The following steps will ensure your project is cloned properly
 
 1. `git clone git@github.com:EverCraft/EverPermissions.git`
 2. `cd EverPermissions`
+
+## Building ##
+To compile EverPermissions, you need to compile [EverPlugins](https://github.com/EverCraft/EverPlugins)
