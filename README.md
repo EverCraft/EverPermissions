@@ -18,16 +18,18 @@ EverPermissions est un plugin de gestion de permissions pour les administrateurs
 
 ## Liens ##
 * [Download](https://github.com/EverCraft/EverPermissions/releases)
-* [Wiki](http://wiki.evercraft.fr)
+* [Website](https://evercraft.fr)
+* [Documentation](https://docs.evercraft.fr)
 * [Issues](https://github.com/EverCraft/EverPermissions/issues)
-* [Website](http://evercraft.fr)
+* [Repo](https://repo.evercraft.fr/artifactory/list/gradle-release/fr/evercraft/)
 * [Support Me](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RUSKPBMNJG5R4)
 
 ## Licence ##
 This plugin is licensed under [GNU License](https://github.com/EverCraft/EverPermissions/blob/master/LICENSE).
 
-## Prerequisites ##
-* [Java](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+## Prérequis ##
+* [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* [EverAPI](https://github.com/EverCraft/EverAPI)
 
 ## Clone ##
 The following steps will ensure your project is cloned properly
