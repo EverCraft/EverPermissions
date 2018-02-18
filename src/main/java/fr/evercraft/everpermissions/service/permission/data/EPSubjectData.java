@@ -28,7 +28,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
@@ -111,7 +110,7 @@ public abstract class EPSubjectData<T extends EPSubject> implements ESubjectData
 	
 	public void onUpdate() {
 		this.subject.clearCache();
-		ESpongeEventFactory.createSubjectDataUpdate(this, Cause.source(this.plugin).build());
+		ESpongeEventFactory.createSubjectDataUpdate(this, this.plugin.getCurrentCause());
 	}
 	
 	/*

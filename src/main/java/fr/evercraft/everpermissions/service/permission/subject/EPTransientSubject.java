@@ -39,8 +39,8 @@ public class EPTransientSubject extends EPSubject {
     public EPTransientSubject(final EverPermissions plugin, final String identifier, final EPSubjectCollection<?> collection) {
     	super(plugin, identifier, collection);
     	
-    	this.data = new MemorySubjectData(plugin.getService());
-        this.transientData = new MemorySubjectData(plugin.getService());
+    	this.data = new MemorySubjectData(this);
+        this.transientData = new MemorySubjectData(this);
     }
     
     @Override
